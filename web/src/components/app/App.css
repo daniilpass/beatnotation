@@ -1,10 +1,18 @@
 
 .App-header {
+  position: fixed;
+  top: 0px;
+  width: 100%;
+  height: 32px;
+
   background-color: #2F3485;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  font-size: 24px;
   color: white;
+  white-space: nowrap;  
+
+  z-index: 3;
 }
 
 
@@ -13,8 +21,15 @@ App-toolbar
 */
 
 .App-toolbar {
+  position: fixed;
+  top: 32px;
+  height: 40px;
+  width: 100%;
   background-color: #7277D8;
   padding: 8px;
+  white-space: nowrap;
+
+  z-index: 3;
 }
 
 .toolbar-btn {
@@ -39,27 +54,29 @@ App-toolbar
 workspace
 */
 .workspace{
- background-color: #2F3485;
- /* height: 100px; */
+ /* background-color: #2F3485; */
+  /* height: 100px; */
  /* margin: 20px; */
 }
 
+.track-container {
+ margin-top: 80px;
+ margin-left:150px;
+}
+
 .time-pointer{
-  position: absolute;
+  position: relative;
   width: 10px;
   height: 10px;
   background-color: #FFAA40;
-  /* margin-left: -5px; */
-  margin-top: -5px;
   border-radius: 50%;
   z-index: 2;
 }
 .time-pointer__stick{
-  position: absolute;
-  width: 2px;
-  height: 100px;
-  background-color: #FFAA40;  
-  margin-left: 4px;
+    width: 2px;
+    height: 100px;
+    background-color: #FFAA40;
+    margin-left: 4px;
 }
 
 .workspace__row {
@@ -73,7 +90,7 @@ workspace
 Note
 */
 .note{
-  height: 24px;
+  /* height: 24px; */
   border: 1px solid #080E73;
   display: inline-block;
   position: absolute;
