@@ -495,7 +495,7 @@ class CanvasNotes extends React.PureComponent {
         rightBound = rightBound != -99 ? rightBound % 4 : rightBound ;
 
         // Вычисляю размер        
-        if ( !(pattern[0] === 1 && pattern[1] === 0 && pattern[2] === 1 && pattern[3] === 0)) {
+        if (lead4 && !(pattern[0] === 1 && pattern[1] === 0 && pattern[2] === 1 && pattern[3] === 0)) {
           pattern16 = true;
         }
 
@@ -504,20 +504,26 @@ class CanvasNotes extends React.PureComponent {
           
         }
 
-        // Подтягиваю нотные палки вверх
-        
+        // Подтягиваю нотные палки вверх        
         console.log('condition drawVerticalLine', leftBound, rightBound,noteLine);
         if (/*leftBound != 99 && rightBound != -99 &&*/ noteLine != -99) {  
             let x = note_x + this.noteRadius;
-            let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + noteLine * this.linePadding - this.noteRadius*2;            
-            let length = (noteLine - downBound ) * (this.linePadding) + this.noteRadius*4;
+            let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + noteLine * this.linePadding;//- this.noteRadius*2;            
+            let length = (noteLine - downBound ) * (this.linePadding) + this.noteRadius*6;
+
+            // Если размер 16 и нота не первая и не последняя в группе, то рисую палочку покороче
+            let idx16 = noteIndex % 4;
+            if (pattern16 && idx16 != leftBound && idx16 != rightBound) {
+              length  = length - this.noteRadius;
+            }
+
             //console.log(noteLine, downBound);
             this.drawVerticalLine(x, y, -length);
         }
 
         // Рисую соеденительную линию
         if (lead4 && leftBound != 99 && rightBound != -99) {
-          let x = note_x + this.noteRadius + leftBound* this.noteRadius * 3;// + this.noteRadius + leftBound * this.noteRadius * 3  ;  //TODO: съезжает второй такт и далее
+          let x = note_x + this.noteRadius + leftBound* this.noteRadius * 3;
           let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + downBound * this.linePadding - this.noteRadius*6;
           let length = (rightBound - leftBound) * this.noteRadius * 3; 
           //console.log( leftBound, rightBound,/* x, y,*/ length, pattern);
@@ -595,30 +601,37 @@ class CanvasNotes extends React.PureComponent {
   }
 
   drawNoteTail(posX, posY, type, connected) {
-    if (type === 2) { 
-      // HH closed
-      this.ctx.beginPath();
-      this.ctx.moveTo(posX + this.noteRadius, posY - this.noteRadius);
-      this.ctx.lineTo(posX + this.noteRadius, posY - this.noteRadius*6);
-      this.ctx.stroke();
-    } if (type === 3) {
-      // HH opened
-      this.ctx.beginPath();
-      this.ctx.moveTo(posX + this.noteRadius, posY - this.noteRadius);
-      this.ctx.lineTo(posX + this.noteRadius, posY - this.noteRadius*6);
-      this.ctx.stroke();
+     if (type === 3) {
       // Draw o
       this.ctx.beginPath();
-      this.ctx.arc(posX, posY - this.noteRadius*6, this.noteRadius/2, 0, 2 * Math.PI);
+      this.ctx.arc(posX, posY - this.noteRadius*4, this.noteRadius/2, 0, 2 * Math.PI);
       this.ctx.stroke();
-    } else {
-      // Default note
-      // |
-      this.ctx.beginPath();
-      this.ctx.moveTo(posX + this.noteRadius, posY);
-      this.ctx.lineTo(posX + this.noteRadius, posY - this.noteRadius*6);
-      this.ctx.stroke();      
-    }
+    } 
+
+    // if (type === 2) { 
+    //   // HH closed
+    //   this.ctx.beginPath();
+    //   this.ctx.moveTo(posX + this.noteRadius, posY - this.noteRadius);
+    //   this.ctx.lineTo(posX + this.noteRadius, posY - this.noteRadius*6);
+    //   this.ctx.stroke();
+    // } if (type === 3) {
+    //   // HH opened
+    //   this.ctx.beginPath();
+    //   this.ctx.moveTo(posX + this.noteRadius, posY - this.noteRadius);
+    //   this.ctx.lineTo(posX + this.noteRadius, posY - this.noteRadius*6);
+    //   this.ctx.stroke();
+    //   // Draw o
+    //   this.ctx.beginPath();
+    //   this.ctx.arc(posX, posY - this.noteRadius*6, this.noteRadius/2, 0, 2 * Math.PI);
+    //   this.ctx.stroke();
+    // } else {
+    //   // Default note
+    //   // |
+    //   this.ctx.beginPath();
+    //   this.ctx.moveTo(posX + this.noteRadius, posY);
+    //   this.ctx.lineTo(posX + this.noteRadius, posY - this.noteRadius*6);
+    //   this.ctx.stroke();      
+    // }
     // \
     // this.ctx.beginPath();      
     // this.ctx.moveTo(posX + this.noteRadius, posY - this.noteRadius*6);
