@@ -1,9 +1,16 @@
 import React from "react";
 import './App.css';
 
+import SoundCrash from '../../assets/sounds/crash.mp3';
+import SoundRide from '../../assets/sounds/ride.mp3';
+import SoundHiHatClosed from '../../assets/sounds/hh_closed.mp3';
 import SoundHiHatOpened from '../../assets/sounds/hh_open.mp3';
 import SoundSnare from '../../assets/sounds/snare.mp3';
 import SoundBass from '../../assets/sounds/bassdrum.mp3';
+import SoundTomHi from '../../assets/sounds/tom_hi.mp3';
+import SoundTomMid from '../../assets/sounds/tom_mid.mp3';
+import SoundTomLow from '../../assets/sounds/tom_low.mp3';
+
 
 class App extends React.Component {
   constructor(props){
@@ -24,6 +31,27 @@ class App extends React.Component {
       // 3 - cross with o
       this.tracks = [
         {
+          audioUrl: SoundCrash,
+          audio: new Audio(SoundCrash),
+          notes: [],
+          line: 0.5,
+          type: 2
+        },
+        {
+          audioUrl: SoundRide,
+          audio: new Audio(SoundRide),
+          notes: [],
+          line: 1.5,
+          type: 2
+        },
+        {
+          audioUrl: SoundHiHatClosed, 
+          audio: new Audio(SoundHiHatOpened),
+          notes: [],
+          line: 1,
+          type: 2
+        },
+        {
           audioUrl: SoundHiHatOpened,
           audio: new Audio(SoundHiHatOpened),
           notes: [],
@@ -38,12 +66,33 @@ class App extends React.Component {
           type: 1
         },
         {
+          audioUrl: SoundTomHi,
+          audio: new Audio(SoundTomHi), // tom 2
+          notes: []  ,
+          line: 2,
+          type: 1  
+        },
+        {
+          audioUrl: SoundTomMid,
+          audio: new Audio(SoundTomMid), // tom 2
+          notes: []  ,
+          line: 2.5,
+          type: 1  
+        },
+        {
+          audioUrl: SoundTomLow,
+          audio: new Audio(SoundTomLow ), //floor tom
+          notes: []  ,
+          line: 4,
+          type: 1  
+        },
+        {
           audioUrl: SoundBass,
           audio: new Audio(SoundBass),
           notes: []  ,
           line: 5,
           type: 1  
-        }
+        },
       ]
 
       console.log(this.tracks, SoundSnare);
@@ -359,7 +408,7 @@ class CanvasNotes extends React.PureComponent {
     this.lineGroupHeight = this.linesInGroupCount * (this.lineWidth  + this.linePadding) + this.groupsPadding;
     this.delimiterHeight = (this.linesInGroupCount + 1) * (this.lineWidth  + this.linePadding);
     // Ноты
-    this.noteRadius = 4;
+    this.noteRadius = 5;
     
     this.notesInTakt = 16;
     this.notesInLine = this.notesInTakt * 3;
