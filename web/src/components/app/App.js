@@ -395,10 +395,7 @@ class CanvasNotes extends React.PureComponent {
 
     // Рисую ноты
     if (tracks) {
-      //console.log('draw notes', tracks);
-      let notesLength = tracks[0].notes.length;
-
-      //console.log('notesLength', notesLength);
+      
 
       let lineNumb = 1;
       let lineNoteCounter = 1;
@@ -408,27 +405,26 @@ class CanvasNotes extends React.PureComponent {
 
       // ГРаницы для соединения нот
       let downBound = 999;
-      let upperBound = -999;
+      //let upperBound = -999;
       let leftBound = 99;
       let rightBound = -99;
       let pattern = [0,0,0,0];
       let pattern16 = false;
       let pattern4 = false;
       
-
+      let notesLength = tracks[0].notes.length;
       for (let noteIndex = 0; noteIndex < notesLength; noteIndex++) {
         
+        // Координаты ноты по X
         let note_x = this.startX + lineNoteCounter * (this.noteRadius * 2 + this.noteRadius) + taktCounter * this.taktPadding;
-        // Началоа четверти
+        // Начало четверти
         let lead4 = (noteIndex) % 4 == 0;
-
         // Номер нижней ноты на линииях
         let noteLine = -99;
-
         // Сбросим границы при новом такте
         if (lead4) {
           downBound = 999;
-          upperBound = -999;
+          //upperBound = -999;
           leftBound = 99;
           rightBound = -99;
           pattern = [0,0,0,0];
@@ -438,12 +434,13 @@ class CanvasNotes extends React.PureComponent {
 
         
 
-        // notes in track
+        // Проходим по всем треках, рисуем ноты и если начало такта, то вычисляем границы нот в такте
         for (let trackIndex = 0; trackIndex <  tracks.length; trackIndex++) {
           let track = tracks[trackIndex];
           let note = track.notes[noteIndex];
           let line = track.line;
           
+          // Вычисление границ и размера такта
           if (lead4) {
             //reset bounds            
             let _leftBound=99;
@@ -483,11 +480,12 @@ class CanvasNotes extends React.PureComponent {
             }
           }
 
+          // Если нота звучит, то рисуем её
           if (note > 0) {
             let _y = lineNumb * this.lineGroupHeight - this.linePadding/2 + line * this.linePadding
-            //this.drawNote(note_x, _y, track.type, {l:noteLength, c:rightNotesCount});
-            this.drawNote(note_x, _y, track.type, {l:0, c:0});
+            this.drawNote(note_x, _y, track.type);
 
+            // Запоминаем самую верхнююю линию, на которой лежит нота
             noteLine = line > noteLine ? line : noteLine;
           }
         }
@@ -505,9 +503,8 @@ class CanvasNotes extends React.PureComponent {
           pattern4 = true;
         }
 
-        //Если размер 16 и нет ноты, то рисую паузу <===========TODOOOOOOOOO
+        //Если размер 16 и нет ноты, то рисую паузу
         if (pattern16 && noteLine == -99 && leftBound != 99 && rightBound !=-99) {
-          //console.log(pattern16, pattern4, noteLine);
           let pauseLine = 3;
           let x = note_x;
           let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + pauseLine * this.linePadding
@@ -515,11 +512,12 @@ class CanvasNotes extends React.PureComponent {
         }
 
         // Подтягиваю нотные палки вверх        
-        //console.log('condition drawVerticalLine', leftBound, rightBound,noteLine);
-        if (/*leftBound != 99 && rightBound != -99 &&*/ noteLine != -99) {  
+        if (noteLine != -99) {  
+            // Вертикальная линия
             let x = note_x + this.noteRadius;
             let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + noteLine * this.linePadding;//- this.noteRadius*2;            
             let length = (noteLine - downBound ) * (this.linePadding) + this.noteRadius*6;
+            this.drawVerticalLine(x, y, -length);
 
             // Если размер 16 и нота не первая и не последняя в группе, то рисую палочку покороче
             let idx16 = noteIndex % 4;
@@ -527,99 +525,84 @@ class CanvasNotes extends React.PureComponent {
               length  = length - this.noteRadius;
             }
 
-            // Рисую кончик 16 нот
+            // Если онты обособлены, то рисую кончик 16 нот
             if (pattern16 && leftBound == rightBound) {
               this.drawNote16Tail(x - this.noteRadius, y - length + this.noteRadius * 2);
             }
-            //console.log(noteLine, downBound);
-            this.drawVerticalLine(x, y, -length);
         }
 
         // Рисую соеденительную линию
         if (lead4 && leftBound != 99 && rightBound != -99) {
+          // Соеденительная линия размер 8
           let x = note_x + this.noteRadius + leftBound* this.noteRadius * 3;
           let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + downBound * this.linePadding - this.noteRadius*6;
           let length = (rightBound - leftBound) * this.noteRadius * 3; 
-          //console.log( leftBound, rightBound,/* x, y,*/ length, pattern);
-
-          // Соеденительная линия размер 8
           this.drawHorizontalLine(x, y, length);
-          // Соеденительная линия размер 16
+
+          // Дополнительная соеденительная линия для размера 16
           if (pattern16) {
             this.drawHorizontalLine(x, y + this.noteRadius, length);
           }
         }
 
-        // Соединяю нижнюю и верхнюю ноты
-        // if (downBound != upperBound && downBound != 999 && upperBound != -999){
-        //   let x = note_x + this.noteRadius;
-        //   let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + downBound * this.linePadding - this.noteRadius*2;
-        //   let length = (upperBound - downBound) * this.noteRadius*2;
-        //   this.drawVerticalLine(x, y, length);
-        // }
-        //console.log(downBound, upperBound);
-
-        // delimiter
+        // Разделитель тактов
         if (taktNoteCounter === this.notesInTakt) { 
-          let _x = note_x + this.taktPadding/2 + this.noteRadius * 2 - this.noteRadius/2;// + this.taktPadding/2;
+          let _x = note_x + this.taktPadding/2 + this.noteRadius * 2 - this.noteRadius/2;
           let _y = lineNumb * this.lineGroupHeight - this.linePadding/2;
-          this.drawNoteDelimiter(_x, _y, _y + this.delimiterHeight);
+          this.drawTaktDelimiter(_x, _y, _y + this.delimiterHeight);
         }
 
+        // Считаю ноты в линии и такте
         lineNoteCounter = lineNoteCounter + 1;
         taktNoteCounter = taktNoteCounter + 1;
 
-        // counters
+        // Если нот достаточно, то перехожу на новые строчки в листе и сбрасываю линейные счетчики
         if (lineNoteCounter > this.notesInLine){
-          //console.log('NEW LINE');
           lineNoteCounter = 1;
           taktCounter = 1;
           taktNoteCounter = 1;  
           lineNumb = lineNumb + 1;
         }
 
+        // Если такт полный, то увеличиваю счетчики такта и сбрасываю  счетчик нот в такте
         if (taktNoteCounter > this.notesInTakt) {   
           taktCounter = taktCounter + 1;
           taktNoteCounter = 1;
         }
 
+        // Для дебага рисую меньше нот
         //if (lineNoteCounter > 4)        return;
       }
       
     }
-    //this.drawNote(10, 10);
   }
 
+  // Задачет цвет и толщину
+  setCanvasStyle(color, width) {
+    this.ctx.fillStyle = color;
+    this.ctx.strokeStyle = color;
+    this.ctx.lineWidth = width;
+  }
+
+  // Рисует паузу
   drawPause(posX, posY) {
-    //console.log('drawNote',posX, posY);
-    this.ctx.fillStyle = "#a1a1a1";
-    this.ctx.strokeStyle = "#a1a1a1";
-    this.ctx.lineWidth = 1.1;
+    this.setCanvasStyle("#a1a1a1", 1.1);
     
     let pauseRadius = this.noteRadius / 2;
-
 
     this.ctx.beginPath();
     this.ctx.arc(posX + pauseRadius, posY, pauseRadius, 0, 2 * Math.PI);
     this.ctx.fill();
-
-    this.ctx.beginPath();
     this.ctx.arc(posX, posY + pauseRadius * 5, pauseRadius, 0, 2 * Math.PI);
     this.ctx.fill();
-
-    
-    this.ctx.beginPath();
     this.ctx.moveTo(posX + pauseRadius*2, posY - pauseRadius*2);
-    this.ctx.lineTo(posX + pauseRadius, posY + pauseRadius * 10);
-    
+    this.ctx.lineTo(posX + pauseRadius, posY + pauseRadius * 10);    
     this.ctx.stroke();
   }
 
-  drawNote(posX, posY, type, connected) {
-    //console.log('drawNote',posX, posY);
-    this.ctx.fillStyle = "#000000";
-    this.ctx.strokeStyle = "#000000";
-    this.ctx.lineWidth = 1.1;
+  // Рисует ноту
+  drawNote(posX, posY, type) {
+    this.setCanvasStyle("#000000", 1.1);
 
     if (type === 2 || type === 3) {
       // X-type notes
@@ -637,13 +620,12 @@ class CanvasNotes extends React.PureComponent {
       this.ctx.fill();
     }
     
-    this.drawNoteTail(posX, posY, type, connected);
+    this.drawNoteTail(posX, posY, type);
   }
 
+  // Рисует кончик для 16х нот
   drawNote16Tail (posX, posY) {
-    this.ctx.fillStyle = "#000000";
-    this.ctx.strokeStyle = "#000000";
-    this.ctx.lineWidth = 1.1;
+    this.setCanvasStyle("#000000", 1.1);
     this.ctx.beginPath();      
     this.ctx.moveTo(posX + this.noteRadius, posY - this.noteRadius);
     this.ctx.lineTo(posX + this.noteRadius*2, posY);
@@ -653,80 +635,22 @@ class CanvasNotes extends React.PureComponent {
 
   }
 
-  drawNoteTail(posX, posY, type, connected) {
-    this.ctx.fillStyle = "#000000";
-    this.ctx.strokeStyle = "#000000";
-    this.ctx.lineWidth = 1.1;
+  // рисует особые кончики
+  drawNoteTail(posX, posY, type) {
+    this.setCanvasStyle("#000000", 1.1);
 
+     // Кружок для открытого Hi-Hat's
      if (type === 3) {
       // Draw o
       this.ctx.beginPath();
       this.ctx.arc(posX, posY - this.noteRadius*4, this.noteRadius/2, 0, 2 * Math.PI);
       this.ctx.stroke();
     } 
-
-    // if (type === 2) { 
-    //   // HH closed
-    //   this.ctx.beginPath();
-    //   this.ctx.moveTo(posX + this.noteRadius, posY - this.noteRadius);
-    //   this.ctx.lineTo(posX + this.noteRadius, posY - this.noteRadius*6);
-    //   this.ctx.stroke();
-    // } if (type === 3) {
-    //   // HH opened
-    //   this.ctx.beginPath();
-    //   this.ctx.moveTo(posX + this.noteRadius, posY - this.noteRadius);
-    //   this.ctx.lineTo(posX + this.noteRadius, posY - this.noteRadius*6);
-    //   this.ctx.stroke();
-    //   // Draw o
-    //   this.ctx.beginPath();
-    //   this.ctx.arc(posX, posY - this.noteRadius*6, this.noteRadius/2, 0, 2 * Math.PI);
-    //   this.ctx.stroke();
-    // } else {
-    //   // Default note
-    //   // |
-    //   this.ctx.beginPath();
-    //   this.ctx.moveTo(posX + this.noteRadius, posY);
-    //   this.ctx.lineTo(posX + this.noteRadius, posY - this.noteRadius*6);
-    //   this.ctx.stroke();      
-    // }
-    // \
-    // this.ctx.beginPath();      
-    // this.ctx.moveTo(posX + this.noteRadius, posY - this.noteRadius*6);
-    // this.ctx.lineTo(posX + this.noteRadius*2, posY - this.noteRadius*5);
-    // this.ctx.moveTo(posX + this.noteRadius, posY - this.noteRadius*5);
-    // this.ctx.lineTo(posX + this.noteRadius*2, posY - this.noteRadius*4);
-    // this.ctx.stroke();
-
-    //Draw connection
-    let oldLineWidth = this.ctx.lineWidth;
-    this.ctx.lineWidth = 1.5;
-
-    if (connected.l == 8 && connected.c == 1) {  
-      this.ctx.beginPath();
-      this.ctx.moveTo(posX + this.noteRadius, posY - this.noteRadius*6);
-      this.ctx.lineTo(posX + this.noteRadius*7, posY - this.noteRadius*6);
-      this.ctx.stroke();
-    }
-
-    if (connected.l == 16) {
-      console.log('===> DRAW 16', connected.c);      
-      
-      this.ctx.beginPath();
-      this.ctx.moveTo(posX + this.noteRadius, posY - this.noteRadius*6);
-      this.ctx.lineTo(posX + this.noteRadius * 3 * connected.c + this.noteRadius, posY - this.noteRadius*6);
-
-      this.ctx.moveTo(posX + this.noteRadius, posY - this.noteRadius*5);
-      this.ctx.lineTo(posX + this.noteRadius * 3 * connected.c + this.noteRadius, posY - this.noteRadius*5);
-      this.ctx.stroke();
-    }
-
-    this.ctx.lineWidth = oldLineWidth;
   }
 
-  drawNoteDelimiter(x, y, length) {
-    this.ctx.fillStyle = "#000000";
-    this.ctx.strokeStyle = "#000000";
-    this.ctx.lineWidth = 1.1;
+  // Разделитель тактов
+  drawTaktDelimiter(x, y, length) {
+    this.setCanvasStyle("#000000", 1.1);
 
     this.ctx.beginPath();
     this.ctx.moveTo(x, y);
@@ -734,16 +658,16 @@ class CanvasNotes extends React.PureComponent {
     this.ctx.stroke();
   }
 
+  // Рисует группу линий
   drawLineSet(startX, startY) {
     for (let i = 1; i <= this.linesInGroupCount ; i++) {
       this.drawHorizontalLine(startX, startY + i * this.linePadding, this.lineLength);    
     }
   }
 
+  // Вертикальная линия
   drawHorizontalLine(x, y, length) {
-    this.ctx.fillStyle = "#000000";
-    this.ctx.strokeStyle = "#000000";
-    this.ctx.lineWidth = 1.1;
+    this.setCanvasStyle("#000000", 1.1);
 
     this.ctx.beginPath();
     this.ctx.moveTo(x, y);
@@ -751,10 +675,9 @@ class CanvasNotes extends React.PureComponent {
     this.ctx.stroke();
   }
 
+  // Горизонтальная линия
   drawVerticalLine(x, y, length) {
-    this.ctx.fillStyle = "#000000";
-    this.ctx.strokeStyle = "#000000";
-    this.ctx.lineWidth = 1.1;
+    this.setCanvasStyle("#000000", 1.1);
 
     this.ctx.beginPath();
     this.ctx.moveTo(x, y);
