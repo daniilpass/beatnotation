@@ -149,7 +149,16 @@ class App extends React.Component {
   }
 
   tryDrawNotes() {
-    this.canvasRef && this.canvasRef.current && this.canvasRef.current.draw(this.tracks, this.state.connect);
+    // get max right note index
+    let notesCount = 0;
+    this.tracks.forEach(t => {
+      let nc = t.notes.lastIndexOf(1);  
+      notesCount = nc > notesCount ? nc : notesCount;
+    });
+    notesCount++; // Перевожу индекс в число нот
+    notesCount = notesCount + (16 - notesCount % 16) ; //Добиваю число нот до конца такта
+    //console.log('====> tryDrawNotes', notesCount);
+    this.canvasRef && this.canvasRef.current && this.canvasRef.current.draw(this.tracks, notesCount);
   }
 
   handleKeyDown= (e) => {

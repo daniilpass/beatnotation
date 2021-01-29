@@ -40,17 +40,17 @@ class CanvasNotes extends React.PureComponent {
       this.lastNoteIndex = 0;
     }
   
-    draw(tracks, connect) {
+    draw(tracks, notesLimit) {
       //console.log('Draw', tracks);
       this.clear();
-      this.drawList(tracks, connect);
+      this.drawList(tracks, notesLimit);
     }
     
     clear() {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
     
-    drawList(tracks, connect) {
+    drawList(tracks, notesLimit) {
       // Рисую сетку
       for (let i = 1; i <= this.groupsCount; i++) {
         this.drawLineSet(this.startX, this.lineGroupHeight  * i);   
@@ -75,7 +75,7 @@ class CanvasNotes extends React.PureComponent {
         let pattern16 = false;
         let pattern4 = false;
         
-        let notesLength = tracks[0].notes.length;
+        let notesLength = notesLimit; //tracks[0].notes.length;
         for (let noteIndex = 0; noteIndex < notesLength; noteIndex++) {
           
           // Координаты ноты по X
