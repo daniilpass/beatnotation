@@ -280,11 +280,11 @@ class App extends React.Component {
     //console.log('Render App');
 
     return <div className="App">
-      <header className="App-header">
+      <header className="App-header no-print">
         Beat maker
       </header>
 
-      <div className="App-toolbar">
+      <div className="App-toolbar no-print">
         <button className="toolbar-btn toolbar-btn__play" onClick={this.play} disabled={this.state.state === "play"}>Play</button>
         <button className="toolbar-btn toolbar-btn__stop" onClick={this.stop} disabled={this.state.state === "stop"}>Stop</button>
         <button className="toolbar-btn toolbar-btn__pause" onClick={this.pause} disabled={this.state.state === "pause" || this.state.state === "stop"}>Pause</button>
@@ -304,7 +304,7 @@ class App extends React.Component {
         </div> */}
       </div>
 
-      <div className="workspace" style={{margin: this.workspaceMargin + 'px'}}> 
+      <div className="workspace no-print" style={{margin: this.workspaceMargin + 'px'}}> 
         
         <div className="track-container" ref={this.tracksContainerRes}>
           <div className="time-pointer" style={{left: this.timePointerXPos}}> 

@@ -1,3 +1,23 @@
+/*
+ NO PRINT
+*/
+@media print
+{    
+  .no-print {
+    display: none !important;
+  }
+  @page { 
+    margin-top: 0; 
+    margin-bottom: 0; 
+    margin-left: 48px; 
+    margin-right: 48px; 
+  }
+}
+
+
+/*
+  STYLES
+*/
 
 .App-header {
   position: fixed;
