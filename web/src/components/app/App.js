@@ -565,14 +565,15 @@ class CanvasNotes extends React.PureComponent {
             // Вертикальная линия
             let x = note_x + this.noteRadius;
             let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + noteLine * this.linePadding;//- this.noteRadius*2;            
-            let length = (noteLine - downBound ) * (this.linePadding) + this.noteRadius*6;
-            this.drawVerticalLine(x, y, -length);
+            let length = (noteLine - downBound ) * (this.linePadding) + this.noteRadius*6;            
 
             // Если размер 16 и нота не первая и не последняя в группе, то рисую палочку покороче
             let idx16 = noteIndex % 4;
             if (pattern16 && idx16 != leftBound && idx16 != rightBound) {
               length  = length - this.noteRadius;
             }
+
+            this.drawVerticalLine(x, y, -length);
 
             // Если онты обособлены, то рисую кончик 16 нот
             if (pattern16 && leftBound == rightBound) {
