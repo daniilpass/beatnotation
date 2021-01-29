@@ -549,7 +549,7 @@ class CanvasNotes extends React.PureComponent {
         if (taktNoteCounter === this.notesInTakt) { 
           let _x = note_x + this.taktPadding/2 + this.noteRadius * 2 - this.noteRadius/2;
           let _y = lineNumb * this.lineGroupHeight - this.linePadding/2;
-          this.drawTaktDelimiter(_x, _y, _y + this.delimiterHeight);
+          this.drawVerticalLine(_x, _y, this.delimiterHeight);
         }
 
         // Считаю ноты в линии и такте
@@ -649,14 +649,14 @@ class CanvasNotes extends React.PureComponent {
   }
 
   // Разделитель тактов
-  drawTaktDelimiter(x, y, length) {
-    this.setCanvasStyle("#000000", 1.1);
+  // drawTaktDelimiter(x, y, length) {
+  //   this.setCanvasStyle("#000000", 1.1);
 
-    this.ctx.beginPath();
-    this.ctx.moveTo(x, y);
-    this.ctx.lineTo(x, length);
-    this.ctx.stroke();
-  }
+  //   this.ctx.beginPath();
+  //   this.ctx.moveTo(x, y);
+  //   this.ctx.lineTo(x, length);
+  //   this.ctx.stroke();
+  // }
 
   // Рисует группу линий
   drawLineSet(startX, startY) {
