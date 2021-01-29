@@ -413,6 +413,7 @@ class CanvasNotes extends React.PureComponent {
       let rightBound = -99;
       let pattern = [0,0,0,0];
       let pattern16 = false;
+      let pattern4 = false;
       
 
       for (let noteIndex = 0; noteIndex < notesLength; noteIndex++) {
@@ -432,6 +433,7 @@ class CanvasNotes extends React.PureComponent {
           rightBound = -99;
           pattern = [0,0,0,0];
           pattern16 = false;
+          pattern4 = false;
         }
 
         
@@ -495,17 +497,25 @@ class CanvasNotes extends React.PureComponent {
         rightBound = rightBound != -99 ? rightBound % 4 : rightBound ;
 
         // Вычисляю размер        
-        if (lead4 && !(pattern[0] === 1 && pattern[1] === 0 && pattern[2] === 1 && pattern[3] === 0)) {
+        if (lead4 && !(pattern[0] === 1 && pattern[1] === 0 && pattern[2] === 1 && pattern[3] === 0) ) {
           pattern16 = true;
+        }
+        if (lead4 && (pattern[0] === 1 && pattern[1] === 0 && pattern[2] === 0 && pattern[3] === 0)) {
+          pattern16 = false;
+          pattern4 = true;
         }
 
         //Если размер 16 и нет ноты, то рисую паузу <===========TODOOOOOOOOO
-        if (pattern16 && noteLine == -99) {
-          
+        if (pattern16 && noteLine == -99 && leftBound != 99 && rightBound !=-99) {
+          //console.log(pattern16, pattern4, noteLine);
+          let pauseLine = 3;
+          let x = note_x;
+          let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + pauseLine * this.linePadding
+          this.drawPause(x, y);
         }
 
         // Подтягиваю нотные палки вверх        
-        console.log('condition drawVerticalLine', leftBound, rightBound,noteLine);
+        //console.log('condition drawVerticalLine', leftBound, rightBound,noteLine);
         if (/*leftBound != 99 && rightBound != -99 &&*/ noteLine != -99) {  
             let x = note_x + this.noteRadius;
             let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + noteLine * this.linePadding;//- this.noteRadius*2;            
@@ -517,6 +527,10 @@ class CanvasNotes extends React.PureComponent {
               length  = length - this.noteRadius;
             }
 
+            // Рисую кончик 16 нот
+            if (pattern16 && leftBound == rightBound) {
+              this.drawNote16Tail(x - this.noteRadius, y - length + this.noteRadius * 2);
+            }
             //console.log(noteLine, downBound);
             this.drawVerticalLine(x, y, -length);
         }
@@ -576,9 +590,35 @@ class CanvasNotes extends React.PureComponent {
     //this.drawNote(10, 10);
   }
 
+  drawPause(posX, posY) {
+    //console.log('drawNote',posX, posY);
+    this.ctx.fillStyle = "#a1a1a1";
+    this.ctx.strokeStyle = "#a1a1a1";
+    this.ctx.lineWidth = 1.1;
+    
+    let pauseRadius = this.noteRadius / 2;
+
+
+    this.ctx.beginPath();
+    this.ctx.arc(posX + pauseRadius, posY, pauseRadius, 0, 2 * Math.PI);
+    this.ctx.fill();
+
+    this.ctx.beginPath();
+    this.ctx.arc(posX, posY + pauseRadius * 5, pauseRadius, 0, 2 * Math.PI);
+    this.ctx.fill();
+
+    
+    this.ctx.beginPath();
+    this.ctx.moveTo(posX + pauseRadius*2, posY - pauseRadius*2);
+    this.ctx.lineTo(posX + pauseRadius, posY + pauseRadius * 10);
+    
+    this.ctx.stroke();
+  }
+
   drawNote(posX, posY, type, connected) {
     //console.log('drawNote',posX, posY);
     this.ctx.fillStyle = "#000000";
+    this.ctx.strokeStyle = "#000000";
     this.ctx.lineWidth = 1.1;
 
     if (type === 2 || type === 3) {
@@ -600,7 +640,24 @@ class CanvasNotes extends React.PureComponent {
     this.drawNoteTail(posX, posY, type, connected);
   }
 
+  drawNote16Tail (posX, posY) {
+    this.ctx.fillStyle = "#000000";
+    this.ctx.strokeStyle = "#000000";
+    this.ctx.lineWidth = 1.1;
+    this.ctx.beginPath();      
+    this.ctx.moveTo(posX + this.noteRadius, posY - this.noteRadius);
+    this.ctx.lineTo(posX + this.noteRadius*2, posY);
+    this.ctx.moveTo(posX + this.noteRadius, posY - this.noteRadius * 2);
+    this.ctx.lineTo(posX + this.noteRadius*2, posY- this.noteRadius);
+    this.ctx.stroke();
+
+  }
+
   drawNoteTail(posX, posY, type, connected) {
+    this.ctx.fillStyle = "#000000";
+    this.ctx.strokeStyle = "#000000";
+    this.ctx.lineWidth = 1.1;
+
      if (type === 3) {
       // Draw o
       this.ctx.beginPath();
@@ -667,6 +724,10 @@ class CanvasNotes extends React.PureComponent {
   }
 
   drawNoteDelimiter(x, y, length) {
+    this.ctx.fillStyle = "#000000";
+    this.ctx.strokeStyle = "#000000";
+    this.ctx.lineWidth = 1.1;
+
     this.ctx.beginPath();
     this.ctx.moveTo(x, y);
     this.ctx.lineTo(x, length);
@@ -680,6 +741,10 @@ class CanvasNotes extends React.PureComponent {
   }
 
   drawHorizontalLine(x, y, length) {
+    this.ctx.fillStyle = "#000000";
+    this.ctx.strokeStyle = "#000000";
+    this.ctx.lineWidth = 1.1;
+
     this.ctx.beginPath();
     this.ctx.moveTo(x, y);
     this.ctx.lineTo(x + length, y);
@@ -687,6 +752,10 @@ class CanvasNotes extends React.PureComponent {
   }
 
   drawVerticalLine(x, y, length) {
+    this.ctx.fillStyle = "#000000";
+    this.ctx.strokeStyle = "#000000";
+    this.ctx.lineWidth = 1.1;
+
     this.ctx.beginPath();
     this.ctx.moveTo(x, y);
     this.ctx.lineTo(x, y + length);
