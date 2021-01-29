@@ -95,7 +95,7 @@ class App extends React.Component {
         },
       ]
 
-      console.log(this.tracks, SoundSnare);
+      //console.log(this.tracks, SoundSnare);
 
       this.tracks.forEach(track => {
         for (let i = 0; i < this.tracksLength; i++) {
@@ -104,15 +104,15 @@ class App extends React.Component {
       });
 
       // for test
-      console.log(this.tracks[0]);
-      this.tracks[0].notes[0] = 1; this.tracks[0].notes[4] = 1; this.tracks[0].notes[8] = 1; this.tracks[0].notes[12] = 1; 
-      this.tracks[0].notes[16] = 1; this.tracks[0].notes[20] = 1; this.tracks[0].notes[24] = 1; this.tracks[0].notes[28] = 1; 
-      this.tracks[0].notes[32] = 1; this.tracks[0].notes[36] = 1; this.tracks[0].notes[40] = 1; this.tracks[0].notes[44] = 1; 
-      this.tracks[0].notes[48] = 1; this.tracks[0].notes[52] = 1; this.tracks[0].notes[56] = 1; this.tracks[0].notes[60] = 1;
-      this.tracks[0].notes[64] = 1; this.tracks[0].notes[68] = 1; this.tracks[0].notes[72] = 1; this.tracks[0].notes[76] = 1;
-      this.tracks[1].notes[4] = 1; this.tracks[1].notes[12] = 1; this.tracks[1].notes[20] = 1;  this.tracks[1].notes[28] = 1;
-      this.tracks[2].notes[0] = 1; this.tracks[2].notes[6] = 1; this.tracks[2].notes[10] = 1;
-      this.tracks[2].notes[16] = 1; this.tracks[2].notes[22] = 1; 
+      //console.log(this.tracks[0]);
+      this.tracks[3].notes[0] = 1; this.tracks[3].notes[4] = 1; this.tracks[3].notes[8] = 1; this.tracks[3].notes[12] = 1; 
+      this.tracks[3].notes[16] = 1; this.tracks[3].notes[20] = 1; this.tracks[3].notes[24] = 1; this.tracks[3].notes[28] = 1; 
+      this.tracks[3].notes[32] = 1; this.tracks[3].notes[36] = 1; this.tracks[3].notes[40] = 1; this.tracks[3].notes[44] = 1; 
+      this.tracks[3].notes[48] = 1; this.tracks[3].notes[52] = 1; this.tracks[3].notes[56] = 1; this.tracks[3].notes[60] = 1;
+      this.tracks[3].notes[64] = 1; this.tracks[3].notes[68] = 1; this.tracks[3].notes[72] = 1; this.tracks[3].notes[76] = 1;
+      this.tracks[4].notes[4] = 1; this.tracks[4].notes[12] = 1; this.tracks[4].notes[20] = 1;  this.tracks[4].notes[28] = 1;
+      this.tracks[8].notes[0] = 1; this.tracks[8].notes[6] = 1; this.tracks[8].notes[10] = 1;
+      this.tracks[8].notes[16] = 1; this.tracks[8].notes[22] = 1; 
 
       this.state = {
         timestamp: 0,
@@ -129,9 +129,8 @@ class App extends React.Component {
   componentDidMount () {
     document.addEventListener("keyup", this.handleKeyDown);
     document.addEventListener('keydown', function (e) {
-        if (e.key === ' ') {
+        if (e.keyCode === 32) {
             e.preventDefault();
-            console.log('PREVENT SPACE');
         }
     }, false)
   }
@@ -146,16 +145,17 @@ class App extends React.Component {
 
   handleKeyDown= (e) => {
     e.preventDefault();
-    // console.log(e);
-    switch (e.key.toUpperCase()) {
-      case ' ':
+    switch (e.keyCode) {
+      // Space
+      case 32:
         if (this.state.state === "play") {
           this.pause();
         } else if (this.state.state === "stop" || this.state.state === "pause") {
           this.play();
         }
         break;
-      case 'S':
+      // S
+      case 83:
         if (this.state.state === "play" || this.state.state === "pause") {
           this.stop();
         } 
