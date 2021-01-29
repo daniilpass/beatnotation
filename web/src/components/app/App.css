@@ -1,0 +1,98 @@
+
+.App-header {
+  background-color: #2F3485;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+
+/*
+App-toolbar
+*/
+
+.App-toolbar {
+  background-color: #7277D8;
+  padding: 8px;
+}
+
+.toolbar-btn {
+  margin-right: 8px;
+}
+
+.App-toolbar > div {
+  display: inline-block;
+  margin-right: 8px;
+}
+/* .toolbar-time {
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.toolbar-part{
+  display: inline-block;
+  margin-right: 8px;
+} */
+
+/*
+workspace
+*/
+.workspace{
+ background-color: #2F3485;
+ height: 100px;
+ /* margin: 20px; */
+}
+
+.time-pointer{
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: #FFAA40;
+  /* margin-left: -5px; */
+  margin-top: -5px;
+  border-radius: 50%;
+  z-index: 2;
+}
+.time-pointer__stick{
+  position: absolute;
+  width: 2px;
+  height: 100px;
+  background-color: #FFAA40;  
+  margin-left: 4px;
+}
+
+.workspace__row {
+  background-color: #717171;
+  height: 24px;
+  position: relative;
+}
+
+
+/*
+Note
+*/
+.note{
+  height: 24px;
+  border: 1px solid #080E73;
+  display: inline-block;
+  position: absolute;
+}
+
+.note {
+  background-color:#7277D8 ;
+}
+
+.note.note_filled, .note.note_filled.note.note_level_0 {
+  background-color:#2F3485 ;
+}
+
+.note.note_level_1 {
+  background-color:#FFC173 ;
+} 
+/* Основной Цвет:
+#1921B1	#2F3485	#080E73	#4D54D8	#7277D8
+Вторичный Цвет A:
+#FFE500	#BFB130	#A69500	#FFEC40	#FFF173
+Вторичный Цвет B:
+#FF8E00	#BF8030	#A65C00	#FFAA40	#FFC173 */
