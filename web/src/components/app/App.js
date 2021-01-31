@@ -1,4 +1,5 @@
 import React from "react";
+import './reset.css';
 import './App.css';
 
 import CanvasNotes from "../noteList/noteList";
@@ -271,9 +272,6 @@ class App extends React.Component {
   }
 
   get timePointerXPos() {
-    // return this.state.timestamp / this.partWidth + 16;
-    var tcx = this.tracksContainerRes && this.tracksContainerRes.current;
-    console.log('======>', tcx)
     return this.part * this.partWidth - this.timePointerWidth/2 + 2 + this.trackControlWidth;
   }
 
@@ -310,6 +308,13 @@ class App extends React.Component {
     this.tryDrawNotes();
   }
 
+  get getFormattedTime() {
+    let ms = this.state.timestamp % 1000;
+    let sec = Math.trunc(this.state.timestamp / 1000) % 60;
+    let min = Math.trunc(this.state.timestamp / 1000 / 60)
+    return (min+'').padStart(2,"0") + ":" +(sec+'').padStart(2,"0") + "." + (ms+'').padStart(3,"0")
+  }
+
   render () {
     //console.log('Render App');
 
@@ -322,21 +327,25 @@ class App extends React.Component {
         <button className="app-toolbar__button" onClick={this.play} disabled={this.state.state === "play"}>Play</button>
         <button className="app-toolbar__button" onClick={this.stop} disabled={this.state.state === "stop"}>Stop</button>
         <button className="app-toolbar__button" onClick={this.pause} disabled={this.state.state === "pause" || this.state.state === "stop"}>Pause</button>
-        <div className="app-toolbar__time" >
-          Time: {this.state.timestamp}
-        </div>
-        <div className="app-toolbar__part" >
+        <button className="app-toolbar__button" onClick={this.print}>Print notes</button>
+        
+        {/* <div className="app-toolbar__part" >
           Part: {Math.trunc(this.part) + 1 }
-        </div>
+        </div> */}
+
         <div className="app-toolbar__bpm" >
           BPM: 
           <input name="bpm" value={this.state.bpm} onChange={this.handleBpmInputChange} type="number"></input>
         </div>
+        <div className="app-toolbar__time" >
+          Time: {this.getFormattedTime}
+        </div>
+
         {/* <div>
           Connect notes: 
           <input name="connect" value={this.state.connect} onChange={this.handleBooleanInputChange} checked={this.state.connect} type="checkbox"></input>
         </div> */}
-        <button className="app-toolbar__button" onClick={this.print}>Print notes</button>
+        
       </div>
 
       <div className="workspace no-print"> 
