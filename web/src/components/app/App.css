@@ -221,7 +221,7 @@ Note
 /*
 CANVASE
 */
-#canvas_notes {
+.canvas_notes {
   background-color: white;
   margin: 48px auto;
   display: block;

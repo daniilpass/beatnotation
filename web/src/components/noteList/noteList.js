@@ -4,6 +4,7 @@ class CanvasNotes extends React.PureComponent {
     constructor(props) {
       super(props);
   
+      this.canvasWrapper = null
       this.canvas = null;
       this.ctx = null;
       this.cWidth = 1000;
@@ -21,6 +22,7 @@ class CanvasNotes extends React.PureComponent {
       // Высота группы линий
       this.lineGroupHeight = this.linesInGroupCount * (this.lineWidth  + this.linePadding) + this.groupsPadding;
       this.delimiterHeight = (this.linesInGroupCount + 1) * (this.lineWidth  + this.linePadding);
+      this.groupsPerPage = 12;
       // Ноты
       this.noteRadius = 5;
       
@@ -29,19 +31,28 @@ class CanvasNotes extends React.PureComponent {
       this.taktPadding = this.noteRadius * 10;
     }
   
-    componentDidMount() {
-      this.canvas = document.getElementById('canvas_notes');
-      this.ctx = this.canvas.getContext('2d');
-  
-      // this.drawHorizontalLine(10, 10, 400);
-      // this.drawLineSet(this.startX);
+    componentDidMount() { 
+      this.canvasWrapper = document.getElementsByClassName('canvas_notes_wrapper')[0];
       this.draw();
       
       this.lastNoteIndex = 0;
     }
   
+    initCanvasContext() {
+      let allCanvasElements = document.getElementsByClassName('canvas_notes')
+      this.canvas = allCanvasElements[allCanvasElements.length - 1];
+      this.ctx = this.canvas.getContext('2d');
+    }
+
     draw(tracks, notesLimit, bpm) {
-      //console.log('Draw', tracks);
+      // Удаляю старые холсты
+      while (this.canvasWrapper.childElementCount > 1) {
+        this.canvasWrapper.removeChild(this.canvasWrapper.firstChild);
+      }
+
+      // Инициализирую контекст для холста
+      this.initCanvasContext();
+
       this.clear();
       this.drawList(tracks, notesLimit, bpm);
     }
@@ -56,7 +67,8 @@ class CanvasNotes extends React.PureComponent {
 
     drawList(tracks, notesLimit, bpm) {
       // Вычисляю сколько нужно строк, чтобы уместить все ноты
-      this.groupsCount  = Math.ceil(notesLimit / this.notesInLine);
+      this.groupsCount  =  this.groupsPerPage; //Math.ceil(notesLimit / this.notesInLine);
+      //this.groupsCount  =  this.groupsCount > this.groupsPerPage ? this.groupsPerPage : this.groupsCount;      
       // Рассчитываю высоту холста
       this.cHeight = (this.groupsCount  + 1) * this.lineGroupHeight;
       // Обновляю высоту холста
@@ -75,10 +87,10 @@ class CanvasNotes extends React.PureComponent {
         
   
         let lineNumb = 1;
+        let prevLineNumb = 1;
         let lineNoteCounter = 1;
         let taktNoteCounter = 1;
         let taktCounter = 1;
-  
   
         // ГРаницы для соединения нот
         let downBound = Number.MAX_SAFE_INTEGER;
@@ -90,8 +102,30 @@ class CanvasNotes extends React.PureComponent {
         let pattern4 = false;
         
         let notesLength = notesLimit; //tracks[0].notes.length;
-        for (let noteIndex = 0; noteIndex < notesLength; noteIndex++) {
-          
+        for (let noteIndex = 0; noteIndex < notesLength; noteIndex++) { 
+
+          // Если линий достаточно, то создаю новый canvas и рисую уже на нем
+          if ( (prevLineNumb !== lineNumb) && (lineNumb % this.groupsPerPage === 1) ) {
+            
+            console.log("NEW CANVAS", prevLineNumb, lineNumb, this.groupsPerPage);
+            prevLineNumb = 1;
+            lineNumb = 1;
+            
+            // Создавю новый холст
+            let newCanvas = document.createElement("canvas");
+            newCanvas.width = this.cWidth;
+            newCanvas.height = this.cHeight;
+            newCanvas.className ="canvas_notes"
+            this.canvasWrapper.appendChild(newCanvas);
+            this.initCanvasContext();
+
+            // Рисую сетку уже на новом холсте
+            for (let i = 1; i <= this.groupsCount; i++) {
+              this.drawLineSet(this.startX, this.lineGroupHeight  * i);   
+            }
+          }
+
+
           // Координаты ноты по X
           let note_x = this.startX + lineNoteCounter * (this.noteRadius * 2 + this.noteRadius) + taktCounter * this.taktPadding;
           // Начало четверти
@@ -247,7 +281,7 @@ class CanvasNotes extends React.PureComponent {
             taktCounter = taktCounter + 1;
             taktNoteCounter = 1;
           }
-  
+
           // Для дебага рисую меньше нот
           //if (lineNoteCounter > 4)        return;
         }
@@ -377,8 +411,12 @@ class CanvasNotes extends React.PureComponent {
       this.ctx.stroke();
     }
   
+    //TODO: split on different canvas for print
     render() {
-      return <canvas id="canvas_notes" width={this.cWidth} height={this.cHeight}></canvas>;//<div className="canvas_notes_wrapper" >
+      return <div className="canvas_notes_wrapper">
+          <canvas className="canvas_notes" width={this.cWidth} height={this.cHeight}></canvas>
+      </div>
+      
         
         //</div>
     }
