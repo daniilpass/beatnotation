@@ -10,7 +10,7 @@ import SoundRide from '../../assets/sounds/ride.mp3';
 import SoundHiHatClosed from '../../assets/sounds/hh_closed.mp3';
 import SoundHiHatOpened from '../../assets/sounds/hh_open.mp3';
 import SoundSnare from '../../assets/sounds/snare.mp3';
-import SoundBass from '../../assets/sounds/bassdrum.mp3';
+import SoundBass from '../../assets/sounds/kick.mp3';
 import SoundTomHi from '../../assets/sounds/tom_hi.mp3';
 import SoundTomMid from '../../assets/sounds/tom_mid.mp3';
 import SoundTomLow from '../../assets/sounds/tom_low.mp3';
