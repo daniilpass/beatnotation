@@ -2,6 +2,7 @@ import React from "react";
 import './App.css';
 
 import CanvasNotes from "../noteList/noteList";
+import Track from "../track/track";
 
 import SoundCrash from '../../assets/sounds/crash.mp3';
 import SoundRide from '../../assets/sounds/ride.mp3';
@@ -27,7 +28,7 @@ class App extends React.Component {
       this.tracksLength = 128;
       this.prevNoteIndex = -1;
       this.timePointerWidth = 10;
-      this.noteHeight = 24;
+      this.noteHeight = 31;
       // types
       // 1 - cricle
       // 2 - cross
@@ -322,9 +323,9 @@ class App extends React.Component {
           </div>
           {
             this.tracks.map((_track,i) => {
-              return <RowNotes key={"track_"+i} index={i} noteWidth={this.partWidth} noteClick={this.handleNoteClick} 
+              return <Track key={"track_"+i} index={i} noteWidth={this.partWidth} noteHeight={this.noteHeight} noteClick={this.handleNoteClick} 
                               tracksLength={this.tracksLength} notes={_track.notes}
-                              noteHeight={this.noteHeight}/>
+                              />
             })
           }
         </div>
@@ -333,81 +334,6 @@ class App extends React.Component {
       </div>
 
        <CanvasNotes ref={this.canvasRef} />
-    </div>
-  }
-}
-
-class RowNotes extends React.PureComponent {
-  // constructor(props) {
-  //   super(props);
-    
-  // }
-
-  handleNoteClick = (index, level) => {
-    this.props.noteClick && this.props.noteClick(this.props.index, index, level);
-  }
-
-  renderNotes() {
-    let els = []
-    
-    for (let i = 0; i < this.props.tracksLength; i++) {
-
-      let indexInQuarter = i % 16 + 1;
-      let filled = false;
-      if ((indexInQuarter >= 5 && indexInQuarter <=8) || indexInQuarter >= 13) {
-        filled = true;
-      }
-
-      // console.log(i, indexInQuarter, filled);
-      const el = <Note key={i} index={i} filled={filled} width={this.props.noteWidth} 
-                       noteHeight={this.props.noteHeight}
-                       onClick={this.handleNoteClick} level={this.props.notes[i] || 0}></Note>;
-      els.push(el);
-    }
-
-    return els;
-  }
-
-  render() {
-    console.log('Render RowNotes');
-
-    return <div className="workspace__row" style={this.props.style}>
-      {this.renderNotes()}
-    </div>
-  }
-}
-
-class Note extends React.PureComponent {
-  constructor(props) {
-    super(props);
-    
-    this.state = {
-      level: this.props.level
-    }
-  }
-
-  get width(){
-    return this.props.width;
-  }
-
-  get posX() {
-    return this.props.index * this.props.width;
-  }
-
-  handleClick = () => {
-    let newLevel =  this.state.level === 1 ? 0 : 1;
-    this.setState({
-      level: newLevel
-    });
-
-    this.props.onClick && this.props.onClick(this.props.index, newLevel);
-  }
-
-  render() {
-    //console.log('Render Note');
-    return <div className={"note " + (this.props.filled ? "note_filled " : "") + ("note_level_" + this.state.level)} 
-                style={{width: this.width + 'px', left: this.posX, height: this.props.noteHeight}}
-                onClick={this.handleClick}>      
     </div>
   }
 }

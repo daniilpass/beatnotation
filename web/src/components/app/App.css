@@ -99,7 +99,7 @@ workspace
     margin-left: 4px;
 }
 
-.workspace__row {
+.workspace__track {
   background-color: #717171;
   height: 24px;
   position: relative;
