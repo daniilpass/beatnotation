@@ -22,7 +22,7 @@ class App extends React.Component {
 
       this.timerId = 0;
       this.stepDelay = 10;
-      this.partWidth = 20;
+      this.noteWidth = 20;
       this.defaultBpm = 120;
       this.notesInPartCount = 4;
       this.tracksLength = 1280;
@@ -272,7 +272,7 @@ class App extends React.Component {
   }
 
   get timePointerXPos() {
-    return this.part * this.partWidth - this.timePointerWidth/2 + 2 + this.trackControlWidth;
+    return this.part * this.noteWidth - this.timePointerWidth/2 + 2 + this.trackControlWidth;
   }
 
   get timePointerHeight() {
@@ -306,6 +306,21 @@ class App extends React.Component {
     //console.log(trackIndex, noteIndex, level, this.tracks);
 
     this.tryDrawNotes();
+  }
+
+  handleTimelineClick = (e) => {      
+    //Получаю координату клика внутри временной шкалы
+    let parentContainer = e.currentTarget.parentNode;
+    let targetX = e.pageX - e.target.offsetLeft + parentContainer.scrollLeft;
+
+    // Вычисляю положение относительно нот
+    let notePosition = targetX / this.noteWidth;
+    let newTimestamp = Math.trunc(notePosition / this.state.bpms / this.notesInPartCount);
+    
+    // Обновляю время
+    this.setState({
+      timestamp: newTimestamp
+    })
   }
 
   get getFormattedTime() {
@@ -351,13 +366,15 @@ class App extends React.Component {
       <div className="workspace no-print"> 
         
         <div className="track-container" ref={this.tracksContainerRes}>
+          <div className="timeline" style={{width:this.noteWidth * this.tracksLength + "px", marginLeft: this.trackControlWidth+"px"}} onClick={this.handleTimelineClick}>
+          </div>
           <div className="time-pointer" style={{left: this.timePointerXPos}}> 
             <div className="time-pointer__stick" style={{height: this.timePointerHeight+"px"}}>
             </div>
           </div>
           {
             this.tracks.map((_track,i) => {
-              return <Track key={"track_"+i} index={i} noteWidth={this.partWidth} noteHeight={this.noteHeight} noteClick={this.handleNoteClick} 
+              return <Track key={"track_"+i} index={i} noteWidth={this.noteWidth} noteHeight={this.noteHeight} noteClick={this.handleNoteClick} 
                               tracksLength={this.tracksLength} track={_track} trackControlWidth={this.trackControlWidth}
                               />
             })
