@@ -81,10 +81,10 @@ class CanvasNotes extends React.PureComponent {
   
   
         // ГРаницы для соединения нот
-        let downBound = 999;
-        //let upperBound = -999;
-        let leftBound = 99;
-        let rightBound = -99;
+        let downBound = Number.MAX_SAFE_INTEGER;
+        //let upperBound = Number.MIN_SAFE_INTEGER;
+        let leftBound = Number.MAX_SAFE_INTEGER;
+        let rightBound = Number.MIN_SAFE_INTEGER;
         let pattern = [0,0,0,0];
         let pattern16 = false;
         let pattern4 = false;
@@ -97,13 +97,13 @@ class CanvasNotes extends React.PureComponent {
           // Начало четверти
           let lead4 = (noteIndex) % 4 === 0;
           // Номер нижней ноты на линииях
-          let noteLine = -99;
+          let noteLine = Number.MIN_SAFE_INTEGER;
           // Сбросим границы при новом такте
           if (lead4) {
-            downBound = 999;
-            //upperBound = -999;
-            leftBound = 99;
-            rightBound = -99;
+            downBound = Number.MAX_SAFE_INTEGER;
+            //upperBound = Number.MIN_SAFE_INTEGER;
+            leftBound = Number.MAX_SAFE_INTEGER;
+            rightBound = Number.MIN_SAFE_INTEGER;
             pattern = [0,0,0,0];
             pattern16 = false;
             pattern4 = false;
@@ -120,13 +120,13 @@ class CanvasNotes extends React.PureComponent {
             // Вычисление границ и размера такта
             if (lead4) {
               //reset bounds            
-              let _leftBound=99;
+              let _leftBound=Number.MAX_SAFE_INTEGER;
               _leftBound = track.notes[noteIndex + 3] > 0 ? noteIndex + 3 : _leftBound; 
               _leftBound = track.notes[noteIndex + 2] > 0 ? noteIndex + 2 : _leftBound;
               _leftBound = track.notes[noteIndex + 1] > 0 ? noteIndex + 1 : _leftBound;
               _leftBound = track.notes[noteIndex] > 0 ? noteIndex : _leftBound;
   
-              let _rightBound=-99;
+              let _rightBound=Number.MIN_SAFE_INTEGER;
               _rightBound = track.notes[noteIndex] > 0 ? _rightBound : _rightBound; 
               _rightBound = track.notes[noteIndex + 1] > 0 ? noteIndex + 1 : _rightBound;
               _rightBound = track.notes[noteIndex + 2] > 0 ? noteIndex + 2 : _rightBound;
@@ -135,7 +135,7 @@ class CanvasNotes extends React.PureComponent {
               leftBound = _leftBound < leftBound ? _leftBound : leftBound;
               rightBound = _rightBound > rightBound ? _rightBound : rightBound;
   
-              let _downBound = 999;
+              let _downBound = Number.MAX_SAFE_INTEGER;
               _downBound = track.notes[noteIndex + 3] > 0 ? track.line : _downBound; 
               _downBound = track.notes[noteIndex + 2] > 0 ? track.line : _downBound;
               _downBound = track.notes[noteIndex + 1] > 0 ? track.line : _downBound;
@@ -168,8 +168,8 @@ class CanvasNotes extends React.PureComponent {
           }
           
           // Нормализую границы
-          leftBound = leftBound !== 99 ? leftBound % 4 : leftBound;
-          rightBound = rightBound !== -99 ? rightBound % 4 : rightBound ;
+          leftBound = leftBound !== Number.MAX_SAFE_INTEGER ? leftBound % 4 : leftBound;
+          rightBound = rightBound !== Number.MIN_SAFE_INTEGER ? rightBound % 4 : rightBound ;
   
           // Вычисляю размер        
           if (lead4 && !(pattern[0] === 1 && pattern[1] === 0 && pattern[2] === 1 && pattern[3] === 0) ) {
@@ -181,7 +181,7 @@ class CanvasNotes extends React.PureComponent {
           }
   
           //Если размер 16 и нет ноты, то рисую паузу
-          if (pattern16 && noteLine === -99 && leftBound !== 99 && rightBound !==-99) {
+          if (pattern16 && noteLine === Number.MIN_SAFE_INTEGER && leftBound !== Number.MAX_SAFE_INTEGER && rightBound !==Number.MIN_SAFE_INTEGER) {
             let pauseLine = 3;
             let x = note_x;
             let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + pauseLine * this.linePadding
@@ -189,7 +189,7 @@ class CanvasNotes extends React.PureComponent {
           }
   
           // Подтягиваю нотные палки вверх        
-          if (noteLine !== -99) {  
+          if (noteLine !== Number.MIN_SAFE_INTEGER) {  
               // Вертикальная линия
               let x = note_x + this.noteRadius;
               let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + noteLine * this.linePadding;//- this.noteRadius*2;            
@@ -210,7 +210,7 @@ class CanvasNotes extends React.PureComponent {
           }
   
           // Рисую соеденительную линию
-          if (lead4 && leftBound !== 99 && rightBound !== -99) {
+          if (lead4 && leftBound !== Number.MAX_SAFE_INTEGER && rightBound !== Number.MIN_SAFE_INTEGER) {
             // Соеденительная линия размер 8
             let x = note_x + this.noteRadius + leftBound* this.noteRadius * 3;
             let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + downBound * this.linePadding - this.noteRadius*6;
