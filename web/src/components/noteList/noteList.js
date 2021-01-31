@@ -14,7 +14,7 @@ class CanvasNotes extends React.PureComponent {
       this.lineWidth = 2;
       this.linePadding = 10;
       this.linesInGroupCount = 5;      
-      this.lineLength = this.cWidth - this.linePadding;
+      this.lineLength = this.cWidth - this.startX*2;
       // Группы линий
       this.groupsCount = 5;
       this.groupsPadding = 40;
@@ -350,7 +350,9 @@ class CanvasNotes extends React.PureComponent {
     }
   
     render() {
-      return <canvas id="canvas_notes" width={this.cWidth} height={this.cHeight}></canvas>
+      return <canvas id="canvas_notes" width={this.cWidth} height={this.cHeight}></canvas>;//<div className="canvas_notes_wrapper" >
+        
+        //</div>
     }
 }
 

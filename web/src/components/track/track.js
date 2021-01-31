@@ -13,6 +13,10 @@ class Track extends React.PureComponent {
       this.props.noteClick && this.props.noteClick(this.props.index, index, level);
     }
   
+    get Notes() {
+      return this.props.track.notes;
+    }
+
     renderNotes() {
       let els = []
       
@@ -27,7 +31,7 @@ class Track extends React.PureComponent {
         // console.log(i, indexInQuarter, filled);
         const el = <Note key={i} index={i} filled={filled} width={this.props.noteWidth} 
                          noteHeight={this.props.noteHeight}
-                         onClick={this.handleNoteClick} level={this.props.notes[i] || 0}></Note>;
+                         onClick={this.handleNoteClick} level={this.Notes[i] || 0}></Note>;
         els.push(el);
       }
   
@@ -38,7 +42,7 @@ class Track extends React.PureComponent {
       console.log('Render Track');
   
       return <div className="workspace__track" style={{...this.props.style, height: this.props.noteHeight, width:this.props.noteWidth * this.props.tracksLength}}>
-        <TrackControl width={this.props.trackControlWidth}/>
+        <TrackControl track={this.props.track} width={this.props.trackControlWidth} height={this.props.noteHeight}/>
         {this.renderNotes()}
       </div>
     }

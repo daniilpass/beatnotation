@@ -19,6 +19,10 @@
   STYLES
 */
 
+body {
+  background: #4D54D8;
+}
+
 .App-header {
   position: fixed;
   top: 0px;
@@ -113,10 +117,15 @@ workspace
   left: 0;
   display: inline-block;
   width: 150px;
-  height: 31px;
-  background-color: red;
+  /* height: 31px; */
+  background-color: #2F3485;
   z-index: 2;
   border: 0.5px solid black;
+  color: #FFC173;
+}
+
+.track-control__title{
+  position: absolute;
 }
 
 /*
@@ -140,6 +149,20 @@ Note
 .note.note_level_1 {
   background-color:#FFC173 ;
 } 
+
+/*
+CANVASE
+*/
+#canvas_notes {
+  background-color: white;
+  margin: 20px auto;
+  display: block;
+  left: 0;
+    right: 0;
+}
+
+
+
 /* Основной Цвет:
 #1921B1	#2F3485	#080E73	#4D54D8	#7277D8
 Вторичный Цвет A:

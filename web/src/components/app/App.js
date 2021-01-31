@@ -24,7 +24,6 @@ class App extends React.Component {
       this.partWidth = 20;
       this.defaultBpm = 120;
       this.notesInPartCount = 4;
-      this.workspaceMargin = 20;
       this.tracksLength = 1280;
       this.prevNoteIndex = -1;
       this.timePointerWidth = 10;
@@ -38,65 +37,83 @@ class App extends React.Component {
         {
           audioUrl: SoundCrash,
           audio: new Audio(SoundCrash),
+          volume: 0.5,
           notes: [],
           line: 0.5,
-          type: 2
+          type: 2,
+          title: "Crash"
         },
         {
           audioUrl: SoundRide,
           audio: new Audio(SoundRide),
+          volume: 1,
           notes: [],
           line: 1.5,
-          type: 2
+          type: 2,
+          title: "Ride"
         },
         {
           audioUrl: SoundHiHatClosed, 
-          audio: new Audio(SoundHiHatOpened),
+          audio: new Audio(SoundHiHatClosed),
+          volume: 1,
           notes: [],
           line: 1,
-          type: 2
+          type: 2,
+          title: "Hi-Hat Closed"
         },
         {
           audioUrl: SoundHiHatOpened,
           audio: new Audio(SoundHiHatOpened),
+          volume: 1,
           notes: [],
           line: 1,
-          type: 3
+          type: 3,
+          title: "Hi-Hat Open"
         },
         {
           audioUrl: SoundSnare,
           audio: new Audio(SoundSnare),
+          volume: 1,
           notes: [],
           line: 3,
-          type: 1
+          type: 1,
+          title: "Snare"
         },
         {
           audioUrl: SoundTomHi,
           audio: new Audio(SoundTomHi), // tom 2
+          volume: 1,
           notes: []  ,
           line: 2,
-          type: 1  
+          type: 1,
+          title: "Tom Hi"
         },
         {
           audioUrl: SoundTomMid,
           audio: new Audio(SoundTomMid), // tom 2
+          volume: 1,
           notes: []  ,
           line: 2.5,
-          type: 1  
+          type: 1,
+          title: "Tom Mid"  
         },
         {
           audioUrl: SoundTomLow,
-          audio: new Audio(SoundTomLow ), //floor tom
+          audio: new Audio(SoundTomLow), //floor tom
+          volume: 1,
           notes: []  ,
           line: 4,
-          type: 1  
+          type: 1,
+          title: "Tom Low"  
         },
         {
           audioUrl: SoundBass,
           audio: new Audio(SoundBass),
+          volume: 1,
           notes: []  ,
           line: 5,
-          type: 1  
+          type: 1,
+          title: "Kick"  
         },
       ]
 
@@ -238,6 +255,7 @@ class App extends React.Component {
       if (track.notes[noteIndex] > 0) {
         // console.log('Play note', trackIndex, noteIndex, track.audioUrl); 
         let audio = new Audio(track.audioUrl);
+        audio.volume = track.volume;
         audio.play();
         // track.audio.stop();    
         // track.audio.play();
@@ -315,7 +333,7 @@ class App extends React.Component {
         </div> */}
       </div>
 
-      <div className="workspace no-print" style={{margin: this.workspaceMargin + 'px'}}> 
+      <div className="workspace no-print"> 
         
         <div className="track-container" ref={this.tracksContainerRes}>
           <div className="time-pointer" style={{left: this.timePointerXPos}}> 
@@ -325,7 +343,7 @@ class App extends React.Component {
           {
             this.tracks.map((_track,i) => {
               return <Track key={"track_"+i} index={i} noteWidth={this.partWidth} noteHeight={this.noteHeight} noteClick={this.handleNoteClick} 
-                              tracksLength={this.tracksLength} notes={_track.notes} trackControlWidth={this.trackControlWidth}
+                              tracksLength={this.tracksLength} track={_track} trackControlWidth={this.trackControlWidth}
                               />
             })
           }
