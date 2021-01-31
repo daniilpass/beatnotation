@@ -4,12 +4,11 @@ class TrackControl extends React.PureComponent {
     constructor(props) {
       super(props);      
     }
-    render() {
-      console.log('Render Track');
-  
-      return <div className="workspace__track" style={{...this.props.style, height: this.props.noteHeight}}>
+
+    render() {  
+      return <div className="track-control" style={{width: this.props.width}}>
       </div>
     }
   }
 
-  export default Track;
+  export default TrackControl;

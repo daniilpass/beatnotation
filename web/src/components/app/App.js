@@ -25,10 +25,11 @@ class App extends React.Component {
       this.defaultBpm = 120;
       this.notesInPartCount = 4;
       this.workspaceMargin = 20;
-      this.tracksLength = 128;
+      this.tracksLength = 1280;
       this.prevNoteIndex = -1;
       this.timePointerWidth = 10;
       this.noteHeight = 31;
+      this.trackControlWidth = 200;
       // types
       // 1 - cricle
       // 2 - cross
@@ -250,7 +251,7 @@ class App extends React.Component {
     // return this.state.timestamp / this.partWidth + 16;
     var tcx = this.tracksContainerRes && this.tracksContainerRes.current;
     console.log('======>', tcx)
-    return this.part * this.partWidth - this.timePointerWidth/2 + 2;
+    return this.part * this.partWidth - this.timePointerWidth/2 + 2 + this.trackControlWidth;
   }
 
   get timePointerHeight() {
@@ -324,7 +325,7 @@ class App extends React.Component {
           {
             this.tracks.map((_track,i) => {
               return <Track key={"track_"+i} index={i} noteWidth={this.partWidth} noteHeight={this.noteHeight} noteClick={this.handleNoteClick} 
-                              tracksLength={this.tracksLength} notes={_track.notes}
+                              tracksLength={this.tracksLength} notes={_track.notes} trackControlWidth={this.trackControlWidth}
                               />
             })
           }

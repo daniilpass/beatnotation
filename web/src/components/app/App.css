@@ -81,7 +81,7 @@ workspace
 
 .track-container {
  margin-top: 80px;
- margin-left:150px;
+ /* margin-left:150px; */
 }
 
 .time-pointer{
@@ -101,10 +101,23 @@ workspace
 
 .workspace__track {
   background-color: #717171;
-  height: 24px;
-  position: relative;
+  /* height: 24px; */
+  /* width: auto; */
+  /* position: relative; */
+  width: 100%;
+  white-space: nowrap;
 }
 
+.track-control{  
+  position: sticky;
+  left: 0;
+  display: inline-block;
+  width: 150px;
+  height: 31px;
+  background-color: red;
+  z-index: 2;
+  border: 0.5px solid black;
+}
 
 /*
 Note
@@ -113,7 +126,7 @@ Note
   /* height: 24px; */
   border: 1px solid #080E73;
   display: inline-block;
-  position: absolute;
+  /* position: absolute; */
 }
 
 .note {

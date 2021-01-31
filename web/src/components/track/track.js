@@ -1,6 +1,7 @@
 import React from "react";
 
 import Note from "./note";
+import TrackControl from "./trackControl";
 
 class Track extends React.PureComponent {
     // constructor(props) {
@@ -36,7 +37,8 @@ class Track extends React.PureComponent {
     render() {
       console.log('Render Track');
   
-      return <div className="workspace__track" style={{...this.props.style, height: this.props.noteHeight}}>
+      return <div className="workspace__track" style={{...this.props.style, height: this.props.noteHeight, width:this.props.noteWidth * this.props.tracksLength}}>
+        <TrackControl width={this.props.trackControlWidth}/>
         {this.renderNotes()}
       </div>
     }
