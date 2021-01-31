@@ -37,10 +37,10 @@
 
 
 /*
-App-toolbar
+app-toolbar
 */
 
-.App-toolbar {
+.app-toolbar {
   position: fixed;
   top: 32px;
   height: 40px;
@@ -56,7 +56,7 @@ App-toolbar
   margin-right: 8px;
 }
 
-.App-toolbar > div {
+.app-toolbar > div {
   display: inline-block;
   margin-right: 8px;
 }
@@ -65,7 +65,7 @@ App-toolbar
   margin-right: 8px;
 }
 
-.toolbar-part{
+.app-toolbar__part{
   display: inline-block;
   margin-right: 8px;
 } */

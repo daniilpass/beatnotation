@@ -294,17 +294,17 @@ class App extends React.Component {
         Beat maker
       </header>
 
-      <div className="App-toolbar no-print">
+      <div className="app-toolbar no-print">
         <button className="toolbar-btn toolbar-btn__play" onClick={this.play} disabled={this.state.state === "play"}>Play</button>
         <button className="toolbar-btn toolbar-btn__stop" onClick={this.stop} disabled={this.state.state === "stop"}>Stop</button>
         <button className="toolbar-btn toolbar-btn__pause" onClick={this.pause} disabled={this.state.state === "pause" || this.state.state === "stop"}>Pause</button>
         <div className="toolbar-time" >
           Time: {this.state.timestamp}
         </div>
-        <div className="toolbar-part" >
+        <div className="app-toolbar__part" >
           Part: {Math.trunc(this.part) + 1 }
         </div>
-        <div className="toolbar-bpm" >
+        <div className="app-toolbar__bpm" >
           BPM: 
           <input name="bpm" value={this.state.bpm} onChange={this.handleBpmInputChange} type="number"></input>
         </div>
