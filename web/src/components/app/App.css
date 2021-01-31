@@ -28,7 +28,8 @@ body {
   top: 0px;
   width: 100%;
   height: 32px;
-
+  padding-left: 8px;
+  
   background-color: #2F3485;
   align-items: center;
   justify-content: center;
@@ -127,6 +128,7 @@ workspace
 
 .track-control__title{
   position: absolute;
+  padding-left: 8px;
 }
 
 /*
