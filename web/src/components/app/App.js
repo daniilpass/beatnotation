@@ -203,6 +203,11 @@ class App extends React.Component {
     return false;
   }
 
+  print = () => {
+    console.log("print");
+    window.print();
+  }
+
   play = () => {
     console.log("play");
     this.timerId = setInterval(this.step, this.stepDelay);
@@ -331,6 +336,7 @@ class App extends React.Component {
           Connect notes: 
           <input name="connect" value={this.state.connect} onChange={this.handleBooleanInputChange} checked={this.state.connect} type="checkbox"></input>
         </div> */}
+        <button className="app-toolbar__button" onClick={this.print}>Print notes</button>
       </div>
 
       <div className="workspace no-print"> 

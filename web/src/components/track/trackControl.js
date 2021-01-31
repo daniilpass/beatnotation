@@ -1,9 +1,9 @@
 import React from "react";
 
 class TrackControl extends React.PureComponent {
-    constructor(props) {
-      super(props);      
-    }
+    // constructor(props) {
+    //   super(props);      
+    // }
 
     get Title(){
         return this.props.track.title;

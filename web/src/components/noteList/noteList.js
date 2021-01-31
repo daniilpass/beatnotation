@@ -92,7 +92,7 @@ class CanvasNotes extends React.PureComponent {
           // Координаты ноты по X
           let note_x = this.startX + lineNoteCounter * (this.noteRadius * 2 + this.noteRadius) + taktCounter * this.taktPadding;
           // Начало четверти
-          let lead4 = (noteIndex) % 4 == 0;
+          let lead4 = (noteIndex) % 4 === 0;
           // Номер нижней ноты на линииях
           let noteLine = -99;
           // Сбросим границы при новом такте
@@ -165,8 +165,8 @@ class CanvasNotes extends React.PureComponent {
           }
           
           // Нормализую границы
-          leftBound = leftBound != 99 ? leftBound % 4 : leftBound;
-          rightBound = rightBound != -99 ? rightBound % 4 : rightBound ;
+          leftBound = leftBound !== 99 ? leftBound % 4 : leftBound;
+          rightBound = rightBound !== -99 ? rightBound % 4 : rightBound ;
   
           // Вычисляю размер        
           if (lead4 && !(pattern[0] === 1 && pattern[1] === 0 && pattern[2] === 1 && pattern[3] === 0) ) {
@@ -178,7 +178,7 @@ class CanvasNotes extends React.PureComponent {
           }
   
           //Если размер 16 и нет ноты, то рисую паузу
-          if (pattern16 && noteLine == -99 && leftBound != 99 && rightBound !=-99) {
+          if (pattern16 && noteLine === -99 && leftBound !== 99 && rightBound !==-99) {
             let pauseLine = 3;
             let x = note_x;
             let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + pauseLine * this.linePadding
@@ -186,7 +186,7 @@ class CanvasNotes extends React.PureComponent {
           }
   
           // Подтягиваю нотные палки вверх        
-          if (noteLine != -99) {  
+          if (noteLine !== -99) {  
               // Вертикальная линия
               let x = note_x + this.noteRadius;
               let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + noteLine * this.linePadding;//- this.noteRadius*2;            
@@ -194,20 +194,20 @@ class CanvasNotes extends React.PureComponent {
   
               // Если размер 16 и нота не первая и не последняя в группе, то рисую палочку покороче
               let idx16 = noteIndex % 4;
-              if (pattern16 && idx16 != leftBound && idx16 != rightBound) {
+              if (pattern16 && idx16 !== leftBound && idx16 !== rightBound) {
                 length  = length - this.noteRadius;
               }
   
               this.drawVerticalLine(x, y, -length);
   
               // Если онты обособлены, то рисую кончик 16 нот
-              if (pattern16 && leftBound == rightBound) {
+              if (pattern16 && leftBound === rightBound) {
                 this.drawNote16Tail(x - this.noteRadius, y - length + this.noteRadius * 2);
               }
           }
   
           // Рисую соеденительную линию
-          if (lead4 && leftBound != 99 && rightBound != -99) {
+          if (lead4 && leftBound !== 99 && rightBound !== -99) {
             // Соеденительная линия размер 8
             let x = note_x + this.noteRadius + leftBound* this.noteRadius * 3;
             let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + downBound * this.linePadding - this.noteRadius*6;
