@@ -50,7 +50,18 @@ class CanvasNotes extends React.PureComponent {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
     
+    setCanvasHeight(height) {
+      this.canvas.height = height;
+    }
+
     drawList(tracks, notesLimit) {
+      // Вычисляю сколько нужно строк, чтобы уместить все ноты
+      this.groupsCount  = Math.ceil(notesLimit / this.notesInLine);
+      // Рассчитываю высоту холста
+      this.cHeight = (this.groupsCount  + 1) * this.lineGroupHeight;
+      // Обновляю высоту холста
+      this.setCanvasHeight(this.cHeight);
+
       // Рисую сетку
       for (let i = 1; i <= this.groupsCount; i++) {
         this.drawLineSet(this.startX, this.lineGroupHeight  * i);   
