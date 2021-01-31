@@ -20,16 +20,18 @@ class App extends React.Component {
   constructor(props){
       super(props);
 
+      
       this.timerId = 0;
       this.stepDelay = 10;
       this.noteWidth = 20;
       this.defaultBpm = 120;
       this.notesInPartCount = 4;
-      this.tracksLength = 1280;
+      this.tracksLength = 1600;
       this.prevNoteIndex = -1;
       this.timePointerWidth = 10;
       this.noteHeight = 31;
       this.trackControlWidth = 200;
+      this.notesInTakt = 16;
       // types
       // 1 - cricle
       // 2 - cross
@@ -308,10 +310,11 @@ class App extends React.Component {
     this.tryDrawNotes();
   }
 
-  handleTimelineClick = (e) => {      
+  handleTimelineClick = (e) => {    
+    e.preventDefault();
     //Получаю координату клика внутри временной шкалы
     let parentContainer = e.currentTarget.parentNode;
-    let targetX = e.pageX - e.target.offsetLeft + parentContainer.scrollLeft;
+    let targetX = e.pageX - e.currentTarget.offsetLeft + parentContainer.scrollLeft;
 
     // Вычисляю положение относительно нот
     let notePosition = targetX / this.noteWidth;
@@ -335,14 +338,14 @@ class App extends React.Component {
 
     return <div className="App">
       <header className="App-header no-print">
-        Beat maker
+        Beat Notation
       </header>
 
       <div className="app-toolbar no-print">
         <button className="app-toolbar__button" onClick={this.play} disabled={this.state.state === "play"}>Play</button>
         <button className="app-toolbar__button" onClick={this.stop} disabled={this.state.state === "stop"}>Stop</button>
         <button className="app-toolbar__button" onClick={this.pause} disabled={this.state.state === "pause" || this.state.state === "stop"}>Pause</button>
-        <button className="app-toolbar__button" onClick={this.print}>Print notes</button>
+        <button className="app-toolbar__button" onClick={this.print}>Print notation</button>
         
         {/* <div className="app-toolbar__part" >
           Part: {Math.trunc(this.part) + 1 }
@@ -367,6 +370,13 @@ class App extends React.Component {
         
         <div className="track-container" ref={this.tracksContainerRes}>
           <div className="timeline" style={{width:this.noteWidth * this.tracksLength + "px", marginLeft: this.trackControlWidth+"px"}} onClick={this.handleTimelineClick}>
+            {
+               [...Array(Math.ceil(this.tracksLength / this.notesInTakt))].map((i,k) => {
+                return <div key={k} className="timeline__takt" style={{width: this.notesInTakt * this.noteWidth}}>
+                    <div className="takt__number">{k+1}</div>
+                  </div>
+              })
+            }
           </div>
           <div className="time-pointer" style={{left: this.timePointerXPos}}> 
             <div className="time-pointer__stick" style={{height: this.timePointerHeight+"px"}}>
