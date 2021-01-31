@@ -177,7 +177,7 @@ class App extends React.Component {
     notesCount++; // Перевожу индекс в число нот
     notesCount = notesCount + (16 - notesCount % 16) ; //Добиваю число нот до конца такта
     //console.log('====> tryDrawNotes', notesCount);
-    this.canvasRef && this.canvasRef.current && this.canvasRef.current.draw(this.tracks, notesCount);
+    this.canvasRef && this.canvasRef.current && this.canvasRef.current.draw(this.tracks, notesCount, this.state.bpm);
   }
 
   handleKeyDown= (e) => {

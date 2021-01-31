@@ -40,10 +40,10 @@ class CanvasNotes extends React.PureComponent {
       this.lastNoteIndex = 0;
     }
   
-    draw(tracks, notesLimit) {
+    draw(tracks, notesLimit, bpm) {
       //console.log('Draw', tracks);
       this.clear();
-      this.drawList(tracks, notesLimit);
+      this.drawList(tracks, notesLimit, bpm);
     }
     
     clear() {
@@ -54,13 +54,16 @@ class CanvasNotes extends React.PureComponent {
       this.canvas.height = height;
     }
 
-    drawList(tracks, notesLimit) {
+    drawList(tracks, notesLimit, bpm) {
       // Вычисляю сколько нужно строк, чтобы уместить все ноты
       this.groupsCount  = Math.ceil(notesLimit / this.notesInLine);
       // Рассчитываю высоту холста
       this.cHeight = (this.groupsCount  + 1) * this.lineGroupHeight;
       // Обновляю высоту холста
       this.setCanvasHeight(this.cHeight);
+
+      // Рисую ифно о BPM
+      this.drawBpm(bpm);
 
       // Рисую сетку
       for (let i = 1; i <= this.groupsCount; i++) {
@@ -345,6 +348,15 @@ class CanvasNotes extends React.PureComponent {
       }
     }
   
+    // Инфо о BPM
+    drawBpm(bpm) {
+      let oldFont = this.ctx.font;
+      this.ctx.font = "16px Arial";
+      this.ctx.textAlign = "center"
+      this.ctx.fillText(`BPM = ${bpm}`, this.cWidth / 2, this.groupsPadding);       
+      this.ctx.font = oldFont;
+    }
+
     // Вертикальная линия
     drawHorizontalLine(x, y, length) {
       this.setCanvasStyle("#000000", 1.1);
