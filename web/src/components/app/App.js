@@ -261,16 +261,18 @@ class App extends React.Component {
     for (let trackIndex = 0; trackIndex < this.tracks.length; trackIndex++) {
       const track = this.tracks[trackIndex];
       if (track.notes[noteIndex] > 0) {
-        // console.log('Play note', trackIndex, noteIndex, track.audioUrl); 
-        let audio = new Audio(track.audioUrl);
-        audio.volume = track.volume;
-        audio.play();
-        // track.audio.stop();    
-        // track.audio.play();
+        this.playTrackSound(trackIndex);
       }
     }    
 
     this.prevNoteIndex = noteIndex;
+  }
+
+  playTrackSound(trackIndex) {
+    const track = this.tracks[trackIndex];
+    let audio = new Audio(track.audioUrl);
+    audio.volume = track.volume;
+    audio.play();
   }
 
   get timePointerXPos() {
@@ -306,7 +308,13 @@ class App extends React.Component {
     let track = this.tracks[trackIndex];
     track.notes[noteIndex] = level;
     //console.log(trackIndex, noteIndex, level, this.tracks);
+    
+    // Проигрываю выбранную ноту
+    if (level > 0) {
+      this.playTrackSound(trackIndex);
+    }
 
+    // Рисую ноты
     this.tryDrawNotes();
   }
 
