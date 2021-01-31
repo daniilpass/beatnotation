@@ -295,10 +295,10 @@ class App extends React.Component {
       </header>
 
       <div className="app-toolbar no-print">
-        <button className="toolbar-btn toolbar-btn__play" onClick={this.play} disabled={this.state.state === "play"}>Play</button>
-        <button className="toolbar-btn toolbar-btn__stop" onClick={this.stop} disabled={this.state.state === "stop"}>Stop</button>
-        <button className="toolbar-btn toolbar-btn__pause" onClick={this.pause} disabled={this.state.state === "pause" || this.state.state === "stop"}>Pause</button>
-        <div className="toolbar-time" >
+        <button className="app-toolbar__button" onClick={this.play} disabled={this.state.state === "play"}>Play</button>
+        <button className="app-toolbar__button" onClick={this.stop} disabled={this.state.state === "stop"}>Stop</button>
+        <button className="app-toolbar__button" onClick={this.pause} disabled={this.state.state === "pause" || this.state.state === "stop"}>Pause</button>
+        <div className="app-toolbar__time" >
           Time: {this.state.timestamp}
         </div>
         <div className="app-toolbar__part" >

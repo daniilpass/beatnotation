@@ -52,7 +52,7 @@ app-toolbar
   z-index: 3;
 }
 
-.toolbar-btn {
+.app-toolbar__button {
   margin-right: 8px;
 }
 
@@ -60,7 +60,7 @@ app-toolbar
   display: inline-block;
   margin-right: 8px;
 }
-/* .toolbar-time {
+/* .app-toolbar__time {
   display: inline-block;
   margin-right: 8px;
 }
