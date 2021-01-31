@@ -178,6 +178,13 @@ workspace
   width: 100%;
   white-space: nowrap;
 }
+.workspace__track:hover .note{
+  /* box-shadow:inset 0px -31px 0px rgb(255 0 0 / 20%); */
+  box-shadow:inset 0px -31px 0px rgb(255 193 115 / 15%);
+}
+.workspace__track:hover .track-control{
+  box-shadow:inset 0px -31px 0px rgb(255 193 115 / 15%);
+}
 
 .track-control{  
   position: sticky;
@@ -187,7 +194,9 @@ workspace
   /* height: 31px; */
   background-color: #2F3485;
   z-index: 2;
-  border: 0.5px solid #080E73;
+  border: 1px solid #080E73;
+  border-right: 8px solid #080E73;
+  border-left: 0px;
   color: #FFC173;
 }
 
