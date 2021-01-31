@@ -157,7 +157,7 @@ class CanvasNotes extends React.PureComponent {
             // Если нота звучит, то рисуем её
             if (note > 0) {
               let _y = lineNumb * this.lineGroupHeight - this.linePadding/2 + line * this.linePadding
-              this.drawNote(note_x, _y, track.type);
+              this.drawNote(note_x, _y, track.type, line);
   
               // Запоминаем самую верхнююю линию, на которой лежит нота
               noteLine = line > noteLine ? line : noteLine;
@@ -276,7 +276,7 @@ class CanvasNotes extends React.PureComponent {
     }
   
     // Рисует ноту
-    drawNote(posX, posY, type) {
+    drawNote(posX, posY, type, line) {
       this.setCanvasStyle("#000000", 1.1);
   
       if (type === 2 || type === 3) {
@@ -293,6 +293,11 @@ class CanvasNotes extends React.PureComponent {
         this.ctx.beginPath();
         this.ctx.arc(posX, posY, this.noteRadius, 0, 2 * Math.PI);
         this.ctx.fill();
+      }
+
+      // Дополнительная линия для верхних ноты
+      if (line === 0.5) {
+        this.drawHorizontalLine(posX - this.noteRadius * 1.5 , posY, this.noteRadius * 3);
       }
       
       this.drawNoteTail(posX, posY, type);
