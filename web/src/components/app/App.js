@@ -22,11 +22,11 @@ class App extends React.Component {
 
       
       this.timerId = 0;
-      this.stepDelay = 20;
+      this.stepDelay = 10;
       this.noteWidth = 20;
       this.defaultBpm = 120;
       this.notesInPartCount = 4;
-      this.tracksLength = 64;//256;
+      this.tracksLength = 7200;//256;
       this.prevNoteIndex = -1;
       this.timePointerWidth = 10;
       this.noteHeight = 31;
@@ -143,7 +143,6 @@ class App extends React.Component {
       // this.tracks[8].notes[16] = 1; this.tracks[8].notes[22] = 1; 
 
       this.state = {
-        timestamp: 0,
         bpm: this.defaultBpm,
         bpms: this.defaultBpm / 60 / 1000,
         state: "stop",
@@ -152,6 +151,9 @@ class App extends React.Component {
 
       this.canvasRef = React.createRef();
       this.tracksContainerRef = React.createRef();
+      this.timePointerRef = React.createRef();
+      this.timeTextRef = React.createRef();
+      this.timestamp = 0;
   }
  
 
@@ -164,6 +166,7 @@ class App extends React.Component {
     }, false)
     this.tracksContainerRef.current.addEventListener('wheel', this.handleTracksWheel);
     this.tryDrawNotes();
+    this.updateTimeControls();
   }
 
   componentDidUpdate() {
@@ -201,9 +204,9 @@ class App extends React.Component {
         break;
       // S
       case 83:
-        if (this.state.state === "play" || this.state.state === "pause") {
+        //if (this.state.state === "play" || this.state.state === "pause") {
           this.stop();
-        } 
+        //} 
       break;
       default:
         break;
@@ -230,8 +233,10 @@ class App extends React.Component {
 
     clearInterval(this.timerId);
 
+    this.timestamp = 0;
+    this.updateTimeControls();
+
     this.setState({
-      timestamp: 0,
       state: "stop"
     })
   }
@@ -247,13 +252,9 @@ class App extends React.Component {
   }
 
   step = () => {
-    this.setState((state) =>  { 
-      return {
-        timestamp: state.timestamp + this.stepDelay
-      };
-    });
-
+    this.timestamp = this.timestamp + this.stepDelay;
     this.playNotes();
+    window.requestAnimationFrame(this.updateTimeControls.bind(this));
   }
 
   playNotes = () => {
@@ -326,9 +327,8 @@ class App extends React.Component {
     let newTimestamp = Math.trunc(notePosition / this.state.bpms / this.notesInPartCount);
     
     // Обновляю время
-    this.setState({
-      timestamp: newTimestamp
-    })
+    this.timestamp = newTimestamp;
+    this.updateTimeControls();
   }
 
   handleAddTakt = (e) => {
@@ -412,7 +412,7 @@ class App extends React.Component {
   handlePasteClick = (taktIndex) => {
     console.log('Paste', taktIndex, !this.buffer, this.buffer);
 
-    if (this.buffer.length == 0) {
+    if (this.buffer.length === 0) {
       console.log('Empty buffer');
       return;
     }
@@ -433,6 +433,11 @@ class App extends React.Component {
     this.forceUpdate();
   }
 
+  updateTimeControls() {
+    this.timeTextRef.current.innerText = "Time: " + this.getFormattedTime;
+    this.timePointerRef.current.style.left = this.timePointerXPos + "px";
+  }
+
   get timePointerXPos() {
     return this.part * this.noteWidth - this.timePointerWidth/2 + 2 + this.trackControlWidth;
   }
@@ -442,13 +447,13 @@ class App extends React.Component {
   }
 
   get part() {
-    return this.state.timestamp * this.state.bpms * this.notesInPartCount;
+    return this.timestamp * this.state.bpms * this.notesInPartCount;
   }
 
   get getFormattedTime() {
-    let ms = this.state.timestamp % 1000;
-    let sec = Math.trunc(this.state.timestamp / 1000) % 60;
-    let min = Math.trunc(this.state.timestamp / 1000 / 60)
+    let ms = this.timestamp % 1000;
+    let sec = Math.trunc(this.timestamp / 1000) % 60;
+    let min = Math.trunc(this.timestamp / 1000 / 60)
     return (min+'').padStart(2,"0") + ":" +(sec+'').padStart(2,"0") + "." + (ms+'').padStart(3,"0")
   }
 
@@ -474,8 +479,8 @@ class App extends React.Component {
           BPM: 
           <input name="bpm" value={this.state.bpm} onChange={this.handleBpmInputChange} type="number"></input>
         </div>
-        <div className="app-toolbar__time" >
-          Time: {this.getFormattedTime}
+        <div className="app-toolbar__time" ref={this.timeTextRef}>
+          {/* Time: {this.getFormattedTime} */}
         </div>
 
         {/* <div>
@@ -499,7 +504,11 @@ class App extends React.Component {
             }
           </div>
           {/* TIME POINTER */}
-          <TimePointer timePointerXPos={this.timePointerXPos} timePointerHeight={this.timePointerHeight}/>
+          {/* <TimePointer timePointerXPos={this.timePointerXPos} timePointerHeight={this.timePointerHeight}/> */}
+          <div className="time-pointer" ref={this.timePointerRef}> 
+            <div className="time-pointer__stick" style={{height: this.timePointerHeight+"px"}}>
+            </div>
+          </div>
 
           {/* TRACKS */}
           {
