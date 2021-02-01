@@ -41,7 +41,7 @@ class Track extends React.PureComponent {
     render() {
       console.log('Render Track');
   
-      return <div className="workspace__track" style={{...this.props.style, height: this.props.noteHeight, width:this.props.noteWidth * this.props.tracksLength}}>
+      return <div className="workspace__track" style={{...this.props.style, height: this.props.noteHeight, width:this.props.noteWidth * this.props.tracksLength + this.props.trackControlWidth}}>
         <TrackControl track={this.props.track} width={this.props.trackControlWidth} height={this.props.noteHeight}/>
         {this.renderNotes()}
       </div>

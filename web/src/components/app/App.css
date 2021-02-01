@@ -154,6 +154,28 @@ workspace
   margin-top: -5px;
 }
 
+.takt-add {
+  width: 100px;
+  height: 250px;
+  right: 0;
+  /* margin-top: -250px; */
+  z-index: 0;
+  position: absolute;
+  display: table;
+  user-select: none;
+}
+
+.takt-add__content{
+  text-align: center;
+  color: #FFC173;
+  font-size: 70px;
+  line-height: 70px;
+  cursor: pointer;
+  display: table-cell;
+  vertical-align: middle;
+  padding-bottom: 14px;
+}
+
 .time-pointer{
   position: relative;
   width: 10px;
@@ -171,12 +193,13 @@ workspace
 }
 
 .workspace__track {
-  background-color: #717171;
+  /* background-color: #717171; */
   /* height: 24px; */
   /* width: auto; */
-  /* position: relative; */
+  position: relative;
   width: 100%;
   white-space: nowrap;
+  z-index: 1;
 }
 .workspace__track:hover .note{
   /* box-shadow:inset 0px -31px 0px rgb(255 0 0 / 20%); */
@@ -209,14 +232,13 @@ workspace
 Note
 */
 .note{
-  /* height: 24px; */
   border: 1px solid #080E73;
   display: inline-block;
-  /* position: absolute; */
+  background-color:#7277D8 ;
 }
 
-.note {
-  background-color:#7277D8 ;
+.note:last-child{
+  margin-right: 100px;
 }
 
 .note.note_filled, .note.note_filled.note.note_level_0 {

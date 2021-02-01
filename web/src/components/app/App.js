@@ -31,6 +31,7 @@ class App extends React.Component {
       this.timePointerWidth = 10;
       this.noteHeight = 31;
       this.trackControlWidth = 200;
+      this.addTaktButtonWidth = 100;
       this.notesInTakt = 16;
       // types
       // 1 - cricle
@@ -308,7 +309,7 @@ class App extends React.Component {
     let track = this.tracks[trackIndex];
     track.notes[noteIndex] = level;
     //console.log(trackIndex, noteIndex, level, this.tracks);
-    
+
     // Проигрываю выбранную ноту
     if (level > 0) {
       this.playTrackSound(trackIndex);
@@ -332,6 +333,30 @@ class App extends React.Component {
     this.setState({
       timestamp: newTimestamp
     })
+  }
+
+  handleAddTakt = (e) => {
+    console.log('handleAddTakt');
+    this.tracksLength = this.tracksLength + this.notesInTakt; //Добавлю ноты
+    console.log(...this.tracks)
+    this.tracks.forEach(track => {
+        track.notes = [...track.notes, ...[...Array(this.notesInTakt)].map(el => {return 0})];   
+    });
+    console.log(...this.tracks)
+
+    //Получаю координату клика внутри временной шкалы
+    let parentContainer = e.currentTarget.parentNode || e.target.parentNode;
+
+    //TODO: закончил здесь
+    this.forceUpdate(() => {      
+      console.log(parentContainer, !!parentContainer)
+      if (!!parentContainer) {
+        parentContainer.scrollLeft=Number.MAX_SAFE_INTEGER;
+      }
+    });
+
+    
+    
   }
 
   get getFormattedTime() {
@@ -386,17 +411,25 @@ class App extends React.Component {
               })
             }
           </div>
+
           <div className="time-pointer" style={{left: this.timePointerXPos}}> 
             <div className="time-pointer__stick" style={{height: this.timePointerHeight+"px"}}>
             </div>
           </div>
+
           {
             this.tracks.map((_track,i) => {
               return <Track key={"track_"+i} index={i} noteWidth={this.noteWidth} noteHeight={this.noteHeight} noteClick={this.handleNoteClick} 
-                              tracksLength={this.tracksLength} track={_track} trackControlWidth={this.trackControlWidth}
+                              tracksLength={this.tracksLength} track={_track} trackControlWidth={this.trackControlWidth} addTaktButtonWidth={this.addTaktButtonWidth}
                               />
             })
           }
+          
+          <div className="takt-add" style={{width:this.addTaktButtonWidth, height: this.tracks.length * this.noteHeight+"px", marginTop: -this.tracks.length * this.noteHeight+"px"}}
+                onClick={this.handleAddTakt}> 
+                <div className="takt-add__content" style={{lineHeight: this.tracks.length * this.noteHeight+"px"}}>+</div>           
+          </div>
+
         </div>
         
        
