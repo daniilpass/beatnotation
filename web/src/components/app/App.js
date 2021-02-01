@@ -26,7 +26,7 @@ class App extends React.Component {
       this.noteWidth = 20;
       this.defaultBpm = 120;
       this.notesInPartCount = 4;
-      this.tracksLength = 64;
+      this.tracksLength = 256;
       this.prevNoteIndex = -1;
       this.timePointerWidth = 10;
       this.noteHeight = 31;
@@ -149,7 +149,7 @@ class App extends React.Component {
       }
 
       this.canvasRef = React.createRef();
-      this.tracksContainerRes = React.createRef();
+      this.tracksContainerRef = React.createRef();
   }
  
 
@@ -160,6 +160,7 @@ class App extends React.Component {
             e.preventDefault();
         }
     }, false)
+    this.tracksContainerRef.current.addEventListener('wheel', this.handleTracksWheel);
     this.tryDrawNotes();
   }
 
@@ -352,10 +353,12 @@ class App extends React.Component {
       if (!!parentContainer) {
         parentContainer.scrollLeft=Number.MAX_SAFE_INTEGER;
       }
-    });
+    });    
+  }
 
-    
-    
+  handleTracksWheel = (e) => {
+    e.preventDefault();
+    this.tracksContainerRef.current.scrollLeft += e.deltaY;;
   }
 
   get getFormattedTime() {
@@ -400,7 +403,7 @@ class App extends React.Component {
 
       <div className="workspace no-print"> 
         
-        <div className="track-container" ref={this.tracksContainerRes}>
+        <div className="track-container" ref={this.tracksContainerRef}>
           <div className="timeline" style={{width:this.noteWidth * this.tracksLength + "px", marginLeft: this.trackControlWidth+"px"}} onClick={this.handleTimelineClick}>
             {
                [...Array(Math.ceil(this.tracksLength / this.notesInTakt))].map((i,k) => {
@@ -426,7 +429,7 @@ class App extends React.Component {
           
           <div className="takt-add" style={{width:this.addTaktButtonWidth, height: this.tracks.length * this.noteHeight+"px", marginTop: -this.tracks.length * this.noteHeight+"px"}}
                 onClick={this.handleAddTakt}> 
-                <div className="takt-add__content" style={{lineHeight: this.tracks.length * this.noteHeight+"px"}}>+</div>           
+                <div className="takt-add__content" style={{lineHeight: this.tracks.length * this.noteHeight - 20 +"px"}}>+</div>           
           </div>
 
         </div>
