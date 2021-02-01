@@ -26,7 +26,7 @@ class App extends React.Component {
       this.noteWidth = 20;
       this.defaultBpm = 120;
       this.notesInPartCount = 4;
-      this.tracksLength = 1600;
+      this.tracksLength = 64;
       this.prevNoteIndex = -1;
       this.timePointerWidth = 10;
       this.noteHeight = 31;
@@ -299,7 +299,7 @@ class App extends React.Component {
   }
 
   handleBooleanInputChange = (event) => {
-    console.log(event.target.checked);
+    // console.log(event.target.checked);
     this.setState({
       [event.target.name]: event.target.checked,
     }) 
@@ -336,20 +336,19 @@ class App extends React.Component {
   }
 
   handleAddTakt = (e) => {
-    console.log('handleAddTakt');
+    console.log('Add takt');
     this.tracksLength = this.tracksLength + this.notesInTakt; //Добавлю ноты
-    console.log(...this.tracks)
+    // console.log(...this.tracks)
     this.tracks.forEach(track => {
         track.notes = [...track.notes, ...[...Array(this.notesInTakt)].map(el => {return 0})];   
     });
-    console.log(...this.tracks)
+    // console.log(...this.tracks)
 
     //Получаю координату клика внутри временной шкалы
     let parentContainer = e.currentTarget.parentNode || e.target.parentNode;
 
-    //TODO: закончил здесь
+    // Обновляю приложение
     this.forceUpdate(() => {      
-      console.log(parentContainer, !!parentContainer)
       if (!!parentContainer) {
         parentContainer.scrollLeft=Number.MAX_SAFE_INTEGER;
       }

@@ -27,7 +27,7 @@ class Note extends React.PureComponent {
     }
   
     render() {
-      //console.log('Render Note');
+      // console.log('Render Note');
       return <div className={"note " + (this.props.filled ? "note_filled " : "") + ("note_level_" + this.state.level)} 
                   style={{width: this.width + 'px', left: this.posX, height: this.props.noteHeight}}
                   onClick={this.handleClick}>      
