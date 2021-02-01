@@ -3,14 +3,27 @@ import React from "react";
 import Note from "./note";
 import TrackControl from "./trackControl";
 
-class Track extends React.PureComponent {
+class Track extends React.Component {
     // constructor(props) {
     //   super(props);
       
     // }
   
-    handleNoteClick = (index, level) => {
-      this.props.noteClick && this.props.noteClick(this.props.index, index, level);
+    shouldComponentUpdate(nextProps, nextState){
+      if (this.props.trackControlWidth !== nextProps.trackControlWidth
+        || this.props.noteHeight !== nextProps.noteHeight
+        || this.props.noteWidth !== nextProps.noteWidth
+        || this.props.tracksLength !== nextProps.tracksLength
+        || this.props.trackControlWidth !== nextProps.trackControlWidth
+        || this.props.style !== nextProps.style
+        || this.props.ts !== nextProps.ts) {
+        return true;
+      }
+      return false;
+    }
+
+    handleNoteClick = (noteIndex) => {
+      this.props.noteClick && this.props.noteClick(this.props.index, noteIndex);
     }
   
     get Notes() {

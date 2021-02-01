@@ -22,17 +22,19 @@ class App extends React.Component {
 
       
       this.timerId = 0;
-      this.stepDelay = 10;
+      this.stepDelay = 20;
       this.noteWidth = 20;
       this.defaultBpm = 120;
       this.notesInPartCount = 4;
-      this.tracksLength = 256;
+      this.tracksLength = 64;//256;
       this.prevNoteIndex = -1;
       this.timePointerWidth = 10;
       this.noteHeight = 31;
+      this.taktControlHeight = 31;
       this.trackControlWidth = 200;
       this.addTaktButtonWidth = 100;
       this.notesInTakt = 16;
+      this.buffer = [];
       // types
       // 1 - cricle
       // 2 - cross
@@ -173,6 +175,7 @@ class App extends React.Component {
   }
 
   tryDrawNotes() {
+    //return;
     // get max right note index
     let notesCount = 0;
     this.tracks.forEach(t => {
@@ -277,18 +280,6 @@ class App extends React.Component {
     audio.play();
   }
 
-  get timePointerXPos() {
-    return this.part * this.noteWidth - this.timePointerWidth/2 + 2 + this.trackControlWidth;
-  }
-
-  get timePointerHeight() {
-    return this.tracks.length * this.noteHeight + this.timePointerWidth;
-  }
-
-  get part() {
-    return this.state.timestamp * this.state.bpms * this.notesInPartCount;
-  }
-
   handleBpmInputChange = (event) => {
     // let name = event.target.name;
     let value = event.target.value;
@@ -307,17 +298,21 @@ class App extends React.Component {
   }
 
   handleNoteClick = (trackIndex, noteIndex, level) => {
+    //let track = {...this.tracks[trackIndex]};
     let track = this.tracks[trackIndex];
-    track.notes[noteIndex] = level;
-    //console.log(trackIndex, noteIndex, level, this.tracks);
+    track.notes[noteIndex] = track.notes[noteIndex] === 1 ? 0 : 1 ; //level;
+    track.ts = Date.now();
 
     // Проигрываю выбранную ноту
     if (level > 0) {
       this.playTrackSound(trackIndex);
     }
 
+    
     // Рисую ноты
     this.tryDrawNotes();
+
+    this.forceUpdate();
   }
 
   handleTimelineClick = (e) => {    
@@ -359,6 +354,95 @@ class App extends React.Component {
   handleTracksWheel = (e) => {
     e.preventDefault();
     this.tracksContainerRef.current.scrollLeft += e.deltaY;;
+  }
+
+  /*
+  TAKT ACTIONs
+  */
+  handleDeleteClick = (taktIndex) => {
+    console.log('Delete', taktIndex);
+
+    let noteStart = taktIndex * this.notesInTakt;
+    this.tracksLength = this.tracksLength - this.notesInTakt;
+    this.tracks.forEach(track => { 
+      track.ts = Date.now();
+      track.notes.splice(noteStart, this.notesInTakt) 
+    });
+
+    this.forceUpdate();
+  }
+
+  handleClearClick = (taktIndex) => {
+    console.log('Clear', taktIndex);
+    let noteStart = taktIndex * this.notesInTakt;
+    let noteEnd = noteStart + this.notesInTakt;
+
+    this.tracks.forEach(track => { 
+      track.ts = Date.now();
+      for (let index = noteStart; index < noteEnd; index++) {  
+        track.notes[index] = 0;  
+      }
+    });
+
+    this.forceUpdate();
+  }
+
+  handleCopyClick = (taktIndex) => {
+    console.log('Copy', taktIndex);
+
+    let noteStart = taktIndex * this.notesInTakt;
+    let noteEnd = noteStart + this.notesInTakt;
+
+    this.buffer = [];
+    let counter = 0;
+
+    this.tracks.forEach( (track, trackIndex) => { 
+      this.buffer[trackIndex] = [];
+      counter = 0;
+      track.ts = Date.now();
+      for (let noteIndex = noteStart; noteIndex < noteEnd; noteIndex++) {  
+        this.buffer[trackIndex][counter] = track.notes[noteIndex];  
+        counter++;
+      }
+    });
+
+    console.log('Buffer', this.buffer);
+  }
+
+  handlePasteClick = (taktIndex) => {
+    console.log('Paste', taktIndex, !this.buffer, this.buffer);
+
+    if (this.buffer.length == 0) {
+      console.log('Empty buffer');
+      return;
+    }
+
+    let noteStart = taktIndex * this.notesInTakt;
+    let noteEnd = noteStart + this.notesInTakt;
+    let counter = 0;
+
+    this.tracks.forEach( (track, trackIndex) => {  
+      counter = 0;     
+      track.ts = Date.now();
+      for (let noteIndex = noteStart; noteIndex < noteEnd; noteIndex++) {  
+        track.notes[noteIndex] = this.buffer[trackIndex][counter];  
+        counter++;
+      }
+    });
+
+    this.forceUpdate();
+  }
+
+  get timePointerXPos() {
+    return this.part * this.noteWidth - this.timePointerWidth/2 + 2 + this.trackControlWidth;
+  }
+
+  get timePointerHeight() {
+    return this.tracks.length * this.noteHeight + this.timePointerWidth;
+  }
+
+  get part() {
+    return this.state.timestamp * this.state.bpms * this.notesInPartCount;
   }
 
   get getFormattedTime() {
@@ -404,6 +488,7 @@ class App extends React.Component {
       <div className="workspace no-print"> 
         
         <div className="track-container" ref={this.tracksContainerRef}>
+          {/* TIMELINE */}
           <div className="timeline" style={{width:this.noteWidth * this.tracksLength + "px", marginLeft: this.trackControlWidth+"px"}} onClick={this.handleTimelineClick}>
             {
                [...Array(Math.ceil(this.tracksLength / this.notesInTakt))].map((i,k) => {
@@ -413,23 +498,37 @@ class App extends React.Component {
               })
             }
           </div>
+          {/* TIME POINTER */}
+          <TimePointer timePointerXPos={this.timePointerXPos} timePointerHeight={this.timePointerHeight}/>
 
-          <div className="time-pointer" style={{left: this.timePointerXPos}}> 
-            <div className="time-pointer__stick" style={{height: this.timePointerHeight+"px"}}>
-            </div>
-          </div>
-
+          {/* TRACKS */}
           {
             this.tracks.map((_track,i) => {
               return <Track key={"track_"+i} index={i} noteWidth={this.noteWidth} noteHeight={this.noteHeight} noteClick={this.handleNoteClick} 
-                              tracksLength={this.tracksLength} track={_track} trackControlWidth={this.trackControlWidth} addTaktButtonWidth={this.addTaktButtonWidth}
+                              tracksLength={this.tracksLength} track={_track} ts={_track.ts} trackControlWidth={this.trackControlWidth} addTaktButtonWidth={this.addTaktButtonWidth}
                               />
             })
           }
-          
-          <div className="takt-add" style={{width:this.addTaktButtonWidth, height: this.tracks.length * this.noteHeight+"px", marginTop: -this.tracks.length * this.noteHeight+"px"}}
+
+          {/* TAKT CONTROLS */}
+          <div className="takt-controls" style={{width:this.noteWidth * this.tracksLength + "px", marginLeft: this.trackControlWidth+"px"}}>
+            {
+               [...Array(Math.ceil(this.tracksLength / this.notesInTakt))].map((i,k) => {
+                return <div key={k} className="takt-control" style={{width: this.notesInTakt * this.noteWidth}}>
+                    <button className="takt-control__button button" onClick={this.handlePasteClick.bind(this, k)}>Paste</button>
+                    <button className="takt-control__button button" onClick={this.handleCopyClick.bind(this, k)}>Copy</button>
+                    <button className="takt-control__button button" onClick={this.handleClearClick.bind(this, k)}>Clear</button>
+                    <button className="takt-control__button button" onClick={this.handleDeleteClick.bind(this, k)}>Delete</button>
+                    <div style={{clear: "both"}}></div>
+                  </div>
+              })
+            }
+          </div>
+
+          {/* BUTTON ADD TAKT */}
+          <div className="takt-add" style={{width:this.addTaktButtonWidth, height: this.tracks.length * this.noteHeight + this.taktControlHeight + "px", marginTop: -this.tracks.length * this.noteHeight - this.taktControlHeight + "px"}}
                 onClick={this.handleAddTakt}> 
-                <div className="takt-add__content" style={{lineHeight: this.tracks.length * this.noteHeight - 20 +"px"}}>+</div>           
+                <div className="takt-add__content">+</div>           
           </div>
 
         </div>
@@ -443,3 +542,31 @@ class App extends React.Component {
 }
 
 export default App;
+
+class TimePointer extends React.Component {
+
+  // constructor(props){
+  //   super(props);
+
+  //   this.posx = this.props.timePointerXPos;
+  // }
+
+  // shouldComponentUpdate(nextProps){
+  //   console.log(Math.abs(this.posx  - nextProps.timePointerXPos), Math.abs(this.posx  - nextProps.timePointerXPos) > 50 );
+  //   if (Math.abs(this.posx  - nextProps.timePointerXPos) > 50)
+  //   {
+  //     this.posx = this.props.timePointerXPos;
+  //     return true;
+  //   }
+
+  //   return false;
+  // }
+
+  render() {
+    //console.log('redner TimePointer');
+    return <div className="time-pointer" style={{left: this.props.timePointerXPos}}> 
+            <div className="time-pointer__stick" style={{height: this.props.timePointerHeight+"px"}}>
+            </div>
+          </div>
+  }
+}

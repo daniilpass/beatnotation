@@ -107,7 +107,7 @@ app-toolbar
 } */
 
 /*
-workspace
+WORKSPACE
 */
 .workspace{
  /* background-color: #2F3485; */
@@ -121,6 +121,9 @@ workspace
  overflow-x: scroll;
 }
 
+/*
+TIMELINE
+*/
 .timeline{
   display: block;
   height: 20px;
@@ -154,6 +157,9 @@ workspace
   margin-top: -5px;
 }
 
+/*
+TAKT-ADD button
+*/
 .takt-add {
   width: 100px;
   height: 250px;
@@ -169,13 +175,15 @@ workspace
   text-align: center;
   color: #FFC173;
   font-size: 70px;
-  line-height: 70px;
   cursor: pointer;
   display: table-cell;
   vertical-align: middle;
   padding-bottom: 14px;
 }
 
+/*
+TIME-POINTER
+*/
 .time-pointer{
   position: relative;
   width: 10px;
@@ -192,6 +200,9 @@ workspace
     margin-left: 4px;
 }
 
+/*
+WORKSPACE__TRACK
+*/
 .workspace__track {
   /* background-color: #717171; */
   /* height: 24px; */
@@ -209,6 +220,9 @@ workspace
   box-shadow:inset 0px -31px 0px rgb(255 193 115 / 15%);
 }
 
+/*
+TRACK-CONTROL
+*/
 .track-control{  
   position: sticky;
   left: 0;
@@ -226,6 +240,38 @@ workspace
 .track-control__title{
   position: absolute;
   padding-left: 8px;
+}
+
+/*
+TAKT-CONTROLS
+*/
+.takt-controls{
+  display: block;
+  height: 31px;
+  background-color: #2F3485;
+}
+
+.takt-control{
+  display: inline-block;
+  height: 31px;
+  /* border-left: 1px solid #080E73; */
+  border-right: 1px solid #080E73;
+  vertical-align: top;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.takt-control:first-child{
+  border-left: 1px solid #080E73;
+}
+
+.takt-control__button.button{
+  color: #FFAA40;
+  height: 20px;
+  /* display: inline-block; */
+  float: right;
+  margin-top: 5px;
+  box-shadow: 1px 1px 0px 2px rgb(0 0 0 / 30%);
 }
 
 /*
@@ -297,4 +343,29 @@ CANVASE
 .track-container::-webkit-scrollbar-button:single-button:horizontal:increment {
   border-width: 8px 8px 8px 8px;
   border-color: transparent transparent transparent #7277D8;
+}
+
+
+/*
+CONTROLS
+*/
+.button{
+  height: 21px;
+  margin-right: 8px;
+  background-color: #2F3485;
+  color: #FFC173;
+  border: 2px solid #2F3485;
+  box-shadow: 2px 2px 0px rgb(0 0 0 / 30%);
+  vertical-align: top;
+}
+
+.button:hover {
+  cursor: pointer;
+}
+
+.button:disabled {
+  cursor: default;
+  background-color: #7277D8;
+  color: #2F3485;
+  border: 2px solid #2F3485;
 }

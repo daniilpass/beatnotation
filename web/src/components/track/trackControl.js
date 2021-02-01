@@ -10,6 +10,7 @@ class TrackControl extends React.PureComponent {
     }
 
     render() {  
+      console.log("Render TrackControl");
       return <div className="track-control" style={{width: this.props.width, height: this.props.height}}>
           <div className="track-control__title" style={{lineHeight: this.props.height-2+"px"}}>{this.Title}</div>
       </div>

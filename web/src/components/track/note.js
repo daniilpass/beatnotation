@@ -1,14 +1,6 @@
 import React from "react";
 
-class Note extends React.PureComponent {
-    constructor(props) {
-      super(props);
-      
-      this.state = {
-        level: this.props.level
-      }
-    }
-  
+class Note extends React.Component {  
     get width(){
       return this.props.width;
     }
@@ -17,18 +9,26 @@ class Note extends React.PureComponent {
       return this.props.index * this.props.width;
     }
   
-    handleClick = () => {
-      let newLevel =  this.state.level === 1 ? 0 : 1;
-      this.setState({
-        level: newLevel
-      });
-  
-      this.props.onClick && this.props.onClick(this.props.index, newLevel);
+
+    shouldComponentUpdate(prevProps) {
+      // console.log('shouldComponentUpdate Note');
+      if (this.props.level !== prevProps.level)
+        return true;
+      
+        return false;
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+      console.log('componentDidUpdate note');
+    }
+
+    handleClick = () => {  
+      this.props.onClick && this.props.onClick(this.props.index);
     }
   
     render() {
-      // console.log('Render Note');
-      return <div className={"note " + (this.props.filled ? "note_filled " : "") + ("note_level_" + this.state.level)} 
+      //console.log('Render Note');
+      return <div className={"note " + (this.props.filled ? "note_filled " : "") + ("note_level_" + this.props.level)} 
                   style={{width: this.width + 'px', left: this.posX, height: this.props.noteHeight}}
                   onClick={this.handleClick}>      
       </div>
