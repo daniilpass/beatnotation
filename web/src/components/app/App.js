@@ -2,6 +2,8 @@ import React from "react";
 import './reset.css';
 import './App.css';
 
+
+
 import CanvasNotes from "../noteList/noteList";
 import Track from "../track/track";
 
@@ -15,6 +17,7 @@ import SoundTomHi from '../../assets/sounds/tom_hi.mp3';
 import SoundTomMid from '../../assets/sounds/tom_mid.mp3';
 import SoundTomLow from '../../assets/sounds/tom_low.mp3';
 
+import axios from 'axios';
 
 class App extends React.Component {
   constructor(props){
@@ -146,7 +149,9 @@ class App extends React.Component {
         bpm: this.defaultBpm,
         bpms: this.defaultBpm / 60 / 1000,
         state: "stop",
-        connect: true
+        connect: true,
+        dtu: false,
+        useAudioBuffer: true
       }
 
       this.canvasRef = React.createRef();
@@ -156,8 +161,15 @@ class App extends React.Component {
       this.timestamp = 0;
       this.playPrevTs = 0;
       this.fileReaderRef = React.createRef();
+
+
+      this.soundBuffer = [];
+      // this.bufferSize = 1;
+
+      //try fix delay
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      this.audioCtx = new AudioContext();
   }
- 
 
   componentDidMount () {
     document.addEventListener("keyup", this.handleKeyDown);
@@ -169,6 +181,7 @@ class App extends React.Component {
     this.tracksContainerRef.current.addEventListener('wheel', this.handleTracksWheel);
     this.tryDrawNotes();
     this.updateTimeControls();
+    this.initSoundBuffer();
   }
 
   componentDidUpdate() {
@@ -178,6 +191,38 @@ class App extends React.Component {
   componentWillUnmount () {
     document.removeEventListener("keyup", this.handleKeyDown);
   }
+
+  // shouldComponentUpdate() {
+  //   console.log('shouldComponentUpdate', 'App');
+  //   return true;
+  // }
+
+
+  /*
+  AUDIO CONTEXT
+  */
+
+  loadAudioSample = (url, callback) => {
+    console.log("Loading sample", url);
+    axios.get(url, {responseType: 'arraybuffer'})
+          .then(response => {
+            this.audioCtx.decodeAudioData(response.data, callback, (e) => { console.log("decodeAudioData failed", e); });
+          })   
+  }  
+
+  initSoundBuffer() {
+    this.tracks.forEach( (_track, trackIndex) => {
+      //Init empty item
+      this.soundBuffer[trackIndex] = {};      
+
+      this.loadAudioSample(_track.audioUrl, audioBuffer => {
+            this.soundBuffer[trackIndex].audioBuffer = audioBuffer;
+            console.log("Sample loaded", _track.audioUrl);
+          })      
+    });
+  }
+
+ 
 
   tryDrawNotes() {
     //return;
@@ -343,11 +388,22 @@ class App extends React.Component {
   }
 
   playTrackSound(trackIndex) {
+    if (this.state.useAudioBuffer) {
+      this.playTrackSoundUsingBuffer(trackIndex);
+      return;
+    }
     const track = this.tracks[trackIndex];
     let audio = new Audio(track.audioUrl);
-    audio.volume = track.volume;
+    audio.volume = track.volume;    
     audio.play();
   }
+
+  playTrackSoundUsingBuffer(trackIndex){    
+    let source = this.audioCtx.createBufferSource();
+    source.buffer = this.soundBuffer[trackIndex].audioBuffer;
+    source.connect(this.audioCtx.destination);
+    source.start();
+  }  
 
   handleBpmInputChange = (event) => {
     let value = event.target.value;
@@ -518,6 +574,9 @@ class App extends React.Component {
   }
 
   updateTimeControls() {
+    if (this.state.dtu)
+      return;
+
     this.timeTextRef.current.innerText = "Time: " + this.getFormattedTime;
     this.timePointerRef.current.style.left = this.timePointerXPos + "px";
   }
@@ -542,7 +601,7 @@ class App extends React.Component {
   }
 
   render () {
-    //console.log('Render App');
+    console.log('Render App');
 
     return <div className="App">
       <header className="App-header no-print">
@@ -573,6 +632,14 @@ class App extends React.Component {
           Connect notes: 
           <input name="connect" value={this.state.connect} onChange={this.handleBooleanInputChange} checked={this.state.connect} type="checkbox"></input>
         </div> */}
+        <div>
+          Disable time update: 
+          <input name="dtu" value={this.state.dtu} onChange={this.handleBooleanInputChange} checked={this.state.dtu} type="checkbox"></input>
+        </div>
+        <div>
+          Use Audio Buffer: 
+          <input name="useAudioBuffer" value={this.state.useAudioBuffer} onChange={this.handleBooleanInputChange} checked={this.state.useAudioBuffer} type="checkbox"></input>
+        </div>
         
       </div>
 
