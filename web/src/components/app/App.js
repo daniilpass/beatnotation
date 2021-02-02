@@ -266,8 +266,9 @@ class App extends React.Component {
     this.setState({
       bpm: data.bpm,
       bpms: data.bpm / 60 / 1000
+    }, () => {
+      this.updateTimeControls()
     })
-    this.updateTimeControls();
   }
 
   print = () => {
