@@ -42,7 +42,7 @@ class App extends React.Component {
       this.tracks = [
         {
           audioUrl: SoundCrash,
-          audio: new Audio(SoundCrash),
+          // audio: new Audio(SoundCrash),
           volume: 0.5,
           notes: [],
           line: 0.5,
@@ -51,7 +51,7 @@ class App extends React.Component {
         },
         {
           audioUrl: SoundRide,
-          audio: new Audio(SoundRide),
+          // audio: new Audio(SoundRide),
           volume: 1,
           notes: [],
           line: 1.5,
@@ -60,7 +60,7 @@ class App extends React.Component {
         },
         {
           audioUrl: SoundHiHatClosed, 
-          audio: new Audio(SoundHiHatClosed),
+          // audio: new Audio(SoundHiHatClosed),
           volume: 1,
           notes: [],
           line: 1,
@@ -69,7 +69,7 @@ class App extends React.Component {
         },
         {
           audioUrl: SoundHiHatOpened,
-          audio: new Audio(SoundHiHatOpened),
+          // audio: new Audio(SoundHiHatOpened),
           volume: 1,
           notes: [],
           line: 1,
@@ -78,7 +78,7 @@ class App extends React.Component {
         },
         {
           audioUrl: SoundSnare,
-          audio: new Audio(SoundSnare),
+          // audio: new Audio(SoundSnare),
           volume: 1,
           notes: [],
           line: 3,
@@ -87,7 +87,7 @@ class App extends React.Component {
         },
         {
           audioUrl: SoundTomHi,
-          audio: new Audio(SoundTomHi), // tom 2
+          // audio: new Audio(SoundTomHi), // tom 2
           volume: 1,
           notes: []  ,
           line: 2,
@@ -96,7 +96,7 @@ class App extends React.Component {
         },
         {
           audioUrl: SoundTomMid,
-          audio: new Audio(SoundTomMid), // tom 2
+          // audio: new Audio(SoundTomMid), // tom 2
           volume: 1,
           notes: []  ,
           line: 2.5,
@@ -105,7 +105,7 @@ class App extends React.Component {
         },
         {
           audioUrl: SoundTomLow,
-          audio: new Audio(SoundTomLow), //floor tom
+          // audio: new Audio(SoundTomLow), //floor tom
           volume: 1,
           notes: []  ,
           line: 4,
@@ -114,7 +114,7 @@ class App extends React.Component {
         },
         {
           audioUrl: SoundBass,
-          audio: new Audio(SoundBass),
+          // audio: new Audio(SoundBass),
           volume: 1,
           notes: []  ,
           line: 5,
@@ -213,6 +213,26 @@ class App extends React.Component {
         break;
     }
     return false;
+  }
+
+  save = () => {
+    console.log("save");
+    
+    //TODO: improve data to save
+    let content = JSON.stringify(this.tracks);
+    let filename = "BeatNotation_"+Date.now()+".beno";
+    const file = new Blob([content], {type: 'application/json'});
+
+    const a = document.createElement('a');
+    a.href= URL.createObjectURL(file);
+    a.download = filename;
+    a.click();
+  
+    URL.revokeObjectURL(a.href);
+  }
+
+  load = () => {
+    console.log("load");
   }
 
   print = () => {
@@ -482,7 +502,8 @@ class App extends React.Component {
         <button className="app-toolbar__button" onClick={this.stop} disabled={this.state.state === "stop"}>Stop</button>
         <button className="app-toolbar__button" onClick={this.pause} disabled={this.state.state === "pause" || this.state.state === "stop"}>Pause</button>
         <button className="app-toolbar__button" onClick={this.print}>Print notation</button>
-        
+        <button className="app-toolbar__button" onClick={this.save}>Save project</button>
+
         {/* <div className="app-toolbar__part" >
           Part: {Math.trunc(this.part) + 1 }
         </div> */}
