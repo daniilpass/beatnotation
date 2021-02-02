@@ -261,12 +261,13 @@ class App extends React.Component {
       maxTrackLength = tmpTrack.notes.length > maxTrackLength ? tmpTrack.notes.length : maxTrackLength;
     }
     this.tracksLength = maxTrackLength;
+    this.timestamp = 0;
 
     this.setState({
       bpm: data.bpm,
       bpms: data.bpm / 60 / 1000
     })
-    // this.forceUpdate();
+    this.updateTimeControls();
   }
 
   print = () => {
