@@ -212,13 +212,14 @@ WORKSPACE__TRACK
   white-space: nowrap;
   z-index: 1;
 }
-.workspace__track:hover .note{
-  /* box-shadow:inset 0px -31px 0px rgb(255 0 0 / 20%); */
+
+/*Cause bad performance then playing*/
+/* .workspace__track:hover .note{ 
   box-shadow:inset 0px -31px 0px rgb(255 193 115 / 15%);
-}
+}*/
 .workspace__track:hover .track-control{
   box-shadow:inset 0px -31px 0px rgb(255 193 115 / 15%);
-}
+}  
 
 /*
 TRACK-CONTROL

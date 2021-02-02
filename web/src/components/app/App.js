@@ -154,6 +154,7 @@ class App extends React.Component {
       this.timePointerRef = React.createRef();
       this.timeTextRef = React.createRef();
       this.timestamp = 0;
+      this.playPrevTs = 0;
   }
  
 
@@ -221,6 +222,7 @@ class App extends React.Component {
 
   play = () => {
     console.log("play");
+    this.playPrevTs = Date.now();
     this.timerId = setInterval(this.step, this.stepDelay);
 
     this.setState({
@@ -252,7 +254,9 @@ class App extends React.Component {
   }
 
   step = () => {
-    this.timestamp = this.timestamp + this.stepDelay;
+    //this.timestamp = this.timestamp + this.stepDelay;
+    this.timestamp = this.timestamp + (Date.now() - this.playPrevTs);
+    this.playPrevTs = Date.now();
     this.playNotes();
     window.requestAnimationFrame(this.updateTimeControls.bind(this));
   }
