@@ -29,6 +29,7 @@ class TrackControl extends React.Component {
     }
 
     shouldComponentUpdate(prevPros, prevState) {
+      // console.log('shouldComponentUpdate', this.props, prevPros);
       if (this.props.track.volume !== prevPros.track.volume
         || this.state.tmpVolume !== prevState.tmpVolume) {
         return true;

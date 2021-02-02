@@ -26,7 +26,7 @@ class App extends React.Component {
       this.noteWidth = 20;
       this.defaultBpm = 120;
       this.notesInPartCount = 4;
-      this.tracksLength = 7200;//256;
+      this.tracksLength = 64;//256;
       this.prevNoteIndex = -1;
       this.timePointerWidth = 10;
       this.noteHeight = 31;
@@ -155,6 +155,7 @@ class App extends React.Component {
       this.timeTextRef = React.createRef();
       this.timestamp = 0;
       this.playPrevTs = 0;
+      this.fileReaderRef = React.createRef();
   }
  
 
@@ -233,6 +234,30 @@ class App extends React.Component {
 
   load = () => {
     console.log("load");
+    this.fileReaderRef.current.selectFile();
+  }
+
+  handleFileLoaded = (content) => {
+    console.log("loaded");
+    //Load from files:
+    //-volume
+    //-notes
+    //-trackLength
+
+    var data = JSON.parse(content);
+    var maxTrackLength = 0;
+
+    for (let it = 0; it < this.tracks.length; it++) {
+      const tmpTrack = {...this.tracks[it]};
+      const loadedTrack = data[it];
+      tmpTrack.volume = loadedTrack.volume;
+      tmpTrack.notes = [...loadedTrack.notes];
+      tmpTrack.ts = Date.now();
+      this.tracks[it] = tmpTrack;
+      maxTrackLength = tmpTrack.notes.length > maxTrackLength ? tmpTrack.notes.length : maxTrackLength;
+    }
+    this.tracksLength = maxTrackLength;
+    this.forceUpdate();
   }
 
   print = () => {
@@ -501,8 +526,9 @@ class App extends React.Component {
         <button className="app-toolbar__button" onClick={this.play} disabled={this.state.state === "play"}>Play</button>
         <button className="app-toolbar__button" onClick={this.stop} disabled={this.state.state === "stop"}>Stop</button>
         <button className="app-toolbar__button" onClick={this.pause} disabled={this.state.state === "pause" || this.state.state === "stop"}>Pause</button>
-        <button className="app-toolbar__button" onClick={this.print}>Print notation</button>
-        <button className="app-toolbar__button" onClick={this.save}>Save project</button>
+        <button className="app-toolbar__button" onClick={this.print} disabled={this.state.state === "play"}>Print notation</button>
+        <button className="app-toolbar__button" onClick={this.save} disabled={this.state.state === "play"}>Save project</button>
+        <button className="app-toolbar__button" onClick={this.load} disabled={this.state.state === "play"}>Load project</button>
 
         {/* <div className="app-toolbar__part" >
           Part: {Math.trunc(this.part) + 1 }
@@ -579,12 +605,56 @@ class App extends React.Component {
        
       </div>
 
-       <CanvasNotes ref={this.canvasRef} />
+      <UserFileReader ref={this.fileReaderRef} onFileLoaded={this.handleFileLoaded} accept=".beno"/>
+
+      <CanvasNotes ref={this.canvasRef} />
     </div>
   }
 }
 
 export default App;
+
+class UserFileReader extends React.PureComponent {
+
+  constructor(props){
+    super(props);
+
+    this.input = React.createRef();
+  }
+
+  selectFile = () => {
+    this.input.current.click();
+  }
+
+  fileInputChange = (e) => {
+    this.loadFile();
+  }
+
+  loadFile = () => {
+    if (this.input.current.files.length == 0) {
+      return;
+    } 
+
+    let file = this.input.current.files[0];
+    var reader = new FileReader();
+    reader.onload = (re) => {
+      var fileContent = re.target.result;
+      this.props.onFileLoaded && this.props.onFileLoaded(fileContent);
+    }
+    reader.onerror = () => {
+      alert("Can't load file");
+    }
+    reader.readAsText(file);    
+  }
+  
+  
+
+  render() {
+    return <div className="file-reader" style={{display:"none"}}> 
+            <input type="file" ref={this.input} onChange={this.fileInputChange} accept={this.props.accept}></input>
+          </div>
+  }
+}
 
 class TimePointer extends React.Component {
 
