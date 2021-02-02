@@ -220,7 +220,11 @@ class App extends React.Component {
     console.log("save");
     
     //TODO: improve data to save
-    let content = JSON.stringify(this.tracks);
+    let saveData = {
+      tracks: this.tracks,
+      bpm: this.state.bpm
+    }
+    let content = JSON.stringify(saveData);
     let filename = "BeatNotation_"+Date.now()+".beno";
     const file = new Blob([content], {type: 'application/json'});
 
@@ -249,7 +253,7 @@ class App extends React.Component {
 
     for (let it = 0; it < this.tracks.length; it++) {
       const tmpTrack = {...this.tracks[it]};
-      const loadedTrack = data[it];
+      const loadedTrack = data.tracks[it];
       tmpTrack.volume = loadedTrack.volume;
       tmpTrack.notes = [...loadedTrack.notes];
       tmpTrack.ts = Date.now();
@@ -257,7 +261,12 @@ class App extends React.Component {
       maxTrackLength = tmpTrack.notes.length > maxTrackLength ? tmpTrack.notes.length : maxTrackLength;
     }
     this.tracksLength = maxTrackLength;
-    this.forceUpdate();
+
+    this.setState({
+      bpm: data.bpm,
+      bpms: data.bpm / 60 / 1000
+    })
+    // this.forceUpdate();
   }
 
   print = () => {
