@@ -200,7 +200,7 @@ class App extends React.Component {
       case 32:
         if (this.state.state === "play") {
           this.pause();
-        } else if (this.state.state === "stop" || this.state.state === "pause") {
+        } else if ( (this.state.state === "stop" || this.state.state === "pause") && this.part < this.tracksLength) {
           this.play();
         }
         break;
@@ -313,6 +313,10 @@ class App extends React.Component {
     this.playPrevTs = Date.now();
     this.playNotes();
     window.requestAnimationFrame(this.updateTimeControls.bind(this));
+
+    //Pause then end
+    if(this.part > this.tracksLength)
+      this.pause();  
   }
 
   playNotes = () => {
@@ -395,6 +399,7 @@ class App extends React.Component {
     // Обновляю время
     this.timestamp = newTimestamp;
     this.updateTimeControls();
+    this.forceUpdate();
   }
 
   handleAddTakt = (e) => {
@@ -532,7 +537,7 @@ class App extends React.Component {
       </header>
 
       <div className="app-toolbar no-print">
-        <button className="app-toolbar__button" onClick={this.play} disabled={this.state.state === "play"}>Play</button>
+        <button className="app-toolbar__button" onClick={this.play} disabled={this.state.state === "play" || this.part >= this.tracksLength}>Play</button>
         <button className="app-toolbar__button" onClick={this.stop} disabled={this.state.state === "stop"}>Stop</button>
         <button className="app-toolbar__button" onClick={this.pause} disabled={this.state.state === "pause" || this.state.state === "stop"}>Pause</button>
         <button className="app-toolbar__button" onClick={this.print} disabled={this.state.state === "play"}>Print notation</button>
