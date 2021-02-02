@@ -350,13 +350,20 @@ class App extends React.Component {
   }
 
   handleBpmInputChange = (event) => {
-    // let name = event.target.name;
     let value = event.target.value;
+    value = value === '' ? '1' : value;
 
-    this.setState({
-      bpm: value,
-      bpms: value / 60 / 1000,
-    })    
+    var regNumber = /^[0-9\b]+$/;
+    if (regNumber.test(value)){
+      let intValue = parseInt(value);
+      intValue = intValue < 1 ?  1 : intValue;
+      intValue = intValue > 300 ? 300 : intValue;
+
+      this.setState({
+        bpm: intValue,
+        bpms: intValue / 60 / 1000,
+      })  
+    }  
   }
 
   handleBooleanInputChange = (event) => {
