@@ -246,11 +246,8 @@ class CanvasNotes extends React.PureComponent {
           // Рисую соеденительную линию
           if (lead4 && leftBound !== Number.MAX_SAFE_INTEGER && rightBound !== Number.MIN_SAFE_INTEGER) {
             // Соеденительная линия размер 8
-            let x = note_x + this.noteRadius + leftBound* this.noteRadius * 3;
+            let x = note_x + this.noteRadius + leftBound* this.noteRadius * 2.5;
             let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + downBound * this.linePadding - this.noteRadius*6;
-
-            //OLD let note_x = this.startX + lineNoteCounter * (this.noteRadius * 2 + this.noteRadius) + taktCounter * this.taktPadding;
-            //NEW let note_x = this.startX + lineNoteCounter * (this.noteRadius * 2 + this.noteRadius / 2) + (taktCounter) * this.taktPadding;
             let length = (rightBound - leftBound) * this.noteRadius * 2.5; 
 
             this.drawHorizontalLine(x, y, length);
