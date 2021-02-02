@@ -263,6 +263,10 @@ class App extends React.Component {
     this.tracksLength = maxTrackLength;
     this.timestamp = 0;
 
+    console.log("BPM:", data.bpm);
+    console.log("TracksLength:", this.tracksLength);
+    console.log("FileData:", data);
+
     this.setState({
       bpm: data.bpm,
       bpms: data.bpm / 60 / 1000
