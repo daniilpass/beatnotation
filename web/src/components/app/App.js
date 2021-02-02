@@ -646,7 +646,7 @@ class UserFileReader extends React.PureComponent {
   }
 
   loadFile = () => {
-    if (this.input.current.files.length == 0) {
+    if (this.input.current.files.length === 0) {
       return;
     } 
 
@@ -667,34 +667,6 @@ class UserFileReader extends React.PureComponent {
   render() {
     return <div className="file-reader" style={{display:"none"}}> 
             <input type="file" ref={this.input} onChange={this.fileInputChange} accept={this.props.accept}></input>
-          </div>
-  }
-}
-
-class TimePointer extends React.Component {
-
-  // constructor(props){
-  //   super(props);
-
-  //   this.posx = this.props.timePointerXPos;
-  // }
-
-  // shouldComponentUpdate(nextProps){
-  //   console.log(Math.abs(this.posx  - nextProps.timePointerXPos), Math.abs(this.posx  - nextProps.timePointerXPos) > 50 );
-  //   if (Math.abs(this.posx  - nextProps.timePointerXPos) > 50)
-  //   {
-  //     this.posx = this.props.timePointerXPos;
-  //     return true;
-  //   }
-
-  //   return false;
-  // }
-
-  render() {
-    //console.log('redner TimePointer');
-    return <div className="time-pointer" style={{left: this.props.timePointerXPos}}> 
-            <div className="time-pointer__stick" style={{height: this.props.timePointerHeight+"px"}}>
-            </div>
           </div>
   }
 }
