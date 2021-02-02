@@ -27,8 +27,8 @@ class CanvasNotes extends React.PureComponent {
       this.noteRadius = 5;
       
       this.notesInTakt = 16;
-      this.notesInLine = this.notesInTakt * 3;
-      this.taktPadding = this.noteRadius * 10;
+      this.notesInLine = this.notesInTakt * 4;
+      this.taktPadding = this.noteRadius * 5;
     }
   
     componentDidMount() { 
@@ -127,7 +127,7 @@ class CanvasNotes extends React.PureComponent {
 
 
           // Координаты ноты по X
-          let note_x = this.startX + lineNoteCounter * (this.noteRadius * 2 + this.noteRadius) + taktCounter * this.taktPadding;
+          let note_x = this.startX + lineNoteCounter * (this.noteRadius * 2.5) + taktCounter * this.taktPadding;
           // Начало четверти
           let lead4 = (noteIndex) % 4 === 0;
           // Номер нижней ноты на линииях
@@ -248,7 +248,11 @@ class CanvasNotes extends React.PureComponent {
             // Соеденительная линия размер 8
             let x = note_x + this.noteRadius + leftBound* this.noteRadius * 3;
             let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + downBound * this.linePadding - this.noteRadius*6;
-            let length = (rightBound - leftBound) * this.noteRadius * 3; 
+
+            //OLD let note_x = this.startX + lineNoteCounter * (this.noteRadius * 2 + this.noteRadius) + taktCounter * this.taktPadding;
+            //NEW let note_x = this.startX + lineNoteCounter * (this.noteRadius * 2 + this.noteRadius / 2) + (taktCounter) * this.taktPadding;
+            let length = (rightBound - leftBound) * this.noteRadius * 2.5; 
+
             this.drawHorizontalLine(x, y, length);
   
             // Дополнительная соеденительная линия для размера 16
