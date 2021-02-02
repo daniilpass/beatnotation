@@ -30,6 +30,10 @@ class Track extends React.Component {
       return this.props.track.notes;
     }
 
+    onVolumeChange = (value) => {
+      this.props.onVolumeChange && this.props.onVolumeChange(this.props.index, value);
+    }
+
     renderNotes() {
       let els = []
       
@@ -55,7 +59,7 @@ class Track extends React.Component {
       console.log('Render Track');
   
       return <div className="workspace__track" style={{...this.props.style, height: this.props.noteHeight, width:this.props.noteWidth * this.props.tracksLength + this.props.trackControlWidth}}>
-        <TrackControl track={this.props.track} width={this.props.trackControlWidth} height={this.props.noteHeight}/>
+        <TrackControl track={this.props.track} width={this.props.trackControlWidth} height={this.props.noteHeight} onVolumeChange={this.onVolumeChange}/>
         {this.renderNotes()}
       </div>
     }

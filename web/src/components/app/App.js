@@ -320,6 +320,14 @@ class App extends React.Component {
     this.forceUpdate();
   }
 
+  handleTrackVolumeChange = (trackIndex, value) => {
+    console.log("handleTrackVolumeChange", trackIndex, value);
+    let track = this.tracks[trackIndex];
+    track.volume = value;
+    track.ts = Date.now();
+    this.forceUpdate();
+  }
+
   handleTimelineClick = (e) => {    
     e.preventDefault();
     //Получаю координату клика внутри временной шкалы
@@ -519,6 +527,7 @@ class App extends React.Component {
             this.tracks.map((_track,i) => {
               return <Track key={"track_"+i} index={i} noteWidth={this.noteWidth} noteHeight={this.noteHeight} noteClick={this.handleNoteClick} 
                               tracksLength={this.tracksLength} track={_track} ts={_track.ts} trackControlWidth={this.trackControlWidth} addTaktButtonWidth={this.addTaktButtonWidth}
+                              onVolumeChange={this.handleTrackVolumeChange}
                               />
             })
           }

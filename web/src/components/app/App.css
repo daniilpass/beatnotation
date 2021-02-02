@@ -241,8 +241,25 @@ TRACK-CONTROL
 .track-control__title{
   position: absolute;
   padding-left: 8px;
+  left: 48px;
+  user-select: none;
 }
 
+.track-control__volume {
+  position: absolute;
+  left: 8px;
+  width: 40px;
+  height: 23px;
+  overflow: hidden;
+  /* background: linear-gradient(transparent 50%, green 50%); */
+  text-align: center;
+  margin-top: 3px;
+  border: 1px solid rgb(13 136 0 / 52%);
+  color: #329D27;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+}
 /*
 TAKT-CONTROLS
 */
