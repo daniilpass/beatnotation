@@ -29,7 +29,7 @@ class App extends React.Component {
       this.noteWidth = 20;
       this.defaultBpm = 120;
       this.notesInPartCount = 4;
-      this.tracksLength = 64;//256;
+      this.tracksLength = 7200;//256;
       this.prevNoteIndex = -1;
       this.timePointerWidth = 10;
       this.noteHeight = 31;
@@ -151,7 +151,8 @@ class App extends React.Component {
         state: "stop",
         connect: true,
         dtu: false,
-        useAudioBuffer: true
+        useAudioContext: true,
+        realtimeRender: false
       }
 
       this.canvasRef = React.createRef();
@@ -224,8 +225,11 @@ class App extends React.Component {
 
  
 
-  tryDrawNotes() {
-    //return;
+  tryDrawNotes(force) {
+    if (!this.state.realtimeRender && !force) {
+      return;
+    }
+    
     // get max right note index
     let notesCount = 0;
     this.tracks.forEach(t => {
@@ -322,6 +326,7 @@ class App extends React.Component {
 
   print = () => {
     console.log("print");
+    this.tryDrawNotes(true);
     window.print();
   }
 
@@ -388,7 +393,7 @@ class App extends React.Component {
   }
 
   playTrackSound(trackIndex) {
-    if (this.state.useAudioBuffer) {
+    if (this.state.useAudioContext) {
       this.playTrackSoundUsingBuffer(trackIndex);
       return;
     }
@@ -440,7 +445,7 @@ class App extends React.Component {
       this.playTrackSound(trackIndex);
     }
 
-    
+
     // Рисую ноты
     this.tryDrawNotes();
 
@@ -637,10 +642,13 @@ class App extends React.Component {
           <input name="dtu" value={this.state.dtu} onChange={this.handleBooleanInputChange} checked={this.state.dtu} type="checkbox"></input>
         </div>
         <div>
-          Use Audio Buffer: 
-          <input name="useAudioBuffer" value={this.state.useAudioBuffer} onChange={this.handleBooleanInputChange} checked={this.state.useAudioBuffer} type="checkbox"></input>
+          Use AudioContext: 
+          <input name="useAudioContext" value={this.state.useAudioContext} onChange={this.handleBooleanInputChange} checked={this.state.useAudioContext} type="checkbox"></input>
         </div>
-        
+        <div>
+          Realtime render: 
+          <input name="realtimeRender" value={this.state.realtimeRender} onChange={this.handleBooleanInputChange} checked={this.state.realtimeRender} type="checkbox"></input>
+        </div>
       </div>
 
       <div className="workspace no-print"> 

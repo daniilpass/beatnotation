@@ -8,7 +8,7 @@ class CanvasNotes extends React.PureComponent {
       this.canvas = null;
       this.ctx = null;
       this.cWidth = 1000;
-      this.cHeight = 800;
+      this.cHeight = 0;
       // Начало по X линии
       this.startX = 20;
       // Линии
@@ -33,7 +33,7 @@ class CanvasNotes extends React.PureComponent {
   
     componentDidMount() { 
       this.canvasWrapper = document.getElementsByClassName('canvas_notes_wrapper')[0];
-      this.draw();
+      //this.draw();
       
       this.lastNoteIndex = 0;
     }
