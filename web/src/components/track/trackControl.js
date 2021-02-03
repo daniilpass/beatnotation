@@ -24,6 +24,10 @@ class TrackControl extends React.Component {
       return Math.trunc(this.state.tmpVolume > -1 ? this.state.tmpVolume : this.props.track.volume * 100);
     }
 
+    get maxVolume() {
+      return this.props.maxVolume || 100;
+    }
+
     componentDidMount() {
       this.tcVolume.current.onmousedown = this.dragMouseDown;
     }
@@ -68,7 +72,7 @@ class TrackControl extends React.Component {
       this.drag.oldClientY = e.clientY;
       //change volume
       let newVolume = this.state.tmpVolume + deltaY;
-      if (newVolume <= 100 && newVolume >= 0) {
+      if (newVolume <= this.maxVolume && newVolume >= 0) {
         window.requestAnimationFrame( () => { this.setState({tmpVolume: newVolume}) } );
       }
       //console.log(deltaX, deltaY, this.tmpVolume);
@@ -77,7 +81,7 @@ class TrackControl extends React.Component {
     render() {  
       //console.log("Render TrackControl");
       return <div className="track-control" style={{width: this.props.width, height: this.props.height}}>
-          <div className="track-control__volume"  ref={this.tcVolume} style={{background: `linear-gradient(to top, rgb(13 136 0 / 52%) ${this.Volume}%, transparent 0% )`}}>
+          <div className="track-control__volume"  ref={this.tcVolume} style={{background: `linear-gradient(to top, rgb(13 136 0 / 52%) ${this.Volume/(this.maxVolume/100)}%, transparent 0% )`}}>
             {this.Volume}
           </div>
           <div className="track-control__title" style={{lineHeight: this.props.height-2+"px"}}>{this.Title}</div>

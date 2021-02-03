@@ -131,7 +131,12 @@ class App extends React.Component {
       this.soundBuffer[trackIndex] = {};      
 
       this.loadAudioSample(_track.audioUrl, audioBuffer => {
+            //save audio buffer
             this.soundBuffer[trackIndex].audioBuffer = audioBuffer;
+
+            //save gain node for track
+            this.soundBuffer[trackIndex].gainNode = this.audioCtx.createGain()              
+            this.soundBuffer[trackIndex].gainNode.connect(this.audioCtx.destination)
             console.log("Sample loaded", _track.audioUrl);
           })      
     });
@@ -377,9 +382,12 @@ class App extends React.Component {
   }
 
   playTrackSound(trackIndex) {
+    //set gain
+    this.soundBuffer[trackIndex].gainNode.gain.value = this.tracks[trackIndex].volume; 
+    // play sound
     let source = this.audioCtx.createBufferSource();
     source.buffer = this.soundBuffer[trackIndex].audioBuffer;
-    source.connect(this.audioCtx.destination);
+    source.connect(this.soundBuffer[trackIndex].gainNode);
     source.start();
   } 
 

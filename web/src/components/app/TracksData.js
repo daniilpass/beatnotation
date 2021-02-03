@@ -15,7 +15,7 @@ import SoundTomLow from '../../assets/sounds/tom_low.mp3';
 export const tracksData = [
     {
         audioUrl: SoundCrash,
-        volume: 0.5,
+        volume: 1,
         takts:[],
         line: 0.5,
         type: 2,
