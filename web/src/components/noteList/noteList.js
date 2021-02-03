@@ -211,13 +211,21 @@ class CanvasNotes extends React.PureComponent {
               pattern16 = false;
               pattern4 = true;
             }
+
+            //Если четверть пустая, то рисую четвернтую паузу
+            if (lead4 && (pattern[0] === 0 && pattern[1] === 0 && pattern[2] === 0 && pattern[3] === 0)) {
+              let pauseLine = 2;
+              let x = note_x + this.noteRadius*4;
+              let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + pauseLine * this.linePadding
+              this.drawPause4(x,y)  
+            }
     
             //Если размер 16 и нет ноты, то рисую паузу
             if (pattern16 && noteLine === Number.MIN_SAFE_INTEGER && leftBound !== Number.MAX_SAFE_INTEGER && rightBound !==Number.MIN_SAFE_INTEGER) {
               let pauseLine = 3;
               let x = note_x;
               let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + pauseLine * this.linePadding
-              this.drawPause(x, y);
+              this.drawPause16(x, y);
             }
     
             // Подтягиваю нотные палки вверх        
@@ -288,8 +296,8 @@ class CanvasNotes extends React.PureComponent {
       this.ctx.lineWidth = width;
     }
   
-    // Рисует паузу
-    drawPause(posX, posY) {
+    // Рисует паузу 16ю
+    drawPause16(posX, posY) {
       this.setCanvasStyle("#a1a1a1", 1.1);
       
       let pauseRadius = this.noteRadius / 2;
@@ -301,6 +309,42 @@ class CanvasNotes extends React.PureComponent {
       this.ctx.fill();
       this.ctx.moveTo(posX + pauseRadius*2, posY - pauseRadius*2);
       this.ctx.lineTo(posX + pauseRadius, posY + pauseRadius * 10);    
+      this.ctx.stroke();
+    }
+
+    // Рисует паузу 4ю
+    drawPause4(posX, posY){
+      
+      let pauseRadius = this.noteRadius / 2;
+   
+      this.setCanvasStyle("#a1a1a1", 2);
+      this.ctx.beginPath();     
+      this.ctx.moveTo(posX - pauseRadius, posY);
+      this.ctx.lineTo(posX + pauseRadius, posY + pauseRadius * 3);  
+      this.ctx.stroke();
+
+      this.setCanvasStyle("#a1a1a1", 5);
+      this.ctx.beginPath();
+      this.ctx.moveTo(posX + pauseRadius, posY + pauseRadius * 2.5);  
+      this.ctx.lineTo(posX - pauseRadius, posY + pauseRadius * 6); 
+      this.ctx.stroke();
+
+      this.setCanvasStyle("#a1a1a1", 3);
+      this.ctx.beginPath();
+      this.ctx.moveTo(posX - pauseRadius, posY + pauseRadius * 6);  
+      this.ctx.lineTo(posX + pauseRadius, posY + pauseRadius * 9  ); 
+      this.ctx.stroke();
+
+      this.setCanvasStyle("#a1a1a1", 3);
+      this.ctx.beginPath();
+      this.ctx.moveTo(posX + pauseRadius, posY + pauseRadius * 9);  
+      this.ctx.lineTo(posX - pauseRadius*2, posY + pauseRadius * 8); 
+      this.ctx.stroke();
+
+      this.setCanvasStyle("#a1a1a1", 3);
+      this.ctx.beginPath();
+      this.ctx.moveTo(posX - pauseRadius*2, posY + pauseRadius * 8);  
+      this.ctx.lineTo(posX - pauseRadius, posY + pauseRadius * 11); 
       this.ctx.stroke();
     }
   
