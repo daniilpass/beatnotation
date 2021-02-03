@@ -22,8 +22,8 @@ class Track extends React.Component {
       return false;
     }
 
-    handleNoteClick = (noteIndex) => {
-      this.props.noteClick && this.props.noteClick(this.props.index, noteIndex);
+    handleNoteClick = (noteIndex, newlevel) => {
+      this.props.noteClick && this.props.noteClick(this.props.index, noteIndex, newlevel);
     }
   
     get Notes() {

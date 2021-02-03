@@ -435,10 +435,11 @@ class App extends React.Component {
   }
 
   handleNoteClick = (trackIndex, noteIndex, level) => {
+    console.log('handleNoteClick')
     //let track = {...this.tracks[trackIndex]};
     let track = this.tracks[trackIndex];
-    track.notes[noteIndex] = track.notes[noteIndex] === 1 ? 0 : 1 ; //level;
-    track.ts = Date.now();
+    track.notes[noteIndex] = level;
+    //track.ts = Date.now();
 
     // Проигрываю выбранную ноту
     if (level > 0) {
@@ -449,7 +450,7 @@ class App extends React.Component {
     // Рисую ноты
     this.tryDrawNotes();
 
-    this.forceUpdate();
+    //this.forceUpdate();
   }
 
   handleTrackVolumeChange = (trackIndex, value) => {
@@ -566,6 +567,20 @@ class App extends React.Component {
     let noteEnd = noteStart + this.notesInTakt;
     let counter = 0;
 
+    // var tmpTracks = [...this.tracks];
+    // for (let trackIndex = 0; trackIndex < tmpTracks.length; trackIndex++) {
+    //   counter = 0;  
+    //   var track = {...tmpTracks[trackIndex]};
+    //   track.ts = Date.now();
+    //   track.notes=[...track.notes];
+    //   for (let noteIndex = noteStart; noteIndex < noteEnd; noteIndex++) {  
+    //     track.notes[noteIndex] = this.buffer[trackIndex][counter];  
+    //     counter++;
+    //   }
+    //   tmpTracks[trackIndex] = {...track}
+    // }
+    // this.tracks = [...tmpTracks]
+
     this.tracks.forEach( (track, trackIndex) => {  
       counter = 0;     
       track.ts = Date.now();
@@ -574,7 +589,8 @@ class App extends React.Component {
         counter++;
       }
     });
-
+    
+    //console.log(this.tracks );
     this.forceUpdate();
   }
 
