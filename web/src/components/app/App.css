@@ -301,9 +301,9 @@ Note
   background-color:#7277D8 ;
 }
 
-.note:last-child{
+/* .note:last-child{
   margin-right: 100px;
-}
+} */
 
 .note.note_filled, .note.note_filled.note.note_level_0 {
   background-color:#2F3485 ;
@@ -386,4 +386,13 @@ CONTROLS
   background-color: #7277D8;
   color: #2F3485;
   border: 2px solid #2F3485;
+}
+
+
+.workspace__track__takt{
+  display: inline-block;
+}
+
+.workspace__track__takt:last-child {
+  margin-right: 100px;
 }

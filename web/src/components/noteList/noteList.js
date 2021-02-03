@@ -44,7 +44,7 @@ class CanvasNotes extends React.PureComponent {
       this.ctx = this.canvas.getContext('2d');
     }
 
-    draw(tracks, notesLimit, bpm) {
+    draw(tracks, taktCountLimit, bpm) {
       // Удаляю старые холсты
       while (this.canvasWrapper.childElementCount > 1) {
         this.canvasWrapper.removeChild(this.canvasWrapper.firstChild);
@@ -54,7 +54,7 @@ class CanvasNotes extends React.PureComponent {
       this.initCanvasContext();
 
       this.clear();
-      this.drawList(tracks, notesLimit, bpm);
+      this.drawList(tracks, taktCountLimit, bpm);
     }
     
     clear() {
@@ -65,9 +65,9 @@ class CanvasNotes extends React.PureComponent {
       this.canvas.height = height;
     }
 
-    drawList(tracks, notesLimit, bpm) {
+    drawList(tracks, taktCountLimit, bpm) {
       // Вычисляю сколько нужно строк, чтобы уместить все ноты
-      this.groupsCount  =  this.groupsPerPage; //Math.ceil(notesLimit / this.notesInLine);
+      this.groupsCount  =  this.groupsPerPage; //Math.ceil(taktCountLimit / this.notesInLine);
       //this.groupsCount  =  this.groupsCount > this.groupsPerPage ? this.groupsPerPage : this.groupsCount;      
       // Рассчитываю высоту холста
       this.cHeight = (this.groupsCount  + 1) * this.lineGroupHeight;
@@ -88,8 +88,8 @@ class CanvasNotes extends React.PureComponent {
   
         let lineNumb = 1;
         let prevLineNumb = 1;
+
         let lineNoteCounter = 1;
-        let taktNoteCounter = 1;
         let taktCounter = 1;
   
         // ГРаницы для соединения нот
@@ -99,192 +99,183 @@ class CanvasNotes extends React.PureComponent {
         let rightBound = Number.MIN_SAFE_INTEGER;
         let pattern = [0,0,0,0];
         let pattern16 = false;
-        let pattern4 = false;
-        
-        let notesLength = notesLimit; //tracks[0].notes.length;
-        for (let noteIndex = 0; noteIndex < notesLength; noteIndex++) { 
+        let pattern4 = false;        
+      
+        for (let taktIndex = 0; taktIndex < taktCountLimit; taktIndex++) {
 
-          // Если линий достаточно, то создаю новый canvas и рисую уже на нем
-          if ( (prevLineNumb !== lineNumb) && (lineNumb % this.groupsPerPage === 1) ) {
-            
-            console.log("NEW CANVAS", prevLineNumb, lineNumb, this.groupsPerPage);
-            prevLineNumb = 1;
-            lineNumb = 1;
-            
-            // Создавю новый холст
-            let newCanvas = document.createElement("canvas");
-            newCanvas.width = this.cWidth;
-            newCanvas.height = this.cHeight;
-            newCanvas.className ="canvas_notes"
-            this.canvasWrapper.appendChild(newCanvas);
-            this.initCanvasContext();
+          for (let noteIndex = 0; noteIndex < this.notesInTakt; noteIndex++) {
+            // Если линий достаточно, то создаю новый canvas и рисую уже на нем
+            if ( (prevLineNumb !== lineNumb) && (lineNumb % this.groupsPerPage === 1) ) {              
+              console.log("NEW CANVAS", prevLineNumb, lineNumb, this.groupsPerPage);
+              prevLineNumb = 1;
+              lineNumb = 1;
+              
+              // Создавю новый холст
+              let newCanvas = document.createElement("canvas");
+              newCanvas.width = this.cWidth;
+              newCanvas.height = this.cHeight;
+              newCanvas.className ="canvas_notes"
+              this.canvasWrapper.appendChild(newCanvas);
+              this.initCanvasContext();
 
-            // Рисую сетку уже на новом холсте
-            for (let i = 1; i <= this.groupsCount; i++) {
-              this.drawLineSet(this.startX, this.lineGroupHeight  * i);   
+              // Рисую сетку уже на новом холсте
+              for (let i = 1; i <= this.groupsCount; i++) {
+                this.drawLineSet(this.startX, this.lineGroupHeight  * i);   
+              }
             }
-          }
 
-
-          // Координаты ноты по X
-          let note_x = this.startX + lineNoteCounter * (this.noteRadius * 2.5) + taktCounter * this.taktPadding;
-          // Начало четверти
-          let lead4 = (noteIndex) % 4 === 0;
-          // Номер нижней ноты на линииях
-          let noteLine = Number.MIN_SAFE_INTEGER;
-          // Сбросим границы при новом такте
-          if (lead4) {
-            downBound = Number.MAX_SAFE_INTEGER;
-            //upperBound = Number.MIN_SAFE_INTEGER;
-            leftBound = Number.MAX_SAFE_INTEGER;
-            rightBound = Number.MIN_SAFE_INTEGER;
-            pattern = [0,0,0,0];
-            pattern16 = false;
-            pattern4 = false;
-          }
-  
-          
-  
-          // Проходим по всем треках, рисуем ноты и если начало такта, то вычисляем границы нот в такте
-          for (let trackIndex = 0; trackIndex <  tracks.length; trackIndex++) {
-            let track = tracks[trackIndex];
-            let note = track.notes[noteIndex];
-            let line = track.line;
-            
-            // Вычисление границ и размера такта
+            // Начало четверти
+            let lead4 = (noteIndex) % 4 === 0;
+            // Номер нижней ноты на линииях
+            let noteLine = Number.MIN_SAFE_INTEGER;
+            // Сбросим границы при новом такте
             if (lead4) {
-              //reset bounds            
-              let _leftBound=Number.MAX_SAFE_INTEGER;
-              _leftBound = track.notes[noteIndex + 3] > 0 ? noteIndex + 3 : _leftBound; 
-              _leftBound = track.notes[noteIndex + 2] > 0 ? noteIndex + 2 : _leftBound;
-              _leftBound = track.notes[noteIndex + 1] > 0 ? noteIndex + 1 : _leftBound;
-              _leftBound = track.notes[noteIndex] > 0 ? noteIndex : _leftBound;
-  
-              let _rightBound=Number.MIN_SAFE_INTEGER;
-              _rightBound = track.notes[noteIndex] > 0 ? _rightBound : _rightBound; 
-              _rightBound = track.notes[noteIndex + 1] > 0 ? noteIndex + 1 : _rightBound;
-              _rightBound = track.notes[noteIndex + 2] > 0 ? noteIndex + 2 : _rightBound;
-              _rightBound = track.notes[noteIndex + 3] > 0 ? noteIndex +3 : _rightBound;
-  
-              leftBound = _leftBound < leftBound ? _leftBound : leftBound;
-              rightBound = _rightBound > rightBound ? _rightBound : rightBound;
-  
-              let _downBound = Number.MAX_SAFE_INTEGER;
-              _downBound = track.notes[noteIndex + 3] > 0 ? track.line : _downBound; 
-              _downBound = track.notes[noteIndex + 2] > 0 ? track.line : _downBound;
-              _downBound = track.notes[noteIndex + 1] > 0 ? track.line : _downBound;
-              _downBound = track.notes[noteIndex] > 0     ? track.line : _downBound;
-              downBound = _downBound < downBound? _downBound : downBound;
-  
-              //detect size
-              if (track.notes[noteIndex] > 0 ) {
-                pattern[0]=1;
+              downBound = Number.MAX_SAFE_INTEGER;
+              //upperBound = Number.MIN_SAFE_INTEGER;
+              leftBound = Number.MAX_SAFE_INTEGER;
+              rightBound = Number.MIN_SAFE_INTEGER;
+              pattern = [0,0,0,0];
+              pattern16 = false;
+              pattern4 = false;
+            }
+
+            // Координаты ноты по X
+            let note_x = this.startX + lineNoteCounter * (this.noteRadius * 2.5) + taktCounter * this.taktPadding;
+
+            // Проходим по всем треках, рисуем ноты и если начало такта, то вычисляем границы нот в такте
+            for (let trackIndex = 0; trackIndex <  tracks.length; trackIndex++) {
+              let track = tracks[trackIndex];
+              let notes = track.takts[taktIndex].notes;
+              let note = notes[noteIndex];
+              let line = track.line;
+              
+              // Вычисление границ и размера такта
+              if (lead4) {
+                //reset bounds            
+                let _leftBound=Number.MAX_SAFE_INTEGER;
+                _leftBound = notes[noteIndex + 3] > 0 ? noteIndex + 3 : _leftBound; 
+                _leftBound = notes[noteIndex + 2] > 0 ? noteIndex + 2 : _leftBound;
+                _leftBound = notes[noteIndex + 1] > 0 ? noteIndex + 1 : _leftBound;
+                _leftBound = notes[noteIndex] > 0 ? noteIndex : _leftBound;
+    
+                let _rightBound=Number.MIN_SAFE_INTEGER;
+                _rightBound = notes[noteIndex] > 0 ? _rightBound : _rightBound; 
+                _rightBound = notes[noteIndex + 1] > 0 ? noteIndex + 1 : _rightBound;
+                _rightBound = notes[noteIndex + 2] > 0 ? noteIndex + 2 : _rightBound;
+                _rightBound = notes[noteIndex + 3] > 0 ? noteIndex +3 : _rightBound;
+    
+                leftBound = _leftBound < leftBound ? _leftBound : leftBound;
+                rightBound = _rightBound > rightBound ? _rightBound : rightBound;
+    
+                let _downBound = Number.MAX_SAFE_INTEGER;
+                _downBound = notes[noteIndex + 3] > 0 ? track.line : _downBound; 
+                _downBound = notes[noteIndex + 2] > 0 ? track.line : _downBound;
+                _downBound = notes[noteIndex + 1] > 0 ? track.line : _downBound;
+                _downBound = notes[noteIndex] > 0     ? track.line : _downBound;
+                downBound = _downBound < downBound? _downBound : downBound;
+    
+                //detect size
+                if (notes[noteIndex] > 0 ) {
+                  pattern[0]=1;
+                }
+                if (notes[noteIndex+1] > 0 ) {
+                  pattern[1]=1;
+                }
+                if (notes[noteIndex+2] > 0 ) {
+                  pattern[2]=1;
+                }
+                if (notes[noteIndex+3] > 0 ) {
+                  pattern[3]=1;
+                }
               }
-              if (track.notes[noteIndex+1] > 0 ) {
-                pattern[1]=1;
-              }
-              if (track.notes[noteIndex+2] > 0 ) {
-                pattern[2]=1;
-              }
-              if (track.notes[noteIndex+3] > 0 ) {
-                pattern[3]=1;
+    
+              // Если нота звучит, то рисуем её
+              if (note > 0) {
+                let _y = lineNumb * this.lineGroupHeight - this.linePadding/2 + line * this.linePadding
+                this.drawNote(note_x, _y, track.type, line);
+    
+                // Запоминаем самую верхнююю линию, на которой лежит нота
+                noteLine = line > noteLine ? line : noteLine;
               }
             }
-  
-            // Если нота звучит, то рисуем её
-            if (note > 0) {
-              let _y = lineNumb * this.lineGroupHeight - this.linePadding/2 + line * this.linePadding
-              this.drawNote(note_x, _y, track.type, line);
-  
-              // Запоминаем самую верхнююю линию, на которой лежит нота
-              noteLine = line > noteLine ? line : noteLine;
+            
+            // Нормализую границы
+            leftBound = leftBound !== Number.MAX_SAFE_INTEGER ? leftBound % 4 : leftBound;
+            rightBound = rightBound !== Number.MIN_SAFE_INTEGER ? rightBound % 4 : rightBound ;
+    
+            // Вычисляю размер        
+            if (lead4 && !(pattern[0] === 1 && pattern[1] === 0 && pattern[2] === 1 && pattern[3] === 0) ) {
+              pattern16 = true;
+            }
+            if (lead4 && (pattern[0] === 1 && pattern[1] === 0 && pattern[2] === 0 && pattern[3] === 0)) {
+              pattern16 = false;
+              pattern4 = true;
+            }
+    
+            //Если размер 16 и нет ноты, то рисую паузу
+            if (pattern16 && noteLine === Number.MIN_SAFE_INTEGER && leftBound !== Number.MAX_SAFE_INTEGER && rightBound !==Number.MIN_SAFE_INTEGER) {
+              let pauseLine = 3;
+              let x = note_x;
+              let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + pauseLine * this.linePadding
+              this.drawPause(x, y);
+            }
+    
+            // Подтягиваю нотные палки вверх        
+            if (noteLine !== Number.MIN_SAFE_INTEGER) {  
+                // Вертикальная линия
+                let x = note_x + this.noteRadius;
+                let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + noteLine * this.linePadding;//- this.noteRadius*2;            
+                let length = (noteLine - downBound ) * (this.linePadding) + this.noteRadius*6;            
+    
+                // Если размер 16 и нота не первая и не последняя в группе, то рисую палочку покороче
+                let idx16 = noteIndex % 4;
+                if (pattern16 && idx16 !== leftBound && idx16 !== rightBound) {
+                  length  = length - this.noteRadius;
+                }
+    
+                this.drawVerticalLine(x, y, -length);
+    
+                // Если онты обособлены, то рисую кончик 16 нот
+                if (pattern16 && leftBound === rightBound) {
+                  this.drawNote16Tail(x - this.noteRadius, y - length + this.noteRadius * 2);
+                }
+            }
+    
+            // Рисую соеденительную линию
+            if (lead4 && leftBound !== Number.MAX_SAFE_INTEGER && rightBound !== Number.MIN_SAFE_INTEGER) {
+              // Соеденительная линия размер 8
+              let x = note_x + this.noteRadius + leftBound* this.noteRadius * 2.5;
+              let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + downBound * this.linePadding - this.noteRadius*6;
+              let length = (rightBound - leftBound) * this.noteRadius * 2.5; 
+
+              this.drawHorizontalLine(x, y, length);
+    
+              // Дополнительная соеденительная линия для размера 16
+              if (pattern16) {
+                this.drawHorizontalLine(x, y + this.noteRadius, length);
+              }
+            }
+
+            // Разделитель тактов
+            if (noteIndex + 1 === this.notesInTakt) { 
+              let _x = note_x + this.taktPadding/2 + this.noteRadius * 2 - this.noteRadius/2;
+              let _y = lineNumb * this.lineGroupHeight - this.linePadding/2;
+              this.drawVerticalLine(_x, _y, this.delimiterHeight);
+            }
+
+            // Считаю ноты в линии и такте
+            lineNoteCounter = lineNoteCounter + 1;
+    
+            // Если нот достаточно, то перехожу на новые строчки в листе и сбрасываю линейные счетчики
+            if (lineNoteCounter > this.notesInLine){
+              taktCounter = 0;
+              lineNoteCounter = 1;   
+              lineNumb = lineNumb + 1;
             }
           }
           
-          // Нормализую границы
-          leftBound = leftBound !== Number.MAX_SAFE_INTEGER ? leftBound % 4 : leftBound;
-          rightBound = rightBound !== Number.MIN_SAFE_INTEGER ? rightBound % 4 : rightBound ;
-  
-          // Вычисляю размер        
-          if (lead4 && !(pattern[0] === 1 && pattern[1] === 0 && pattern[2] === 1 && pattern[3] === 0) ) {
-            pattern16 = true;
-          }
-          if (lead4 && (pattern[0] === 1 && pattern[1] === 0 && pattern[2] === 0 && pattern[3] === 0)) {
-            pattern16 = false;
-            pattern4 = true;
-          }
-  
-          //Если размер 16 и нет ноты, то рисую паузу
-          if (pattern16 && noteLine === Number.MIN_SAFE_INTEGER && leftBound !== Number.MAX_SAFE_INTEGER && rightBound !==Number.MIN_SAFE_INTEGER) {
-            let pauseLine = 3;
-            let x = note_x;
-            let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + pauseLine * this.linePadding
-            this.drawPause(x, y);
-          }
-  
-          // Подтягиваю нотные палки вверх        
-          if (noteLine !== Number.MIN_SAFE_INTEGER) {  
-              // Вертикальная линия
-              let x = note_x + this.noteRadius;
-              let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + noteLine * this.linePadding;//- this.noteRadius*2;            
-              let length = (noteLine - downBound ) * (this.linePadding) + this.noteRadius*6;            
-  
-              // Если размер 16 и нота не первая и не последняя в группе, то рисую палочку покороче
-              let idx16 = noteIndex % 4;
-              if (pattern16 && idx16 !== leftBound && idx16 !== rightBound) {
-                length  = length - this.noteRadius;
-              }
-  
-              this.drawVerticalLine(x, y, -length);
-  
-              // Если онты обособлены, то рисую кончик 16 нот
-              if (pattern16 && leftBound === rightBound) {
-                this.drawNote16Tail(x - this.noteRadius, y - length + this.noteRadius * 2);
-              }
-          }
-  
-          // Рисую соеденительную линию
-          if (lead4 && leftBound !== Number.MAX_SAFE_INTEGER && rightBound !== Number.MIN_SAFE_INTEGER) {
-            // Соеденительная линия размер 8
-            let x = note_x + this.noteRadius + leftBound* this.noteRadius * 2.5;
-            let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + downBound * this.linePadding - this.noteRadius*6;
-            let length = (rightBound - leftBound) * this.noteRadius * 2.5; 
+          taktCounter = taktCounter + 1;
 
-            this.drawHorizontalLine(x, y, length);
-  
-            // Дополнительная соеденительная линия для размера 16
-            if (pattern16) {
-              this.drawHorizontalLine(x, y + this.noteRadius, length);
-            }
-          }
-  
-          // Разделитель тактов
-          if (taktNoteCounter === this.notesInTakt) { 
-            let _x = note_x + this.taktPadding/2 + this.noteRadius * 2 - this.noteRadius/2;
-            let _y = lineNumb * this.lineGroupHeight - this.linePadding/2;
-            this.drawVerticalLine(_x, _y, this.delimiterHeight);
-          }
-  
-          // Считаю ноты в линии и такте
-          lineNoteCounter = lineNoteCounter + 1;
-          taktNoteCounter = taktNoteCounter + 1;
-  
-          // Если нот достаточно, то перехожу на новые строчки в листе и сбрасываю линейные счетчики
-          if (lineNoteCounter > this.notesInLine){
-            lineNoteCounter = 1;
-            taktCounter = 1;
-            taktNoteCounter = 1;  
-            lineNumb = lineNumb + 1;
-          }
-  
-          // Если такт полный, то увеличиваю счетчики такта и сбрасываю  счетчик нот в такте
-          if (taktNoteCounter > this.notesInTakt) {   
-            taktCounter = taktCounter + 1;
-            taktNoteCounter = 1;
-          }
-
-          // Для дебага рисую меньше нот
-          //if (lineNoteCounter > 4)        return;
         }
         
       }
@@ -414,7 +405,7 @@ class CanvasNotes extends React.PureComponent {
   
     //TODO: split on different canvas for print
     render() {
-      return <div className="canvas_notes_wrapper">
+      return <div className="canvas_notes_wrapper" style={this.props.style}>
           <canvas className="canvas_notes" width={this.cWidth} height={this.cHeight}></canvas>
       </div>
       

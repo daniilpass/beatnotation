@@ -1,185 +1,74 @@
 import React from "react";
-import './reset.css';
-import './App.css';
-
-
+import axios from 'axios';
 
 import CanvasNotes from "../noteList/noteList";
 import Track from "../track/track";
+import {tracksData} from "./TracksData";
 
-import SoundCrash from '../../assets/sounds/crash.mp3';
-import SoundRide from '../../assets/sounds/ride.mp3';
-import SoundHiHatClosed from '../../assets/sounds/hh_closed.mp3';
-import SoundHiHatOpened from '../../assets/sounds/hh_open.mp3';
-import SoundSnare from '../../assets/sounds/snare.mp3';
-import SoundBass from '../../assets/sounds/kick.mp3';
-import SoundTomHi from '../../assets/sounds/tom_hi.mp3';
-import SoundTomMid from '../../assets/sounds/tom_mid.mp3';
-import SoundTomLow from '../../assets/sounds/tom_low.mp3';
-
-import axios from 'axios';
+import './reset.css';
+import './App.css';
 
 class App extends React.Component {
   constructor(props){
       super(props);
-
       
-      this.timerId = 0;
-      this.stepDelay = 10;
-      this.noteWidth = 20;
+      //VARS
       this.defaultBpm = 120;
       this.notesInPartCount = 4;
-      this.tracksLength = 7200;//256;
-      this.prevNoteIndex = -1;
-      this.timePointerWidth = 10;
+
+      this.notesInTakt = 16;
+      this.tracksLengthInTakts = 48;
+      this.tracksLengthInNotes = this.tracksLengthInTakts * this.notesInTakt;
+
+      this.noteWidth = 20;
       this.noteHeight = 31;
       this.taktControlHeight = 31;
       this.trackControlWidth = 200;
       this.addTaktButtonWidth = 100;
-      this.notesInTakt = 16;
-      this.buffer = [];
-      // types
-      // 1 - cricle
-      // 2 - cross
-      // 3 - cross with o
-      this.tracks = [
-        {
-          audioUrl: SoundCrash,
-          // audio: new Audio(SoundCrash),
-          volume: 0.5,
-          notes: [],
-          line: 0.5,
-          type: 2,
-          title: "Crash"
-        },
-        {
-          audioUrl: SoundRide,
-          // audio: new Audio(SoundRide),
-          volume: 1,
-          notes: [],
-          line: 1.5,
-          type: 2,
-          title: "Ride"
-        },
-        {
-          audioUrl: SoundHiHatClosed, 
-          // audio: new Audio(SoundHiHatClosed),
-          volume: 1,
-          notes: [],
-          line: 1,
-          type: 2,
-          title: "Hi-Hat Closed"
-        },
-        {
-          audioUrl: SoundHiHatOpened,
-          // audio: new Audio(SoundHiHatOpened),
-          volume: 1,
-          notes: [],
-          line: 1,
-          type: 3,
-          title: "Hi-Hat Open"
-        },
-        {
-          audioUrl: SoundSnare,
-          // audio: new Audio(SoundSnare),
-          volume: 1,
-          notes: [],
-          line: 3,
-          type: 1,
-          title: "Snare"
-        },
-        {
-          audioUrl: SoundTomHi,
-          // audio: new Audio(SoundTomHi), // tom 2
-          volume: 1,
-          notes: []  ,
-          line: 2,
-          type: 1,
-          title: "Tom Hi"
-        },
-        {
-          audioUrl: SoundTomMid,
-          // audio: new Audio(SoundTomMid), // tom 2
-          volume: 1,
-          notes: []  ,
-          line: 2.5,
-          type: 1,
-          title: "Tom Mid"  
-        },
-        {
-          audioUrl: SoundTomLow,
-          // audio: new Audio(SoundTomLow), //floor tom
-          volume: 1,
-          notes: []  ,
-          line: 4,
-          type: 1,
-          title: "Tom Low"  
-        },
-        {
-          audioUrl: SoundBass,
-          // audio: new Audio(SoundBass),
-          volume: 1,
-          notes: []  ,
-          line: 5,
-          type: 1,
-          title: "Kick"  
-        },
-      ]
+      this.timePointerWidth = 10;
 
-      //console.log(this.tracks, SoundSnare);
+      this.timerId = 0;
+      this.stepDelay = 10;
+      this.prevNoteIndex = -1;
+      this.prevTaktIndex = -1;
+      this.timestamp = 0;
+      this.playPrevTs = 0;
 
-      this.tracks.forEach(track => {
-        for (let i = 0; i < this.tracksLength; i++) {
-          track.notes[i] = 0;       
-        }
-      });
+      this.soundBuffer = [];
+      this.clipboard = []; 
 
-      // for test
-      //console.log(this.tracks[0]);
-      // this.tracks[3].notes[0] = 1; this.tracks[3].notes[4] = 1; this.tracks[3].notes[8] = 1; this.tracks[3].notes[12] = 1; 
-      // this.tracks[3].notes[16] = 1; this.tracks[3].notes[20] = 1; this.tracks[3].notes[24] = 1; this.tracks[3].notes[28] = 1; 
-      // this.tracks[3].notes[32] = 1; this.tracks[3].notes[36] = 1; this.tracks[3].notes[40] = 1; this.tracks[3].notes[44] = 1; 
-      // this.tracks[3].notes[48] = 1; this.tracks[3].notes[52] = 1; this.tracks[3].notes[56] = 1; this.tracks[3].notes[60] = 1;
-      // this.tracks[3].notes[64] = 1; this.tracks[3].notes[68] = 1; this.tracks[3].notes[72] = 1; this.tracks[3].notes[76] = 1;
-      // this.tracks[4].notes[4] = 1; this.tracks[4].notes[12] = 1; this.tracks[4].notes[20] = 1;  this.tracks[4].notes[28] = 1;
-      // this.tracks[8].notes[0] = 1; this.tracks[8].notes[6] = 1; this.tracks[8].notes[10] = 1;
-      // this.tracks[8].notes[16] = 1; this.tracks[8].notes[22] = 1; 
+      this.tracks = this.initTracks();      
 
+      //Init AudioContext
+      this.audioCtx = this.initAudioContext();
+
+      //STATE
       this.state = {
         bpm: this.defaultBpm,
         bpms: this.defaultBpm / 60 / 1000,
         state: "stop",
         connect: true,
         dtu: false,
-        useAudioContext: true,
-        realtimeRender: false
+        realtimeRender: true
       }
 
+      //REFS
       this.canvasRef = React.createRef();
       this.tracksContainerRef = React.createRef();
       this.timePointerRef = React.createRef();
-      this.timeTextRef = React.createRef();
-      this.timestamp = 0;
-      this.playPrevTs = 0;
-      this.fileReaderRef = React.createRef();
-
-
-      this.soundBuffer = [];
-      // this.bufferSize = 1;
-
-      //try fix delay
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      this.audioCtx = new AudioContext();
+      this.timeTextRef = React.createRef();      
+      this.fileReaderRef = React.createRef();      
   }
 
+
+
+
+  /*
+  * LIFECYCLE
+  */
+
   componentDidMount () {
-    document.addEventListener("keyup", this.handleKeyDown);
-    document.addEventListener('keydown', function (e) {
-        if (e.keyCode === 32) {
-            e.preventDefault();
-        }
-    }, false)
-    this.tracksContainerRef.current.addEventListener('wheel', this.handleTracksWheel);
+    this.addEvents();
     this.tryDrawNotes();
     this.updateTimeControls();
     this.initSoundBuffer();
@@ -193,23 +82,48 @@ class App extends React.Component {
     document.removeEventListener("keyup", this.handleKeyDown);
   }
 
-  // shouldComponentUpdate() {
-  //   console.log('shouldComponentUpdate', 'App');
-  //   return true;
-  // }
+
 
 
   /*
-  AUDIO CONTEXT
+  * INIT FUNCTIONS
   */
 
-  loadAudioSample = (url, callback) => {
-    console.log("Loading sample", url);
-    axios.get(url, {responseType: 'arraybuffer'})
-          .then(response => {
-            this.audioCtx.decodeAudioData(response.data, callback, (e) => { console.log("decodeAudioData failed", e); });
-          })   
-  }  
+  initTracks() {
+    const tracks = [...tracksData];
+    //Init empty tracks
+    tracks.forEach(track => {        
+      for (let tIdx = 0; tIdx < this.tracksLengthInTakts; tIdx++) {          
+        track.takts[tIdx] = {
+          ts: Date.now()+"_"+tIdx,
+          notes: []
+        }      
+        for (let nIdx = 0; nIdx < this.notesInTakt; nIdx++) {
+          track.takts[tIdx].notes[nIdx] = 0;           
+        }
+      }
+    });
+    return tracks;
+  }
+
+  initAudioContext() {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    return new AudioContext();
+  }
+
+  addEvents() {
+    document.addEventListener("keyup", this.handleKeyDown);
+    document.addEventListener('keydown', function (e) {
+        if (e.keyCode === 32) {
+            e.preventDefault();
+        }
+    }, false)
+    this.tracksContainerRef.current.addEventListener('wheel', this.handleTracksWheel);
+  }
+
+  /*
+  * SOUND BUFFER
+  */
 
   initSoundBuffer() {
     this.tracks.forEach( (_track, trackIndex) => {
@@ -223,24 +137,20 @@ class App extends React.Component {
     });
   }
 
+  loadAudioSample = (url, callback) => {
+    console.log("Loading sample", url);
+    axios.get(url, {responseType: 'arraybuffer'})
+          .then(response => {
+            this.audioCtx.decodeAudioData(response.data, callback, (e) => { console.log("decodeAudioData failed", e); });
+          })   
+  }  
  
 
-  tryDrawNotes(force) {
-    if (!this.state.realtimeRender && !force) {
-      return;
-    }
-    
-    // get max right note index
-    let notesCount = 0;
-    this.tracks.forEach(t => {
-      let nc = t.notes.lastIndexOf(1);  
-      notesCount = nc > notesCount ? nc : notesCount;
-    });
-    notesCount++; // Перевожу индекс в число нот
-    notesCount = notesCount + (16 - notesCount % 16) ; //Добиваю число нот до конца такта
-    //console.log('====> tryDrawNotes', notesCount);
-    this.canvasRef && this.canvasRef.current && this.canvasRef.current.draw(this.tracks, notesCount, this.state.bpm);
-  }
+
+
+  /*
+  * HANDLE KEYS
+  */
 
   handleKeyDown= (e) => {
     e.preventDefault();
@@ -249,7 +159,7 @@ class App extends React.Component {
       case 32:
         if (this.state.state === "play") {
           this.pause();
-        } else if ( (this.state.state === "stop" || this.state.state === "pause") && this.part < this.tracksLength) {
+        } else if ( (this.state.state === "stop" || this.state.state === "pause") && this.timelineNote < this.tracksLengthInNotes) {
           this.play();
         }
         break;
@@ -264,7 +174,69 @@ class App extends React.Component {
     }
     return false;
   }
+  
 
+
+
+  /*
+  * HANDLE INPUT CHANGES
+  */
+  handleBpmInputChange = (event) => {
+    let value = event.target.value;
+    value = value === '' ? '1' : value;
+
+    var regNumber = /^[0-9\b]+$/;
+    if (regNumber.test(value)){
+      let intValue = parseInt(value);
+      intValue = intValue < 1 ?  1 : intValue;
+      intValue = intValue > 300 ? 300 : intValue;
+
+      this.setState({
+        bpm: intValue,
+        bpms: intValue / 60 / 1000,
+      })  
+    }  
+  }
+
+  handleBooleanInputChange = (event) => {
+    // console.log(event.target.checked);
+    this.setState({
+      [event.target.name]: event.target.checked,
+    }) 
+  }
+
+
+
+
+/*
+* DRAW NOTES
+*/
+
+  tryDrawNotes(force) {
+    if (!this.state.realtimeRender && !force) {
+      return;
+    }
+    
+    let maxTaktCount = 0;
+
+    for (let tIdx = 0; tIdx < this.tracks.length; tIdx++) {
+      const _track = this.tracks[tIdx];
+      for (let taktIdx = 0; taktIdx < _track.takts.length; taktIdx++) {
+        const _takt = _track.takts[taktIdx];
+        maxTaktCount = (_takt.notes.lastIndexOf(1) >= 0 && taktIdx > maxTaktCount) ?  taktIdx : maxTaktCount;
+      }
+    }
+    maxTaktCount = maxTaktCount + 1; //INdex to count
+
+    this.canvasRef && this.canvasRef.current && this.canvasRef.current.draw(this.tracks, maxTaktCount, this.state.bpm);
+  }
+
+  
+
+
+/*
+* TOOLBAR ACTIONS
+*/
   save = () => {
     console.log("save");
     
@@ -298,22 +270,24 @@ class App extends React.Component {
     //-trackLength
 
     var data = JSON.parse(content);
-    var maxTrackLength = 0;
+    var maxTaktCount = 0;
 
     for (let it = 0; it < this.tracks.length; it++) {
       const tmpTrack = {...this.tracks[it]};
       const loadedTrack = data.tracks[it];
       tmpTrack.volume = loadedTrack.volume;
-      tmpTrack.notes = [...loadedTrack.notes];
+      tmpTrack.takts = [...loadedTrack.takts];
       tmpTrack.ts = Date.now();
       this.tracks[it] = tmpTrack;
-      maxTrackLength = tmpTrack.notes.length > maxTrackLength ? tmpTrack.notes.length : maxTrackLength;
+      maxTaktCount = tmpTrack.takts.length > maxTaktCount ? tmpTrack.takts.length : maxTaktCount;
     }
-    this.tracksLength = maxTrackLength;
+
+    this.tracksLengthInTakts = maxTaktCount;
+    this.tracksLengthInNotes = this.tracksLengthInTakts * this.notesInTakt;
     this.timestamp = 0;
 
     console.log("BPM:", data.bpm);
-    console.log("TracksLength:", this.tracksLength);
+    console.log("tracksLengthInNotes:", this.tracksLengthInNotes);
     console.log("FileData:", data);
 
     this.setState({
@@ -363,6 +337,12 @@ class App extends React.Component {
     })
   }
 
+
+
+
+/*
+* PLAY CYCLE
+*/
   step = () => {
     //this.timestamp = this.timestamp + this.stepDelay;
     this.timestamp = this.timestamp + (Date.now() - this.playPrevTs);
@@ -371,20 +351,24 @@ class App extends React.Component {
     window.requestAnimationFrame(this.updateTimeControls.bind(this));
 
     //Pause then end
-    if(this.part > this.tracksLength)
+    if(this.timelineNote > this.tracksLengthInNotes)
       this.pause();  
   }
 
-  playNotes = () => {
-    let noteIndex = Math.trunc(this.part);
-
+  playNotes = () => {    
+    let noteIndex = Math.trunc(this.timelineNote);
+   
     if (noteIndex === this.prevNoteIndex)
       return;
+
+    let taktIndex = Math.trunc(this.timelineTakt)
+    let noteIndexInTakt = noteIndex % this.notesInTakt;
 
     //console.log(noteIndex);
     for (let trackIndex = 0; trackIndex < this.tracks.length; trackIndex++) {
       const track = this.tracks[trackIndex];
-      if (track.notes[noteIndex] > 0) {
+      const takt = track.takts[taktIndex];
+      if (takt.notes[noteIndexInTakt] > 0) {
         this.playTrackSound(trackIndex);
       }
     }    
@@ -393,52 +377,32 @@ class App extends React.Component {
   }
 
   playTrackSound(trackIndex) {
-    if (this.state.useAudioContext) {
-      this.playTrackSoundUsingBuffer(trackIndex);
-      return;
-    }
-    const track = this.tracks[trackIndex];
-    let audio = new Audio(track.audioUrl);
-    audio.volume = track.volume;    
-    audio.play();
-  }
-
-  playTrackSoundUsingBuffer(trackIndex){    
     let source = this.audioCtx.createBufferSource();
     source.buffer = this.soundBuffer[trackIndex].audioBuffer;
     source.connect(this.audioCtx.destination);
     source.start();
-  }  
+  } 
 
-  handleBpmInputChange = (event) => {
-    let value = event.target.value;
-    value = value === '' ? '1' : value;
+  updateTimeControls() {
+    if (this.state.dtu)
+      return;
 
-    var regNumber = /^[0-9\b]+$/;
-    if (regNumber.test(value)){
-      let intValue = parseInt(value);
-      intValue = intValue < 1 ?  1 : intValue;
-      intValue = intValue > 300 ? 300 : intValue;
-
-      this.setState({
-        bpm: intValue,
-        bpms: intValue / 60 / 1000,
-      })  
-    }  
+    this.timeTextRef.current.innerText = "Time: " + this.getFormattedTime;
+    this.timePointerRef.current.style.left = this.timePointerXPos + "px";
   }
 
-  handleBooleanInputChange = (event) => {
-    // console.log(event.target.checked);
-    this.setState({
-      [event.target.name]: event.target.checked,
-    }) 
-  }
 
-  handleNoteClick = (trackIndex, noteIndex, level) => {
-    console.log('handleNoteClick')
-    //let track = {...this.tracks[trackIndex]};
+
+
+  /*
+  * WORKSPACE EVENTS
+  */
+  handleNoteClick = (trackIndex, taktIndex, noteIndex, level) => {
+    //console.log('handleNoteClick', trackIndex, taktIndex, noteIndex)
+    
     let track = this.tracks[trackIndex];
-    track.notes[noteIndex] = level;
+    let takt = track.takts[taktIndex];
+    takt.notes[noteIndex] = level;
     //track.ts = Date.now();
 
     // Проигрываю выбранную ноту
@@ -446,10 +410,8 @@ class App extends React.Component {
       this.playTrackSound(trackIndex);
     }
 
-
     // Рисую ноты
     this.tryDrawNotes();
-
     //this.forceUpdate();
   }
 
@@ -479,13 +441,21 @@ class App extends React.Component {
 
   handleAddTakt = (e) => {
     console.log('Add takt');
-    this.tracksLength = this.tracksLength + this.notesInTakt; //Добавлю ноты
+    this.tracksLengthInTakts = this.tracksLengthInTakts + 1;
+    this.tracksLengthInNotes = this.tracksLengthInTakts * this.notesInTakt; 
     // console.log(...this.tracks)
     this.tracks.forEach(track => {
-        track.notes = [...track.notes, ...[...Array(this.notesInTakt)].map(el => {return 0})];   
+        track.takts = [
+          ...track.takts,
+          {
+            notes: [...Array(this.notesInTakt)].map(el => {return 0}),
+            ts: Date.now() + "_" +(this.tracksLengthInTakts-1)
+          }          
+      ];  
     });
-    // console.log(...this.tracks)
+    console.log(this.tracks)
 
+    //Прокрутка
     //Получаю координату клика внутри временной шкалы
     let parentContainer = e.currentTarget.parentNode || e.target.parentNode;
 
@@ -508,11 +478,13 @@ class App extends React.Component {
   handleDeleteClick = (taktIndex) => {
     console.log('Delete', taktIndex);
 
-    let noteStart = taktIndex * this.notesInTakt;
-    this.tracksLength = this.tracksLength - this.notesInTakt;
+    this.tracksLengthInTakts = this.tracksLengthInTakts - 1;
+    this.tracksLengthInNotes = this.tracksLengthInTakts * this.notesInTakt;
     this.tracks.forEach(track => { 
       track.ts = Date.now();
-      track.notes.splice(noteStart, this.notesInTakt) 
+      var tmpArr = [...track.takts];
+      tmpArr.splice(taktIndex, 1)
+      track.takts = [...tmpArr]
     });
 
     this.forceUpdate();
@@ -520,14 +492,15 @@ class App extends React.Component {
 
   handleClearClick = (taktIndex) => {
     console.log('Clear', taktIndex);
-    let noteStart = taktIndex * this.notesInTakt;
-    let noteEnd = noteStart + this.notesInTakt;
 
-    this.tracks.forEach(track => { 
+    this.tracks.forEach( (track, trackIndex) => { 
       track.ts = Date.now();
-      for (let index = noteStart; index < noteEnd; index++) {  
-        track.notes[index] = 0;  
-      }
+      track.takts[taktIndex] = {};
+      track.takts[taktIndex].ts = Date.now()+"_"+taktIndex;
+      track.takts[taktIndex].notes = [];
+      for (let i = 0; i < this.notesInTakt; i++) {  
+        track.takts[taktIndex].notes[i] = 0;  
+      }      
     });
 
     this.forceUpdate();
@@ -536,82 +509,54 @@ class App extends React.Component {
   handleCopyClick = (taktIndex) => {
     console.log('Copy', taktIndex);
 
-    let noteStart = taktIndex * this.notesInTakt;
-    let noteEnd = noteStart + this.notesInTakt;
-
-    this.buffer = [];
-    let counter = 0;
+    this.clipboard = [];
 
     this.tracks.forEach( (track, trackIndex) => { 
-      this.buffer[trackIndex] = [];
-      counter = 0;
-      track.ts = Date.now();
-      for (let noteIndex = noteStart; noteIndex < noteEnd; noteIndex++) {  
-        this.buffer[trackIndex][counter] = track.notes[noteIndex];  
-        counter++;
-      }
+      this.clipboard[trackIndex] = [...track.takts[taktIndex].notes];
     });
 
-    console.log('Buffer', this.buffer);
+    console.log('Buffer', this.clipboard);
   }
 
   handlePasteClick = (taktIndex) => {
-    console.log('Paste', taktIndex, !this.buffer, this.buffer);
+    console.log('Paste', taktIndex, this.clipboard);
 
-    if (this.buffer.length === 0) {
+    if (this.clipboard.length === 0) {
       console.log('Empty buffer');
       return;
     }
 
-    let noteStart = taktIndex * this.notesInTakt;
-    let noteEnd = noteStart + this.notesInTakt;
-    let counter = 0;
-
-    // var tmpTracks = [...this.tracks];
-    // for (let trackIndex = 0; trackIndex < tmpTracks.length; trackIndex++) {
-    //   counter = 0;  
-    //   var track = {...tmpTracks[trackIndex]};
-    //   track.ts = Date.now();
-    //   track.notes=[...track.notes];
-    //   for (let noteIndex = noteStart; noteIndex < noteEnd; noteIndex++) {  
-    //     track.notes[noteIndex] = this.buffer[trackIndex][counter];  
-    //     counter++;
-    //   }
-    //   tmpTracks[trackIndex] = {...track}
-    // }
-    // this.tracks = [...tmpTracks]
-
-    this.tracks.forEach( (track, trackIndex) => {  
-      counter = 0;     
+    this.tracks.forEach( (track, trackIndex) => { 
       track.ts = Date.now();
-      for (let noteIndex = noteStart; noteIndex < noteEnd; noteIndex++) {  
-        track.notes[noteIndex] = this.buffer[trackIndex][counter];  
-        counter++;
-      }
+      track.takts[taktIndex] = {};
+      track.takts[taktIndex].notes = [...this.clipboard[trackIndex]];
+      track.takts[taktIndex].ts = Date.now()+"_"+taktIndex;
     });
     
-    //console.log(this.tracks );
+    console.log(this.tracks );
     this.forceUpdate();
   }
 
-  updateTimeControls() {
-    if (this.state.dtu)
-      return;
 
-    this.timeTextRef.current.innerText = "Time: " + this.getFormattedTime;
-    this.timePointerRef.current.style.left = this.timePointerXPos + "px";
-  }
 
+
+  /*
+  * GETTERS
+  */
   get timePointerXPos() {
-    return this.part * this.noteWidth - this.timePointerWidth/2 + 2 + this.trackControlWidth;
+    return this.timelineNote * this.noteWidth - this.timePointerWidth/2 + 2 + this.trackControlWidth;
   }
 
   get timePointerHeight() {
     return this.tracks.length * this.noteHeight + this.timePointerWidth;
   }
 
-  get part() {
+  get timelineNote() {
     return this.timestamp * this.state.bpms * this.notesInPartCount;
+  }
+
+  get timelineTakt() {
+    return this.timelineNote / this.notesInTakt;
   }
 
   get getFormattedTime() {
@@ -620,6 +565,9 @@ class App extends React.Component {
     let min = Math.trunc(this.timestamp / 1000 / 60)
     return (min+'').padStart(2,"0") + ":" +(sec+'').padStart(2,"0") + "." + (ms+'').padStart(3,"0")
   }
+
+
+
 
   render () {
     console.log('Render App');
@@ -630,7 +578,7 @@ class App extends React.Component {
       </header>
 
       <div className="app-toolbar no-print">
-        <button className="app-toolbar__button" onClick={this.play} disabled={this.state.state === "play" || this.part >= this.tracksLength}>Play</button>
+        <button className="app-toolbar__button" onClick={this.play} disabled={this.state.state === "play" || this.timelineNote >= this.tracksLengthInNotes}>Play</button>
         <button className="app-toolbar__button" onClick={this.stop} disabled={this.state.state === "stop"}>Stop</button>
         <button className="app-toolbar__button" onClick={this.pause} disabled={this.state.state === "pause" || this.state.state === "stop"}>Pause</button>
         <button className="app-toolbar__button" onClick={this.print} disabled={this.state.state === "play"}>Print notation</button>
@@ -638,7 +586,7 @@ class App extends React.Component {
         <button className="app-toolbar__button" onClick={this.load} disabled={this.state.state === "play"}>Load project</button>
 
         {/* <div className="app-toolbar__part" >
-          Part: {Math.trunc(this.part) + 1 }
+          Part: {Math.trunc(this.timelineNote) + 1 }
         </div> */}
 
         <div className="app-toolbar__bpm" >
@@ -653,16 +601,12 @@ class App extends React.Component {
           Connect notes: 
           <input name="connect" value={this.state.connect} onChange={this.handleBooleanInputChange} checked={this.state.connect} type="checkbox"></input>
         </div> */}
-        <div>
+        {/* <div>
           Disable time update: 
           <input name="dtu" value={this.state.dtu} onChange={this.handleBooleanInputChange} checked={this.state.dtu} type="checkbox"></input>
-        </div>
+        </div> */}
         <div>
-          Use AudioContext: 
-          <input name="useAudioContext" value={this.state.useAudioContext} onChange={this.handleBooleanInputChange} checked={this.state.useAudioContext} type="checkbox"></input>
-        </div>
-        <div>
-          Realtime render: 
+          Show notation: 
           <input name="realtimeRender" value={this.state.realtimeRender} onChange={this.handleBooleanInputChange} checked={this.state.realtimeRender} type="checkbox"></input>
         </div>
       </div>
@@ -671,9 +615,9 @@ class App extends React.Component {
         
         <div className="track-container" ref={this.tracksContainerRef}>
           {/* TIMELINE */}
-          <div className="timeline" style={{width:this.noteWidth * this.tracksLength + "px", marginLeft: this.trackControlWidth+"px"}} onClick={this.handleTimelineClick}>
+          <div className="timeline" style={{width:this.noteWidth * this.tracksLengthInNotes + "px", marginLeft: this.trackControlWidth+"px"}} onClick={this.handleTimelineClick}>
             {
-               [...Array(Math.ceil(this.tracksLength / this.notesInTakt))].map((i,k) => {
+               [...Array(Math.ceil(this.tracksLengthInNotes / this.notesInTakt))].map((i,k) => {
                 return <div key={k} className="timeline__takt" style={{width: this.notesInTakt * this.noteWidth}}>
                     <div className="takt__number">{k+1}</div>
                   </div>
@@ -681,7 +625,6 @@ class App extends React.Component {
             }
           </div>
           {/* TIME POINTER */}
-          {/* <TimePointer timePointerXPos={this.timePointerXPos} timePointerHeight={this.timePointerHeight}/> */}
           <div className="time-pointer" ref={this.timePointerRef}> 
             <div className="time-pointer__stick" style={{height: this.timePointerHeight+"px"}}>
             </div>
@@ -691,16 +634,18 @@ class App extends React.Component {
           {
             this.tracks.map((_track,i) => {
               return <Track key={"track_"+i} index={i} noteWidth={this.noteWidth} noteHeight={this.noteHeight} noteClick={this.handleNoteClick} 
-                              tracksLength={this.tracksLength} track={_track} ts={_track.ts} trackControlWidth={this.trackControlWidth} addTaktButtonWidth={this.addTaktButtonWidth}
+                              tracksLengthInNotes={this.tracksLengthInNotes} tracksLengthInTakts={this.tracksLengthInTakts} 
+                              track={_track} ts={_track.ts} 
+                              trackControlWidth={this.trackControlWidth} addTaktButtonWidth={this.addTaktButtonWidth}
                               onVolumeChange={this.handleTrackVolumeChange}
                               />
             })
           }
 
           {/* TAKT CONTROLS */}
-          <div className="takt-controls" style={{width:this.noteWidth * this.tracksLength + "px", marginLeft: this.trackControlWidth+"px"}}>
+          <div className="takt-controls" style={{width:this.noteWidth * this.tracksLengthInNotes + "px", marginLeft: this.trackControlWidth+"px"}}>
             {
-               [...Array(Math.ceil(this.tracksLength / this.notesInTakt))].map((i,k) => {
+               [...Array(Math.ceil(this.tracksLengthInTakts))].map((i,k) => {
                 return <div key={k} className="takt-control" style={{width: this.notesInTakt * this.noteWidth}}>
                     <button className="takt-control__button button" onClick={this.handlePasteClick.bind(this, k)}>Paste</button>
                     <button className="takt-control__button button" onClick={this.handleCopyClick.bind(this, k)}>Copy</button>
@@ -725,7 +670,7 @@ class App extends React.Component {
 
       <UserFileReader ref={this.fileReaderRef} onFileLoaded={this.handleFileLoaded} accept=".beno"/>
 
-      <CanvasNotes ref={this.canvasRef} />
+      <CanvasNotes ref={this.canvasRef} style={{display: this.state.realtimeRender ? 'block' : 'none'}}/>
     </div>
   }
 }

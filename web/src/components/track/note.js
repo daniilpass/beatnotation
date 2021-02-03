@@ -19,22 +19,22 @@ class Note extends React.Component {
 
 
   shouldComponentUpdate(nextProps, nextSate) {
-    // console.log('shouldComponentUpdate Note');
-    
-    // Пришло обновление ноты из вне
-    if (nextProps.level !== this.props.level && nextProps.level !== this.state.level) {
-      //console.log('update note from parent. Note index:' + this.props.index,'new level:',nextProps.level, 'old level:', this.props.level, this.state.level)
-      this.setState({level: nextProps.level});
-      return true;
-    }
+    //console.log('shouldComponentUpdate Note index:' + this.props.index)
 
+    // ОБновление по клику внутри компонент
     if (this.state.level !== nextSate.level){
       //console.log('update note by self')
       return true;
     }
-      
+
+    // Пришло обновление ноты из вне
+    if (nextProps.level !== this.state.level) {
+      //console.log('update note from parent.')
+      this.setState({level: nextProps.level});
+      return true;
+    }
     
-      return false;
+    return false;
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -42,7 +42,7 @@ class Note extends React.Component {
   }
 
   handleClick = () => {  
-    let newlevel = this.state.level == 1 ? 0 : 1;
+    let newlevel = this.state.level === 1 ? 0 : 1;
     this.setState({level: newlevel})
     this.props.onClick && this.props.onClick(this.props.index, newlevel);
   }

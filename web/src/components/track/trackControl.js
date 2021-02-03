@@ -75,7 +75,7 @@ class TrackControl extends React.Component {
     }
 
     render() {  
-      console.log("Render TrackControl");
+      //console.log("Render TrackControl");
       return <div className="track-control" style={{width: this.props.width, height: this.props.height}}>
           <div className="track-control__volume"  ref={this.tcVolume} style={{background: `linear-gradient(to top, rgb(13 136 0 / 52%) ${this.Volume}%, transparent 0% )`}}>
             {this.Volume}
