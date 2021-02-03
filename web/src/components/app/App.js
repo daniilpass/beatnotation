@@ -11,21 +11,28 @@ import './App.css';
 class App extends React.Component {
   constructor(props){
       super(props);
-      
+
       //VARS
       this.defaultBpm = 120;
       this.notesInPartCount = 4;
-
+      
       this.notesInTakt = 16;
       this.tracksLengthInTakts = 48;
       this.tracksLengthInNotes = this.tracksLengthInTakts * this.notesInTakt;
 
       this.noteWidth = 20;
+      this.defaultNotewWidth = 20;
       this.noteHeight = 31;
       this.taktControlHeight = 31;
+      this.minTaktControlWidth = 250;
       this.trackControlWidth = 200;
       this.addTaktButtonWidth = 100;
       this.timePointerWidth = 10;
+      this.timeSignatures = [
+        "2/4", "3/4", "4/4","6/4", "9/4",
+        "2/8", "3/8", "4/8","6/8", "9/8", "12/8",
+        "2/16","3/16",      "6/16","9/16","12/16",
+      ];
 
       this.timerId = 0;
       this.stepDelay = 10;
@@ -37,11 +44,6 @@ class App extends React.Component {
       this.soundBuffer = [];
       this.clipboard = []; 
 
-      this.tracks = this.initTracks();      
-
-      //Init AudioContext
-      this.audioCtx = this.initAudioContext();
-
       //STATE
       this.state = {
         bpm: this.defaultBpm,
@@ -49,8 +51,14 @@ class App extends React.Component {
         state: "stop",
         connect: true,
         dtu: false,
-        realtimeRender: true
+        realtimeRender: true,
+        timeSignature: "4/4"
       }
+
+      this.tracks = this.initTracks();      
+
+      //Init AudioContext
+      this.audioCtx = this.initAudioContext();
 
       //REFS
       this.canvasRef = React.createRef();
@@ -90,10 +98,41 @@ class App extends React.Component {
   */
 
   initTracks() {
+    let timeSignatureArr = this.state.timeSignature.split("/");
+    let up = parseInt(timeSignatureArr[0]);
+    let down = parseInt(timeSignatureArr[1]);
+    //console.log('timeSignature', up,'/',down);
+
+    //Количество нот в долях
+    let notesInPart = 0;
+    switch (down) {
+      case 4: notesInPart = 4; break;
+      case 8: notesInPart = 2; break;
+      case 16: notesInPart = 1; break;
+      default:
+        throw ("Unknown timeSignature:", this.state.timeSignature);
+    }
+    
+    //РАсчет кол-ва нот в такте, новой длины трека
+    this.notesInTakt = up * notesInPart;
+    this.tracksLengthInNotes = this.tracksLengthInTakts * this.notesInTakt;
+
+    console.log("TimeSignature:", this.state.timeSignature, "notesInPart:", notesInPart, "notesInTakt:", this.notesInTakt );
+
+    //Масштабируем размер нот так, чтобы помещались элементы управления такта
+    let estimatedWidth = this.noteWidth * this.notesInTakt;
+    if (estimatedWidth < this.minTaktControlWidth) {
+      this.noteWidth = Math.ceil(this.minTaktControlWidth / this.notesInTakt)
+    } else {
+      this.noteWidth = this.defaultNotewWidth;
+    }
+
+    //TODO: сохранять введенные до этого ноты
     const tracks = [...tracksData];
     //Init empty tracks
     tracks.forEach(track => {        
-      for (let tIdx = 0; tIdx < this.tracksLengthInTakts; tIdx++) {          
+      for (let tIdx = 0; tIdx < this.tracksLengthInTakts; tIdx++) { 
+        track.ts =   Date.now()+"_"+tIdx       
         track.takts[tIdx] = {
           ts: Date.now()+"_"+tIdx,
           notes: []
@@ -137,13 +176,13 @@ class App extends React.Component {
             //save gain node for track
             this.soundBuffer[trackIndex].gainNode = this.audioCtx.createGain()              
             this.soundBuffer[trackIndex].gainNode.connect(this.audioCtx.destination)
-            console.log("Sample loaded", _track.audioUrl);
+            //console.log("Sample loaded", _track.audioUrl);
           })      
     });
   }
 
   loadAudioSample = (url, callback) => {
-    console.log("Loading sample", url);
+    //console.log("Loading sample", url);
     axios.get(url, {responseType: 'arraybuffer'})
           .then(response => {
             this.audioCtx.decodeAudioData(response.data, callback, (e) => { console.log("decodeAudioData failed", e); });
@@ -211,7 +250,15 @@ class App extends React.Component {
   }
 
 
-
+  handleTimeSignatureChange = (event) => {
+    // console.log(event.target.checked);
+    this.setState({
+      [event.target.name]: event.target.value,
+    }, () => {
+      this.tracks = this.initTracks(true);
+      this.forceUpdate();
+    }) 
+  }
 
 /*
 * DRAW NOTES
@@ -233,7 +280,7 @@ class App extends React.Component {
     }
     maxTaktCount = maxTaktCount + 1; //INdex to count
 
-    this.canvasRef && this.canvasRef.current && this.canvasRef.current.draw(this.tracks, maxTaktCount, this.state.bpm);
+    this.canvasRef && this.canvasRef.current && this.canvasRef.current.draw(this.tracks, maxTaktCount, this.state.bpm, this.state.timeSignature, this.notesInTakt);
   }
 
   
@@ -596,11 +643,21 @@ class App extends React.Component {
         {/* <div className="app-toolbar__part" >
           Part: {Math.trunc(this.timelineNote) + 1 }
         </div> */}
+        <div className="app-toolbar__bpm" >
+          Time signature: 
+          <select name='timeSignature' value={this.state.timeSignature} onChange={this.handleTimeSignatureChange}>
+            {this.timeSignatures.map(ts => {
+              return <option key={ts} value={ts}>{ts}</option>
+            })}
+          </select>
+          <input name="bpm" value={this.state.bpm} onChange={this.handleBpmInputChange} type="number"></input>
+        </div>
 
         <div className="app-toolbar__bpm" >
           BPM: 
           <input name="bpm" value={this.state.bpm} onChange={this.handleBpmInputChange} type="number"></input>
         </div>
+
         <div className="app-toolbar__time" ref={this.timeTextRef}>
           {/* Time: {this.getFormattedTime} */}
         </div>

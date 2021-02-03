@@ -67,7 +67,8 @@ class Takt extends React.Component {
   // }
 
   shouldComponentUpdate(nextProps, nextState) {    
-    if (nextProps.takt.ts !== this.props.takt.ts){
+    if (nextProps.takt.ts !== this.props.takt.ts
+      || nextProps.noteWidth !== this.props.noteWidth){
       return true;
     }
 

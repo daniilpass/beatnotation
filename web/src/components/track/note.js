@@ -33,6 +33,10 @@ class Note extends React.Component {
       this.setState({level: nextProps.level});
       return true;
     }
+
+    if (nextProps.width !== this.props.width) {
+      return true;
+    }
     
     return false;
   }

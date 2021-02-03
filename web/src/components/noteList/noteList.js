@@ -21,7 +21,7 @@ class CanvasNotes extends React.PureComponent {
       this.groupsPadding = 40;
       // Высота группы линий
       this.lineGroupHeight = this.linesInGroupCount * (this.lineWidth  + this.linePadding) + this.groupsPadding;
-      this.delimiterHeight = (this.linesInGroupCount + 1) * (this.lineWidth  + this.linePadding);
+      this.delimiterHeight = (this.linesInGroupCount - 1) * (this.linePadding);
       this.groupsPerPage = 12;
       // Ноты
       this.noteRadius = 5;
@@ -44,7 +44,7 @@ class CanvasNotes extends React.PureComponent {
       this.ctx = this.canvas.getContext('2d');
     }
 
-    draw(tracks, taktCountLimit, bpm) {
+    draw(tracks, taktCountLimit, bpm, timeSignature, notesInTakt) {
       // Удаляю старые холсты
       while (this.canvasWrapper.childElementCount > 1) {
         this.canvasWrapper.removeChild(this.canvasWrapper.firstChild);
@@ -54,7 +54,8 @@ class CanvasNotes extends React.PureComponent {
       this.initCanvasContext();
 
       this.clear();
-      this.drawList(tracks, taktCountLimit, bpm);
+
+      this.drawList(tracks, taktCountLimit, bpm, timeSignature, notesInTakt);
     }
     
     clear() {
@@ -65,7 +66,13 @@ class CanvasNotes extends React.PureComponent {
       this.canvas.height = height;
     }
 
-    drawList(tracks, taktCountLimit, bpm) {
+    drawList(tracks, taktCountLimit, bpm, timeSignature, notesInTakt) {
+      //Размер
+      // let timeSignatureArr = timeSignature.split("/");
+      // let up = parseInt(timeSignatureArr[0]);
+      // let down = parseInt(timeSignatureArr[1]);      
+      this.notesInTakt = notesInTakt;
+
       // Вычисляю сколько нужно строк, чтобы уместить все ноты
       this.groupsCount  =  this.groupsPerPage; //Math.ceil(taktCountLimit / this.notesInLine);
       //this.groupsCount  =  this.groupsCount > this.groupsPerPage ? this.groupsPerPage : this.groupsCount;      
@@ -75,7 +82,7 @@ class CanvasNotes extends React.PureComponent {
       this.setCanvasHeight(this.cHeight);
 
       // Рисую ифно о BPM
-      this.drawBpm(bpm);
+      this.drawBpm(bpm + ". Time signature = " +timeSignature);
 
       // Рисую сетку
       for (let i = 1; i <= this.groupsCount; i++) {
@@ -256,18 +263,18 @@ class CanvasNotes extends React.PureComponent {
               let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + downBound * this.linePadding - this.noteRadius*6;
               let length = (rightBound - leftBound) * this.noteRadius * 2.5; 
 
-              this.drawHorizontalLine(x, y, length);
+              this.drawHorizontalLine(x, y, length, 3);
     
               // Дополнительная соеденительная линия для размера 16
               if (pattern16) {
-                this.drawHorizontalLine(x, y + this.noteRadius, length);
+                this.drawHorizontalLine(x, y + this.noteRadius, length, 3);
               }
             }
 
             // Разделитель тактов
             if (noteIndex + 1 === this.notesInTakt) { 
               let _x = note_x + this.taktPadding/2 + this.noteRadius * 2 - this.noteRadius/2;
-              let _y = lineNumb * this.lineGroupHeight - this.linePadding/2;
+              let _y = lineNumb * this.lineGroupHeight + this.linePadding;
               this.drawVerticalLine(_x, _y, this.delimiterHeight);
             }
 
@@ -428,8 +435,8 @@ class CanvasNotes extends React.PureComponent {
     }
 
     // Вертикальная линия
-    drawHorizontalLine(x, y, length) {
-      this.setCanvasStyle("#000000", 1.1);
+    drawHorizontalLine(x, y, length, width) {
+      this.setCanvasStyle("#000000", width || 1.1);
   
       this.ctx.beginPath();
       this.ctx.moveTo(x, y);
@@ -438,8 +445,8 @@ class CanvasNotes extends React.PureComponent {
     }
   
     // Горизонтальная линия
-    drawVerticalLine(x, y, length) {
-      this.setCanvasStyle("#000000", 1.1);
+    drawVerticalLine(x, y, length, width) {
+      this.setCanvasStyle("#000000", width || 1.1);
   
       this.ctx.beginPath();
       this.ctx.moveTo(x, y);
