@@ -470,7 +470,7 @@ class App extends React.Component {
     // Обновляю приложение
     this.forceUpdate(() => {      
       if (!!parentContainer) {
-        parentContainer.scrollLeft=Number.MAX_SAFE_INTEGER;
+        parentContainer.scrollLeft=parentContainer.scrollLeft+this.noteWidth*this.notesInTakt;
       }
     });    
   }
