@@ -31,8 +31,6 @@ body {
   padding-left: 8px;
   
   background-color: #2F3485;
-  align-items: center;
-  justify-content: center;
   font-size: 24px;
   color: white;
   white-space: nowrap;  
@@ -93,7 +91,7 @@ app-toolbar
   background-color: #7277D8;
   color: #FFC173;
   box-shadow: 2px 2px 0px rgb(0 0 0 / 30%);
-  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
   vertical-align: top;
 }
 /* .app-toolbar__time {
@@ -109,11 +107,11 @@ app-toolbar
 /*
 WORKSPACE
 */
-.workspace{
- /* background-color: #2F3485; */
-  /* height: 100px; */
- /* margin: 20px; */
-}
+/*.workspace{
+  background-color: #2F3485;
+  height: 100px;
+  margin: 20px; 
+}*/
 
 .track-container {
  margin-top: 80px;
@@ -137,8 +135,8 @@ TIMELINE
   /* border-left: 1px solid #080E73; */
   border-right: 1px solid #080E73;
   vertical-align: top;
-  -webkit-user-select: none;
   user-select: none;
+  -webkit-user-select: none;
   margin-top: 4px;
   /* margin-bottom: 5px;*/
 }
@@ -169,6 +167,7 @@ TAKT-ADD button
   position: absolute;
   display: table;
   user-select: none;
+  -webkit-user-select: none;
 }
 
 .takt-add__content{
@@ -243,6 +242,7 @@ TRACK-CONTROL
   padding-left: 8px;
   left: 48px;
   user-select: none;
+  -webkit-user-select: none;
 }
 
 .track-control__volume {
@@ -259,6 +259,7 @@ TRACK-CONTROL
   font-weight: 500;
   cursor: pointer;
   user-select: none;
+  -webkit-user-select: none;
 }
 /*
 TAKT-CONTROLS
@@ -274,9 +275,9 @@ TAKT-CONTROLS
   height: 31px;
   /* border-left: 1px solid #080E73; */
   border-right: 1px solid #080E73;
-  vertical-align: top;
-  -webkit-user-select: none;
+  vertical-align: top;  
   user-select: none;
+  -webkit-user-select: none;
 }
 
 .takt-control:first-child{

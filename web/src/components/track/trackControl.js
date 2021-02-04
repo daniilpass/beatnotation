@@ -1,5 +1,7 @@
 import React from "react";
 
+const requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame;
+
 class TrackControl extends React.Component {
     constructor(props) {
       super(props);  
@@ -73,7 +75,7 @@ class TrackControl extends React.Component {
       //change volume
       let newVolume = this.state.tmpVolume + deltaY;
       if (newVolume <= this.maxVolume && newVolume >= 0) {
-        window.requestAnimationFrame( () => { this.setState({tmpVolume: newVolume}) } );
+        requestAnimationFrame( () => { this.setState({tmpVolume: newVolume}) } );
       }
       //console.log(deltaX, deltaY, this.tmpVolume);
     }

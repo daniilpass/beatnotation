@@ -8,10 +8,12 @@ import {tracksData} from "./TracksData";
 import './reset.css';
 import './App.css';
 
+const requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame;
+
 class App extends React.Component {
   constructor(props){
       super(props);
-
+      
       //VARS
       this.defaultBpm = 120;
       this.notesInPartCount = 4;
@@ -468,7 +470,7 @@ class App extends React.Component {
     this.timestamp = this.timestamp + (Date.now() - this.playPrevTs);
     this.playPrevTs = Date.now();
     this.playNotes();
-    window.requestAnimationFrame(this.updateTimeControls.bind(this));
+    requestAnimationFrame(this.updateTimeControls.bind(this));
 
     //Pause then end
     if(this.timelineNote > this.tracksLengthInNotes)
