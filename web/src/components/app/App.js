@@ -53,7 +53,7 @@ class App extends React.Component {
         connect: true,
         dtu: false,
         realtimeRender: true,
-        timeSignature: "4/4"
+        timeSignature: [4,4]
       }
 
       this.tracks = this.initTracks();      
@@ -98,11 +98,9 @@ class App extends React.Component {
   * INIT FUNCTIONS
   */
 
-  initTracks() {
-    let timeSignatureArr = this.state.timeSignature.split("/");
-    let up = parseInt(timeSignatureArr[0]);
-    let down = parseInt(timeSignatureArr[1]);
-    //console.log('timeSignature', up,'/',down);
+  initTracks() {    
+    let up = this.state.timeSignature[0];
+    let down = this.state.timeSignature[1];   
 
     //Количество нот в долях
     let notesInPart = 0;
@@ -253,8 +251,10 @@ class App extends React.Component {
 
   handleTimeSignatureChange = (event) => {
     // console.log(event.target.checked);
+    let tsUp = parseInt(event.target.value.split("/")[0]);
+    let tsDown = parseInt(event.target.value.split("/")[1]);
     this.setState({
-      [event.target.name]: event.target.value,
+      [event.target.name]: [tsUp, tsDown],
     }, () => {
       this.tracks = this.initTracks(true);
       this.forceUpdate();
@@ -622,7 +622,9 @@ class App extends React.Component {
     return (min+'').padStart(2,"0") + ":" +(sec+'').padStart(2,"0") + "." + (ms+'').padStart(3,"0")
   }
 
-
+  get timeSignatureString() {
+    return this.state.timeSignature[0]+"/"+this.state.timeSignature[1];
+  }
 
 
   render () {
@@ -646,7 +648,7 @@ class App extends React.Component {
         </div> */}
         <div className="app-toolbar__bpm" >
           Time signature: 
-          <select name='timeSignature' value={this.state.timeSignature} onChange={this.handleTimeSignatureChange}>
+          <select name='timeSignature' value={this.timeSignatureString} onChange={this.handleTimeSignatureChange}>
             {this.timeSignatures.map(ts => {
               return <option key={ts} value={ts}>{ts}</option>
             })}

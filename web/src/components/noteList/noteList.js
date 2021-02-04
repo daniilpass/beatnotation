@@ -69,9 +69,8 @@ class CanvasNotes extends React.PureComponent {
 
     drawList(tracks, taktCountLimit, bpm, timeSignature, notesInTakt) {
       //Размер
-      let timeSignatureArr = timeSignature.split("/");
-      let tsUp = parseInt(timeSignatureArr[0]);
-      let tsDown = parseInt(timeSignatureArr[1]); 
+      let tsUp =  timeSignature[0];
+      let tsDown = timeSignature[1];
 
       if (tsDown === 8 && (tsUp % 3) === 0) {
         this.notesInGroup = 6;
@@ -90,7 +89,7 @@ class CanvasNotes extends React.PureComponent {
       this.setCanvasHeight(this.cHeight);
 
       // Рисую ифно о BPM
-      this.drawBpm(bpm + ". Time signature = " +timeSignature);
+      this.drawBpm(bpm + ". Time signature = " + tsUp+"/"+tsDown);
 
       // Рисую сетку
       for (let i = 1; i <= this.groupsCount; i++) {
