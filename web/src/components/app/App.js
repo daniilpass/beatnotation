@@ -822,6 +822,11 @@ class App extends React.Component {
       <UserFileReader ref={this.fileReaderRef} onFileLoaded={this.handleFileLoaded} accept=".beno"/>
 
       <CanvasNotes ref={this.canvasRef} style={{display: this.state.realtimeRender ? 'block' : 'none'}}/>
+
+      {/*
+          Major.Minor.Fixes
+      */}
+      <div className="app-ver">1.0.1</div>
     </div>
   }
 }
