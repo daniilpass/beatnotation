@@ -229,9 +229,18 @@ class App extends React.Component {
     });    
   }
 
-  setTimeSignature(value, callback) {    
-    let up = value[0];
-    let down = value[1];   
+  updateTimeSignatureRelativeProperties = (newTimeSignature) => {
+    this.updateNotesInTakt(newTimeSignature);
+    this.updateTrackLength(newTimeSignature);
+    this.updateNotesSacle(newTimeSignature);    
+
+    console.log("TimeSignature:", newTimeSignature, "notesInTakt:", this.notesInTakt , 'tracksLengthInTakts:', this.tracksLengthInTakts, 'tracksLengthInNotes:', this.tracksLengthInNotes, );
+  }
+
+
+  updateNotesInTakt = (newTimeSignature) => {
+    let up = newTimeSignature[0];
+    let down = newTimeSignature[1];   
 
     //Количество нот в долях
     let notesInPart = 0;
@@ -240,15 +249,19 @@ class App extends React.Component {
       case 8: notesInPart = 2; break;
       case 16: notesInPart = 1; break;
       default:
-        throw ("Unknown timeSignature:", value);
+        throw ("Unknown timeSignature:", newTimeSignature);
     }
     
     //Расчет кол-ва нот в такте, новой длины трека
     this.notesInTakt = up * notesInPart;
+  }
+
+  updateTrackLength = () => {
     this.tracksLengthInTakts = Math.ceil(this.tracksLengthInNotes / this.notesInTakt);
     this.tracksLengthInNotes = this.tracksLengthInTakts * this.notesInTakt;
+  }
 
-    
+  updateNotesSacle = () =>{
     //Масштабируем размер нот так, чтобы помещались элементы управления такта
     let estimatedWidth = this.noteWidth * this.notesInTakt;
     if (estimatedWidth < this.minTaktControlWidth) {
@@ -256,8 +269,12 @@ class App extends React.Component {
     } else {
       this.noteWidth = this.defaultNotewWidth;
     }
+  }
 
-    console.log("TimeSignature:", value, "notesInPart:", notesInPart, "notesInTakt:", this.notesInTakt , 'tracksLengthInTakts:', this.tracksLengthInTakts, 'tracksLengthInNotes:', this.tracksLengthInNotes, );
+
+  setTimeSignature = (value, callback) => {    
+    //ОБновляю связанные свойтсва (длина трека, ноты в такте и т.д.)
+    this.updateTimeSignatureRelativeProperties(value);
 
     //Изменение структуры трека
     const tracks = [...this.tracks];
@@ -289,9 +306,9 @@ class App extends React.Component {
     this.tracks = [...tracks];
     //console.log();
     
-
+    //Обновление состояни для обновления UI
     this.setState({
-      timeSignature: [up, down],
+      timeSignature: value,
     }, callback); 
   }
 
@@ -329,9 +346,9 @@ class App extends React.Component {
     
     //TODO: improve data to save
     let saveData = {
-      tracks: this.tracks,
       bpm: this.state.bpm,
-      timeSignature: this.state.timeSignature
+      timeSignature: this.state.timeSignature,
+      tracks: this.tracks,     
     }
     let content = JSON.stringify(saveData);
     let filename = "BeatNotation_"+Date.now()+".beno";
@@ -370,9 +387,17 @@ class App extends React.Component {
       maxTaktCount = tmpTrack.takts.length > maxTaktCount ? tmpTrack.takts.length : maxTaktCount;
     }
 
+    //calc new notesInTakt
+    this.updateNotesInTakt(data.timeSignature);
+
+    //update tracks length
     this.tracksLengthInTakts = maxTaktCount;
     this.tracksLengthInNotes = this.tracksLengthInTakts * this.notesInTakt;
     this.timestamp = 0;
+
+    //update note scale
+    this.updateNotesSacle(data.timeSignature); 
+    
 
     console.log("BPM:", data.bpm);
     console.log("TimeSignature:", data.timeSignature);
@@ -698,7 +723,6 @@ class App extends React.Component {
               return <option key={ts} value={ts}>{ts}</option>
             })}
           </select>
-          <input name="bpm" value={this.state.bpm} onChange={this.handleBpmInputChange} type="number"></input>
         </div>
 
         <div className="app-toolbar__bpm" >
