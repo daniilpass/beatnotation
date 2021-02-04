@@ -660,7 +660,11 @@ class App extends React.Component {
     this.tracks.forEach( (track, trackIndex) => { 
       track.ts = Date.now();
       track.takts[taktIndex] = {};
-      track.takts[taktIndex].notes = [...this.clipboard[trackIndex]];
+      track.takts[taktIndex].notes = [];
+      //Oops. Из буфера читаем только ноты для нашего размера такта, лишнее не берём
+      for (let i = 0; i < this.notesInTakt; i++) {  
+        track.takts[taktIndex].notes[i] = this.clipboard[trackIndex][i] || 0;  
+      } 
       track.takts[taktIndex].ts = Date.now()+"_"+taktIndex;
     });
     
