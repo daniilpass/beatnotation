@@ -323,17 +323,19 @@ class App extends React.Component {
     if (!this.state.realtimeRender && !force) {
       return;
     }
-    
+
+    //console.log('tryDrawNotes', this.tracks);
     let maxTaktCount = 0;
 
     for (let tIdx = 0; tIdx < this.tracks.length; tIdx++) {
       const _track = this.tracks[tIdx];
+      
       for (let taktIdx = 0; taktIdx < _track.takts.length; taktIdx++) {
         const _takt = _track.takts[taktIdx];
-        maxTaktCount = (_takt.notes.lastIndexOf(1) >= 0 && taktIdx > maxTaktCount) ?  taktIdx : maxTaktCount;
+        let tmpMaxTaktCount = (taktIdx + 1); // make +1 to convert index to count
+        maxTaktCount = (_takt.notes.lastIndexOf(1) >= 0 && tmpMaxTaktCount > maxTaktCount) ?  tmpMaxTaktCount : maxTaktCount; 
       }
-    }
-    maxTaktCount = maxTaktCount + 1; //INdex to count
+    } 
 
     this.canvasRef && this.canvasRef.current && this.canvasRef.current.draw(this.tracks, maxTaktCount, this.state.bpm, this.state.timeSignature, this.notesInTakt);
   }
@@ -572,7 +574,7 @@ class App extends React.Component {
     console.log('Add takt');
     this.tracksLengthInTakts = this.tracksLengthInTakts + 1;
     this.tracksLengthInNotes = this.tracksLengthInTakts * this.notesInTakt; 
-    
+
     this.tracks.forEach(track => {
         track.takts = [
           ...track.takts,

@@ -46,6 +46,7 @@ class CanvasNotes extends React.PureComponent {
     }
 
     draw(tracks, taktCountLimit, bpm, timeSignature, notesInTakt) {
+      // console.log('draw', tracks, taktCountLimit, bpm, timeSignature, notesInTakt)
       // Удаляю старые холсты
       while (this.canvasWrapper.childElementCount > 1) {
         this.canvasWrapper.removeChild(this.canvasWrapper.firstChild);
