@@ -72,6 +72,7 @@ class CanvasNotes extends React.PureComponent {
       let tsUp =  timeSignature[0];
       let tsDown = timeSignature[1];
 
+      //TODO: look at calculation in Track->Takt Component
       if (tsDown === 8 && (tsUp % 3) === 0) {
         this.notesInGroup = 6;
       } else {

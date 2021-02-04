@@ -34,7 +34,8 @@ class Note extends React.Component {
       return true;
     }
 
-    if (nextProps.width !== this.props.width) {
+    if (nextProps.width !== this.props.width
+      || nextProps.filled !== this.props.filled) {
       return true;
     }
     

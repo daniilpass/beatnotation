@@ -16,6 +16,7 @@ class Track extends React.Component {
         || this.props.tracksLengthInTakts !== nextProps.tracksLengthInTakts
         || this.props.tracksLengthInNotes !== nextProps.tracksLengthInNotes
         || this.props.trackControlWidth !== nextProps.trackControlWidth
+        || this.props.timeSignature !== nextProps.timeSignature
         || this.props.style !== nextProps.style
         || this.props.ts !== nextProps.ts) {
         return true;
@@ -40,6 +41,7 @@ class Track extends React.Component {
       for (let i = 0; i < this.props.tracksLengthInTakts; i++) {
         const takt = this.props.track.takts[i];
         const el = <Takt key={"takt_"+i} noteWidth={this.props.noteWidth} noteHeight={this.props.noteHeight} 
+          timeSignature={this.props.timeSignature}
           takt={takt} index={i} tracksLengthInTakts={this.props.tracksLengthInTakts} onNoteClick={this.handleNoteClick}/>
 
         els.push(el);
@@ -68,7 +70,8 @@ class Takt extends React.Component {
 
   shouldComponentUpdate(nextProps, nextState) {    
     if (nextProps.takt.ts !== this.props.takt.ts
-      || nextProps.noteWidth !== this.props.noteWidth){
+      || nextProps.noteWidth !== this.props.noteWidth
+      || nextProps.timeSignature !== this.props.timeSignature){
       return true;
     }
 
@@ -81,16 +84,45 @@ class Takt extends React.Component {
 
   renderNotes() {
     //console.log('renderNotes', this.props.takt);
-    
+    let notesInPart = 0;
+    let notesInGroup = 0;
+
+    let up = this.props.timeSignature[0];
+    let down = this.props.timeSignature[1];
+    switch (down) {
+      case 4: notesInPart = 4; break;
+      case 8: notesInPart = 2; break;
+      case 16: notesInPart = 1; break;
+      default:
+        throw ("Unknown timeSignature:", this.state.timeSignature);
+    }
+
+    if (down === 8 && (up % 3) === 0) {
+      notesInGroup = 6;
+    } else {
+      notesInGroup = 4;
+    }
+
+    //Если в тактах нечетное кол-во долей, то шахматный рисунок сбивается. Исправим
+    let shiftFill = false;
+    if (up % 2 !== 0 && this.props.index % 2 == 1) {
+      shiftFill = true;
+      console.log("use shift")
+    }
+
+
     let els = []
     let notes = this.props.takt.notes;
     for (let i = 0; i < notes.length; i++) {
 
-      let indexInQuarter = i % 16 + 1;
-      let filled = false;
-      if ((indexInQuarter >= 5 && indexInQuarter <=8) || indexInQuarter >= 13) {
-        filled = true;
+    //  let indexInQuarter = i % 16 + 1;
+      let filled = i % (notesInGroup*2) >= notesInGroup;
+      if (shiftFill) {
+        filled = !filled;
       }
+      // if ((indexInQuarter >= 5 && indexInQuarter <=8) || indexInQuarter >= 13) {
+      //   filled = true;
+      // }
 
       // console.log(i, indexInQuarter, filled);
       const el = <Note key={i} index={i} filled={filled} width={this.props.noteWidth} 

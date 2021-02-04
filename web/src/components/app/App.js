@@ -17,7 +17,7 @@ class App extends React.Component {
       this.notesInPartCount = 4;
       
       this.notesInTakt = 16;
-      this.tracksLengthInTakts = 48;
+      this.tracksLengthInTakts = 4;
       this.tracksLengthInNotes = this.tracksLengthInTakts * this.notesInTakt;
 
       this.noteWidth = 20;
@@ -36,7 +36,7 @@ class App extends React.Component {
       ];
 
       this.timerId = 0;
-      this.stepDelay = 10;
+      this.stepDelay = 20;
       this.prevNoteIndex = -1;
       this.prevTaktIndex = -1;
       this.timestamp = 0;
@@ -405,7 +405,9 @@ class App extends React.Component {
 
     //Pause then end
     if(this.timelineNote > this.tracksLengthInNotes)
-      this.pause();  
+    {
+      this.pause();   
+    }
   }
 
   playNotes = () => {    
@@ -413,9 +415,15 @@ class App extends React.Component {
    
     if (noteIndex === this.prevNoteIndex)
       return;
-
+      
     let taktIndex = Math.trunc(this.timelineTakt)
     let noteIndexInTakt = noteIndex % this.notesInTakt;
+
+    if (taktIndex + 1> this.tracksLengthInTakts) {
+      return;
+    }
+
+    //console.log('playNotes', taktIndex,noteIndexInTakt);
 
     //console.log(noteIndex);
     for (let trackIndex = 0; trackIndex < this.tracks.length; trackIndex++) {
@@ -703,6 +711,7 @@ class App extends React.Component {
             this.tracks.map((_track,i) => {
               return <Track key={"track_"+i} index={i} noteWidth={this.noteWidth} noteHeight={this.noteHeight} noteClick={this.handleNoteClick} 
                               tracksLengthInNotes={this.tracksLengthInNotes} tracksLengthInTakts={this.tracksLengthInTakts} 
+                              timeSignature={this.state.timeSignature}
                               track={_track} ts={_track.ts} 
                               trackControlWidth={this.trackControlWidth} addTaktButtonWidth={this.addTaktButtonWidth}
                               onVolumeChange={this.handleTrackVolumeChange}
