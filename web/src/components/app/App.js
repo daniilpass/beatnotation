@@ -99,35 +99,7 @@ class App extends React.Component {
   * INIT FUNCTIONS
   */
 
-  initTracks() {    
-    let up = this.state.timeSignature[0];
-    let down = this.state.timeSignature[1];   
-
-    //Количество нот в долях
-    let notesInPart = 0;
-    switch (down) {
-      case 4: notesInPart = 4; break;
-      case 8: notesInPart = 2; break;
-      case 16: notesInPart = 1; break;
-      default:
-        throw ("Unknown timeSignature:", this.state.timeSignature);
-    }
-    
-    //РАсчет кол-ва нот в такте, новой длины трека
-    this.notesInTakt = up * notesInPart;
-    this.tracksLengthInNotes = this.tracksLengthInTakts * this.notesInTakt;
-
-    console.log("TimeSignature:", this.state.timeSignature, "notesInPart:", notesInPart, "notesInTakt:", this.notesInTakt );
-
-    //Масштабируем размер нот так, чтобы помещались элементы управления такта
-    let estimatedWidth = this.noteWidth * this.notesInTakt;
-    if (estimatedWidth < this.minTaktControlWidth) {
-      this.noteWidth = Math.ceil(this.minTaktControlWidth / this.notesInTakt)
-    } else {
-      this.noteWidth = this.defaultNotewWidth;
-    }
-
-    //TODO: сохранять введенные до этого ноты
+  initTracks() {
     const tracks = [...tracksData];
     //Init empty tracks
     tracks.forEach(track => {        
@@ -251,15 +223,76 @@ class App extends React.Component {
 
 
   handleTimeSignatureChange = (event) => {
-    // console.log(event.target.checked);
-    let tsUp = parseInt(event.target.value.split("/")[0]);
-    let tsDown = parseInt(event.target.value.split("/")[1]);
-    this.setState({
-      [event.target.name]: [tsUp, tsDown],
-    }, () => {
-      this.tracks = this.initTracks(true);
+    let value = [parseInt(event.target.value.split("/")[0]), parseInt(event.target.value.split("/")[1])]
+    this.setTimeSignature(value,  () => {
       this.forceUpdate();
-    }) 
+    });    
+  }
+
+  setTimeSignature(value, callback) {    
+    let up = value[0];
+    let down = value[1];   
+
+    //Количество нот в долях
+    let notesInPart = 0;
+    switch (down) {
+      case 4: notesInPart = 4; break;
+      case 8: notesInPart = 2; break;
+      case 16: notesInPart = 1; break;
+      default:
+        throw ("Unknown timeSignature:", value);
+    }
+    
+    //Расчет кол-ва нот в такте, новой длины трека
+    this.notesInTakt = up * notesInPart;
+    this.tracksLengthInTakts = Math.ceil(this.tracksLengthInNotes / this.notesInTakt);
+    this.tracksLengthInNotes = this.tracksLengthInTakts * this.notesInTakt;
+
+    
+    //Масштабируем размер нот так, чтобы помещались элементы управления такта
+    let estimatedWidth = this.noteWidth * this.notesInTakt;
+    if (estimatedWidth < this.minTaktControlWidth) {
+      this.noteWidth = Math.ceil(this.minTaktControlWidth / this.notesInTakt)
+    } else {
+      this.noteWidth = this.defaultNotewWidth;
+    }
+
+    console.log("TimeSignature:", value, "notesInPart:", notesInPart, "notesInTakt:", this.notesInTakt , 'tracksLengthInTakts:', this.tracksLengthInTakts, 'tracksLengthInNotes:', this.tracksLengthInNotes, );
+
+    //Изменение структуры трека
+    const tracks = [...this.tracks];
+
+    for (let i = 0; i < tracks.length; i++) {
+      let track = {...tracks[i]};
+
+      //Поулчаю ноты в плоском виде, чтобы легче их распихать по новым тактам
+      let plainNotes = [];      
+      track.takts.forEach(takt => {
+        plainNotes = plainNotes.concat(takt.notes);
+      });
+      console.log(plainNotes);
+
+      //Заполняю новую структуру
+      let noteCounter = 0;
+      for (let tIdx = 0; tIdx < this.tracksLengthInTakts; tIdx++) { 
+        track.ts =   Date.now()+"_"+tIdx       
+        track.takts[tIdx] = {
+          ts: Date.now()+"_"+tIdx,
+          notes: []
+        }      
+        for (let nIdx = 0; nIdx < this.notesInTakt; nIdx++) {
+          track.takts[tIdx].notes[nIdx] = plainNotes[noteCounter] || 0;  
+          noteCounter++;         
+        }
+      }
+    }
+    this.tracks = [...tracks];
+    //console.log();
+    
+
+    this.setState({
+      timeSignature: [up, down],
+    }, callback); 
   }
 
 /*
@@ -297,7 +330,8 @@ class App extends React.Component {
     //TODO: improve data to save
     let saveData = {
       tracks: this.tracks,
-      bpm: this.state.bpm
+      bpm: this.state.bpm,
+      timeSignature: this.state.timeSignature
     }
     let content = JSON.stringify(saveData);
     let filename = "BeatNotation_"+Date.now()+".beno";
@@ -341,12 +375,14 @@ class App extends React.Component {
     this.timestamp = 0;
 
     console.log("BPM:", data.bpm);
+    console.log("TimeSignature:", data.timeSignature);
     console.log("tracksLengthInNotes:", this.tracksLengthInNotes);
     console.log("FileData:", data);
 
     this.setState({
       bpm: data.bpm,
-      bpms: data.bpm / 60 / 1000
+      bpms: data.bpm / 60 / 1000,
+      timeSignature: data.timeSignature
     }, () => {
       this.updateTimeControls()
     })

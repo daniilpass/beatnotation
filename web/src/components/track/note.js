@@ -5,7 +5,7 @@ class Note extends React.Component {
     super(props);
 
     this.state = {
-      level: 0
+      level: this.props.level || 0
     }
   }
 
@@ -20,6 +20,12 @@ class Note extends React.Component {
 
   shouldComponentUpdate(nextProps, nextSate) {
     //console.log('shouldComponentUpdate Note index:' + this.props.index)
+    let doUpdate = false;
+
+    if (nextProps.width !== this.props.width
+      || nextProps.filled !== this.props.filled) {
+        doUpdate = true;
+    }
 
     // ОБновление по клику внутри компонент
     if (this.state.level !== nextSate.level){
@@ -34,12 +40,9 @@ class Note extends React.Component {
       return true;
     }
 
-    if (nextProps.width !== this.props.width
-      || nextProps.filled !== this.props.filled) {
-      return true;
-    }
     
-    return false;
+
+    return doUpdate || false;
   }
 
   componentDidUpdate(prevProps, prevState) {
