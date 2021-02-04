@@ -107,7 +107,7 @@ class Takt extends React.Component {
     let shiftFill = false;
     if (up % 2 !== 0 && this.props.index % 2 == 1) {
       shiftFill = true;
-      console.log("use shift")
+      //console.log("use shift")
     }
 
 

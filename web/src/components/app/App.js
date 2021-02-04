@@ -277,34 +277,37 @@ class App extends React.Component {
     this.updateTimeSignatureRelativeProperties(value);
 
     //Изменение структуры трека
-    const tracks = [...this.tracks];
+    let tmpTracks = [...this.tracks];
 
-    for (let i = 0; i < tracks.length; i++) {
-      let track = {...tracks[i]};
+    for (let i = 0; i < tmpTracks.length; i++) {
+      let tmpTrack = {...tmpTracks[i]};
 
       //Поулчаю ноты в плоском виде, чтобы легче их распихать по новым тактам
       let plainNotes = [];      
-      track.takts.forEach(takt => {
+      tmpTrack.takts.forEach(takt => {
         plainNotes = plainNotes.concat(takt.notes);
       });
-      console.log(plainNotes);
+      //console.log(plainNotes);
 
       //Заполняю новую структуру
       let noteCounter = 0;
+      tmpTrack.takts = [];
       for (let tIdx = 0; tIdx < this.tracksLengthInTakts; tIdx++) { 
-        track.ts =   Date.now()+"_"+tIdx       
-        track.takts[tIdx] = {
+        tmpTrack.ts =   Date.now()+"_"+tIdx       
+        tmpTrack.takts[tIdx] = {
           ts: Date.now()+"_"+tIdx,
           notes: []
         }      
         for (let nIdx = 0; nIdx < this.notesInTakt; nIdx++) {
-          track.takts[tIdx].notes[nIdx] = plainNotes[noteCounter] || 0;  
+          tmpTrack.takts[tIdx].notes[nIdx] = plainNotes[noteCounter] || 0;  
           noteCounter++;         
         }
       }
+
+      tmpTracks[i] = tmpTrack;      
     }
-    this.tracks = [...tracks];
-    //console.log();
+    this.tracks = [...tmpTracks];
+    //console.log("New track struckture", tmpTracks);
     
     //Обновление состояни для обновления UI
     this.setState({
@@ -569,7 +572,7 @@ class App extends React.Component {
     console.log('Add takt');
     this.tracksLengthInTakts = this.tracksLengthInTakts + 1;
     this.tracksLengthInNotes = this.tracksLengthInTakts * this.notesInTakt; 
-    // console.log(...this.tracks)
+    
     this.tracks.forEach(track => {
         track.takts = [
           ...track.takts,
