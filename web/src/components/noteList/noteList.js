@@ -26,6 +26,7 @@ class CanvasNotes extends React.PureComponent {
       // Ноты
       this.noteRadius = 5;
       
+      this.notesInGroup = 4;
       this.notesInTakt = 16;
       this.notesInLine = this.notesInTakt * 4;
       this.taktPadding = this.noteRadius * 5;
@@ -68,9 +69,16 @@ class CanvasNotes extends React.PureComponent {
 
     drawList(tracks, taktCountLimit, bpm, timeSignature, notesInTakt) {
       //Размер
-      // let timeSignatureArr = timeSignature.split("/");
-      // let up = parseInt(timeSignatureArr[0]);
-      // let down = parseInt(timeSignatureArr[1]);      
+      let timeSignatureArr = timeSignature.split("/");
+      let tsUp = parseInt(timeSignatureArr[0]);
+      let tsDown = parseInt(timeSignatureArr[1]); 
+
+      if (tsDown === 8 && (tsUp % 3) === 0) {
+        this.notesInGroup = 6;
+      } else {
+        this.notesInGroup = 4;
+      }
+
       this.notesInTakt = notesInTakt;
 
       // Вычисляю сколько нужно строк, чтобы уместить все ноты
@@ -106,6 +114,7 @@ class CanvasNotes extends React.PureComponent {
         let rightBound = Number.MIN_SAFE_INTEGER;
         let pattern = [0,0,0,0];
         let pattern16 = false;
+        let pattern8 = false;
         let pattern4 = false;        
       
         for (let taktIndex = 0; taktIndex < taktCountLimit; taktIndex++) {
@@ -132,16 +141,19 @@ class CanvasNotes extends React.PureComponent {
             }
 
             // Начало четверти
-            let lead4 = (noteIndex) % 4 === 0;
+            let leadNote = (noteIndex) % this.notesInGroup === 0;
             // Номер нижней ноты на линииях
             let noteLine = Number.MIN_SAFE_INTEGER;
             // Сбросим границы при новом такте
-            if (lead4) {
+            if (leadNote) {
               downBound = Number.MAX_SAFE_INTEGER;
               //upperBound = Number.MIN_SAFE_INTEGER;
               leftBound = Number.MAX_SAFE_INTEGER;
               rightBound = Number.MIN_SAFE_INTEGER;
-              pattern = [0,0,0,0];
+              pattern = new Array(this.notesInGroup);
+              for (let i = 0; i < this.notesInGroup; i++) {
+                pattern[i] = 0;                
+              }
               pattern16 = false;
               pattern4 = false;
             }
@@ -157,43 +169,32 @@ class CanvasNotes extends React.PureComponent {
               let line = track.line;
               
               // Вычисление границ и размера такта
-              if (lead4) {
+              if (leadNote) {
                 //reset bounds            
                 let _leftBound=Number.MAX_SAFE_INTEGER;
-                _leftBound = notes[noteIndex + 3] > 0 ? noteIndex + 3 : _leftBound; 
-                _leftBound = notes[noteIndex + 2] > 0 ? noteIndex + 2 : _leftBound;
-                _leftBound = notes[noteIndex + 1] > 0 ? noteIndex + 1 : _leftBound;
-                _leftBound = notes[noteIndex] > 0 ? noteIndex : _leftBound;
-    
-                let _rightBound=Number.MIN_SAFE_INTEGER;
-                _rightBound = notes[noteIndex] > 0 ? _rightBound : _rightBound; 
-                _rightBound = notes[noteIndex + 1] > 0 ? noteIndex + 1 : _rightBound;
-                _rightBound = notes[noteIndex + 2] > 0 ? noteIndex + 2 : _rightBound;
-                _rightBound = notes[noteIndex + 3] > 0 ? noteIndex +3 : _rightBound;
-    
+                for (let i = this.notesInGroup - 1; i >= 0; i--) {
+                  _leftBound = notes[noteIndex + i] > 0 ? noteIndex + i : _leftBound; 
+                }
                 leftBound = _leftBound < leftBound ? _leftBound : leftBound;
+
+                let _rightBound=Number.MIN_SAFE_INTEGER;
+                for (let i = 0; i < this.notesInGroup; i++) {
+                  _rightBound = notes[noteIndex + i] > 0 ? noteIndex + i : _rightBound;
+                }                   
                 rightBound = _rightBound > rightBound ? _rightBound : rightBound;
     
                 let _downBound = Number.MAX_SAFE_INTEGER;
-                _downBound = notes[noteIndex + 3] > 0 ? track.line : _downBound; 
-                _downBound = notes[noteIndex + 2] > 0 ? track.line : _downBound;
-                _downBound = notes[noteIndex + 1] > 0 ? track.line : _downBound;
-                _downBound = notes[noteIndex] > 0     ? track.line : _downBound;
+                for (let i = this.notesInGroup - 1; i >= 0; i--) {
+                  _downBound = notes[noteIndex + i] > 0 ? track.line : _downBound; 
+                }
                 downBound = _downBound < downBound? _downBound : downBound;
     
                 //detect size
-                if (notes[noteIndex] > 0 ) {
-                  pattern[0]=1;
-                }
-                if (notes[noteIndex+1] > 0 ) {
-                  pattern[1]=1;
-                }
-                if (notes[noteIndex+2] > 0 ) {
-                  pattern[2]=1;
-                }
-                if (notes[noteIndex+3] > 0 ) {
-                  pattern[3]=1;
-                }
+                for (let i = 0; i < this.notesInGroup; i++) {
+                  if (notes[noteIndex + i] > 0 ) {
+                    pattern[i]=1;
+                  }
+                } 
               }
     
               // Если нота звучит, то рисуем её
@@ -207,35 +208,105 @@ class CanvasNotes extends React.PureComponent {
             }
             
             // Нормализую границы
-            leftBound = leftBound !== Number.MAX_SAFE_INTEGER ? leftBound % 4 : leftBound;
-            rightBound = rightBound !== Number.MIN_SAFE_INTEGER ? rightBound % 4 : rightBound ;
+            leftBound = leftBound !== Number.MAX_SAFE_INTEGER ? leftBound % this.notesInGroup : leftBound;
+            rightBound = rightBound !== Number.MIN_SAFE_INTEGER ? rightBound % this.notesInGroup : rightBound ;
     
-            // Вычисляю размер        
-            if (lead4 && !(pattern[0] === 1 && pattern[1] === 0 && pattern[2] === 1 && pattern[3] === 0) ) {
-              pattern16 = true;
-            }
-            if (lead4 && (pattern[0] === 1 && pattern[1] === 0 && pattern[2] === 0 && pattern[3] === 0)) {
-              pattern16 = false;
-              pattern4 = true;
+            // Вычисляю размер нот в часте такта        
+            if (leadNote) {               
+              //Если ноты чередуются, то это 8й иди 16й размер
+              if (tsDown == 4) {
+                pattern16 = false;  
+                pattern8 = false; 
+                for (let i = 0; i < this.notesInGroup; i=i+2) {
+                  if (!(pattern[i] === 1 && pattern[i+1] === 0)) {
+                      pattern16 =  true;               
+                  }
+                }
+                //Hack: четвертная нота
+                if ((pattern[0] === 1 && pattern[1] === 0 && pattern[2] === 0 && pattern[3] === 0)) {
+                  pattern16 = false;
+                }
+              }
+              
+              if (tsDown == 8) {
+                pattern16 = false;  
+                pattern8 = true; 
+                for (let i = 0; i < this.notesInGroup; i=i+2) {
+                  if (!(pattern[i] === 1 && pattern[i+1] === 0) && !(pattern[i] === 0 && pattern[i+1] === 0)) {
+                      pattern8 = false;                
+                  }
+                }
+                pattern16 = (tsDown === 8 && pattern8 === false) ? true : false;
+              }
+              //console.log('pattern', pattern, 'pattern16', pattern16, 'pattern8', pattern8);
             }
 
-            //Если четверть пустая, то рисую четвернтую паузу
-            if (lead4 && (pattern[0] === 0 && pattern[1] === 0 && pattern[2] === 0 && pattern[3] === 0)) {
-              let pauseLine = 2;
-              let x = note_x + this.noteRadius*4;
-              let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + pauseLine * this.linePadding
-              this.drawPause4(x,y)  
+            /*
+            *ПАУЗЫ
+            */   
+            
+            if (tsDown === 4) {
+              //Если четверть пустая, то рисую четвернтую паузу
+              if (leadNote && (pattern[0] === 0 && pattern[1] === 0 && pattern[2] === 0 && pattern[3] === 0)) {
+                let pauseLine = 2;
+                let x = note_x + this.noteRadius*4;
+                let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + pauseLine * this.linePadding
+                this.drawPause4(x,y)  
+              }
+              //Если размер 16, нет ноты и часть не пустая, то рисую паузу
+              if (noteLine === Number.MIN_SAFE_INTEGER && leftBound !== Number.MAX_SAFE_INTEGER && rightBound !==Number.MIN_SAFE_INTEGER) {
+                let pauseLine = 3;
+                let x = note_x;
+                let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + pauseLine * this.linePadding
+                //16-е паузы самые маленькие, вставляем на каждую пустую ноту
+                if (pattern16) {
+                  this.drawPause16(x, y);
+                } 
+              }
+              //TODO: рисовать 8е паузы
             }
-    
-            //Если размер 16 и нет ноты, то рисую паузу
-            if (pattern16 && noteLine === Number.MIN_SAFE_INTEGER && leftBound !== Number.MAX_SAFE_INTEGER && rightBound !==Number.MIN_SAFE_INTEGER) {
-              let pauseLine = 3;
-              let x = note_x;
-              let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + pauseLine * this.linePadding
-              this.drawPause16(x, y);
+
+            if (tsDown === 8 && this.skipNote != noteIndex) {
+              //Если размеры такта 8, то 4я пауза на каждую 1-ю пустую ноту
+              if (pattern8 && noteIndex%2===0 && noteLine === Number.MIN_SAFE_INTEGER ) {              
+                let pauseLine = 3;
+                let x = note_x;
+                let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + pauseLine * this.linePadding
+                //Восьмые паузы рисуем только на 8х ноты
+                this.drawPause8(x, y);
+              } 
+              if (pattern16 && noteLine === Number.MIN_SAFE_INTEGER) { 
+                //console.log('====>',noteIndex, pattern, noteIndex%this.notesInGroup, noteIndex%this.notesInGroup + 1,leftBound, rightBound)
+                if (noteIndex%2===0 
+                    && pattern[noteIndex%this.notesInGroup + 1] === 0 
+                    && ((noteIndex%this.notesInGroup > rightBound || noteIndex%this.notesInGroup < leftBound)) ) 
+                {
+                  let pauseLine = 3;
+                  let x = note_x;
+                  let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + pauseLine * this.linePadding
+                  //Восьмые паузы рисуем только на 8х ноты
+                  this.drawPause8(x, y);
+                  this.skipNote = noteIndex + 1;
+                } else {
+                  let pauseLine = 3;
+                  let x = note_x;
+                  let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + pauseLine * this.linePadding
+                  //Восьмые паузы рисуем только на 8х ноты
+                  this.drawPause16(x, y);
+                }  
+              }     
             }
+
+            //После пропуска ноты, сбросим значение
+            if (this.skipNote == noteIndex) {
+              this.skipNote = -1;
+            }
+
+                   
     
-            // Подтягиваю нотные палки вверх        
+            /*        
+            * Подтягиваю нотные палки вверх 
+            */
             if (noteLine !== Number.MIN_SAFE_INTEGER) {  
                 // Вертикальная линия
                 let x = note_x + this.noteRadius;
@@ -243,21 +314,27 @@ class CanvasNotes extends React.PureComponent {
                 let length = (noteLine - downBound ) * (this.linePadding) + this.noteRadius*6;            
     
                 // Если размер 16 и нота не первая и не последняя в группе, то рисую палочку покороче
-                let idx16 = noteIndex % 4;
+                let idx16 = noteIndex % this.notesInGroup;
                 if (pattern16 && idx16 !== leftBound && idx16 !== rightBound) {
                   length  = length - this.noteRadius;
                 }
     
                 this.drawVerticalLine(x, y, -length);
     
-                // Если онты обособлены, то рисую кончик 16 нот
+                // Если ноты обособлены, то рисую кончик нот
+                //16
                 if (pattern16 && leftBound === rightBound) {
                   this.drawNote16Tail(x - this.noteRadius, y - length + this.noteRadius * 2);
+                }
+                //8
+                if (pattern8 && leftBound === rightBound) {
+                  this.drawNote8Tail(x - this.noteRadius, y - length + this.noteRadius * 2);
                 }
             }
     
             // Рисую соеденительную линию
-            if (lead4 && leftBound !== Number.MAX_SAFE_INTEGER && rightBound !== Number.MIN_SAFE_INTEGER) {
+            if (leadNote && leftBound !== Number.MAX_SAFE_INTEGER && rightBound !== Number.MIN_SAFE_INTEGER) {
+              //console.log(leftBound, rightBound)
               // Соеденительная линия размер 8
               let x = note_x + this.noteRadius + leftBound* this.noteRadius * 2.5;
               let y = lineNumb * this.lineGroupHeight - this.linePadding/2 + downBound * this.linePadding - this.noteRadius*6;
@@ -316,6 +393,20 @@ class CanvasNotes extends React.PureComponent {
       this.ctx.fill();
       this.ctx.moveTo(posX + pauseRadius*2, posY - pauseRadius*2);
       this.ctx.lineTo(posX + pauseRadius, posY + pauseRadius * 10);    
+      this.ctx.stroke();
+    }
+
+    // Рисует паузу 8ю
+    drawPause8(posX, posY) {
+      this.setCanvasStyle("#a1a1a1", 1.1);
+      
+      let pauseRadius = this.noteRadius / 2;
+  
+      this.ctx.beginPath();
+      this.ctx.arc(posX + pauseRadius, posY, pauseRadius, 0, 2 * Math.PI);
+      this.ctx.fill();
+      this.ctx.moveTo(posX + pauseRadius*2, posY - pauseRadius*2);
+      this.ctx.lineTo(posX + pauseRadius, posY + pauseRadius * 5);    
       this.ctx.stroke();
     }
 
@@ -383,6 +474,15 @@ class CanvasNotes extends React.PureComponent {
       this.drawNoteTail(posX, posY, type);
     }
   
+    // Рисует кончик для 8х нот
+    drawNote8Tail (posX, posY) {
+      this.setCanvasStyle("#000000", 1.1);
+      this.ctx.beginPath();      
+      this.ctx.moveTo(posX + this.noteRadius, posY - this.noteRadius);
+      this.ctx.lineTo(posX + this.noteRadius*2, posY);
+      this.ctx.stroke();  
+    }
+
     // Рисует кончик для 16х нот
     drawNote16Tail (posX, posY) {
       this.setCanvasStyle("#000000", 1.1);
@@ -391,8 +491,7 @@ class CanvasNotes extends React.PureComponent {
       this.ctx.lineTo(posX + this.noteRadius*2, posY);
       this.ctx.moveTo(posX + this.noteRadius, posY - this.noteRadius * 2);
       this.ctx.lineTo(posX + this.noteRadius*2, posY- this.noteRadius);
-      this.ctx.stroke();
-  
+      this.ctx.stroke();  
     }
   
     // рисует особые кончики
