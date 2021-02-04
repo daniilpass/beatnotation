@@ -81,6 +81,19 @@ class CanvasNotes extends React.PureComponent {
       }
 
       this.notesInTakt = notesInTakt;
+     
+      //TODO: если длинный такт, то делать разбиение...
+
+      let taktWidthInPx = this.startX + this.notesInTakt * (this.noteRadius * 2.5) + this.taktPadding
+      let maxTaktInRow  = Math.trunc(this.cWidth / taktWidthInPx);
+      maxTaktInRow = maxTaktInRow < 1 ? 1 : maxTaktInRow;
+
+      console.log('taktWidthInPx', taktWidthInPx);
+      console.log('maxTaktInRow', maxTaktInRow);
+
+      this.notesInLine = this.notesInTakt * maxTaktInRow;
+
+      console.log('notesInLine', taktWidthInPx);
 
       // Вычисляю сколько нужно строк, чтобы уместить все ноты
       this.groupsCount  =  this.groupsPerPage; //Math.ceil(taktCountLimit / this.notesInLine);
@@ -116,7 +129,7 @@ class CanvasNotes extends React.PureComponent {
         let pattern = [0,0,0,0];
         let pattern16 = false;
         let pattern8 = false;
-        let pattern4 = false;        
+        //let pattern4 = false;        
       
         for (let taktIndex = 0; taktIndex < taktCountLimit; taktIndex++) {
 
@@ -156,7 +169,7 @@ class CanvasNotes extends React.PureComponent {
                 pattern[i] = 0;                
               }
               pattern16 = false;
-              pattern4 = false;
+              //pattern4 = false;
             }
 
             // Координаты ноты по X
@@ -215,7 +228,7 @@ class CanvasNotes extends React.PureComponent {
             // Вычисляю размер нот в часте такта        
             if (leadNote) {               
               //Если ноты чередуются, то это 8й иди 16й размер
-              if (tsDown == 4) {
+              if (tsDown === 4) {
                 pattern16 = false;  
                 pattern8 = false; 
                 for (let i = 0; i < this.notesInGroup; i=i+2) {
@@ -229,7 +242,7 @@ class CanvasNotes extends React.PureComponent {
                 }
               }
               
-              if (tsDown == 8) {
+              if (tsDown === 8) {
                 pattern16 = false;  
                 pattern8 = true; 
                 for (let i = 0; i < this.notesInGroup; i=i+2) {
@@ -267,7 +280,7 @@ class CanvasNotes extends React.PureComponent {
               //TODO: рисовать 8е паузы
             }
 
-            if (tsDown === 8 && this.skipNote != noteIndex) {
+            if (tsDown === 8 && this.skipNote !== noteIndex) {
               //Если размеры такта 8, то 4я пауза на каждую 1-ю пустую ноту
               if (pattern8 && noteIndex%2===0 && noteLine === Number.MIN_SAFE_INTEGER ) {              
                 let pauseLine = 3;
@@ -299,7 +312,7 @@ class CanvasNotes extends React.PureComponent {
             }
 
             //После пропуска ноты, сбросим значение
-            if (this.skipNote == noteIndex) {
+            if (this.skipNote === noteIndex) {
               this.skipNote = -1;
             }
 

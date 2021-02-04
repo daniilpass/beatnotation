@@ -84,18 +84,18 @@ class Takt extends React.Component {
 
   renderNotes() {
     //console.log('renderNotes', this.props.takt);
-    let notesInPart = 0;
+    //let notesInPart = 0;
     let notesInGroup = 0;
 
     let up = this.props.timeSignature[0];
     let down = this.props.timeSignature[1];
-    switch (down) {
-      case 4: notesInPart = 4; break;
-      case 8: notesInPart = 2; break;
-      case 16: notesInPart = 1; break;
-      default:
-        throw ("Unknown timeSignature:", this.state.timeSignature);
-    }
+    // switch (down) {
+    //   case 4: notesInPart = 4; break;
+    //   case 8: notesInPart = 2; break;
+    //   case 16: notesInPart = 1; break;
+    //   default:
+    //     throw ("Unknown timeSignature:", this.state.timeSignature);
+    // }
 
     if (down === 8 && (up % 3) === 0) {
       notesInGroup = 6;
@@ -105,7 +105,7 @@ class Takt extends React.Component {
 
     //Если в тактах нечетное кол-во долей, то шахматный рисунок сбивается. Исправим
     let shiftFill = false;
-    if (up % 2 !== 0 && this.props.index % 2 == 1) {
+    if (up % 2 !== 0 && this.props.index % 2 === 1) {
       shiftFill = true;
       //console.log("use shift")
     }

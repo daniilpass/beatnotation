@@ -5,7 +5,7 @@ class TrackControl extends React.Component {
       super(props);  
       
       this.drag = {
-        oldClientX: -1,
+        //oldClientX: -1,
         oldClientY: -1
       }
 
@@ -46,7 +46,7 @@ class TrackControl extends React.Component {
       e.preventDefault();
 
       this.setState({tmpVolume: this.props.track.volume * 100})
-      this.drag.oldClientX = e.clientX;
+      //this.drag.oldClientX = e.clientX;
       this.drag.oldClientY = e.clientY;
 
       document.onmouseup = this.closeDragElement;
@@ -65,10 +65,10 @@ class TrackControl extends React.Component {
       e.preventDefault();
 
       //Cala delta
-      let deltaX = (this.drag.oldClientX - e.clientX);
+      //let deltaX = (this.drag.oldClientX - e.clientX);
       let deltaY = (this.drag.oldClientY - e.clientY)
       //Save new values as old
-      this.drag.oldClientX = e.clientX;
+      //this.drag.oldClientX = e.clientX;
       this.drag.oldClientY = e.clientY;
       //change volume
       let newVolume = this.state.tmpVolume + deltaY;
