@@ -53,6 +53,7 @@ class App extends React.Component {
         connect: true,
         dtu: false,
         realtimeRender: true,
+        playbackNotes: false,
         timeSignature: [4,4]
       }
 
@@ -463,14 +464,14 @@ class App extends React.Component {
   */
   handleNoteClick = (trackIndex, taktIndex, noteIndex, level) => {
     //console.log('handleNoteClick', trackIndex, taktIndex, noteIndex)
-    
+
     let track = this.tracks[trackIndex];
     let takt = track.takts[taktIndex];
     takt.notes[noteIndex] = level;
     //track.ts = Date.now();
 
     // Проигрываю выбранную ноту
-    if (level > 0) {
+    if (level > 0 && this.state.playbackNotes) {
       this.playTrackSound(trackIndex);
     }
 
@@ -684,6 +685,10 @@ class App extends React.Component {
         <div>
           Show notation: 
           <input name="realtimeRender" value={this.state.realtimeRender} onChange={this.handleBooleanInputChange} checked={this.state.realtimeRender} type="checkbox"></input>
+        </div>
+        <div>
+          Playback notes: 
+          <input name="playbackNotes" value={this.state.playbackNotes} onChange={this.handleBooleanInputChange} checked={this.state.playbackNotes} type="checkbox"></input>
         </div>
       </div>
 
