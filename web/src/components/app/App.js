@@ -19,8 +19,15 @@ export default class App extends React.Component {
     this.canvasRef = React.createRef();
   }
 
-  handleRenderNotes = (tracks, maxTaktCount, bpm, timeSignature, notesInTakt) => {
-    this.canvasRef && this.canvasRef.current && this.canvasRef.current.draw(tracks, maxTaktCount, bpm, timeSignature, notesInTakt);
+  handleRenderNotes = (tracks, maxTaktCount, bpm, timeSignature, notesInTakt, dontRepeat) => {
+    if (this.canvasRef && this.canvasRef.current) {
+      this.canvasRef.current.draw(tracks, maxTaktCount, bpm, timeSignature, notesInTakt);      
+    } else if (!dontRepeat){
+      console.log('canvas not ready, second try...');
+      setTimeout(() =>  {
+        this.handleRenderNotes(tracks, maxTaktCount, bpm, timeSignature, notesInTakt, true);
+      }, 1);
+    }     
   }
 
   handleChangeRealtimeRender = (value) => {
