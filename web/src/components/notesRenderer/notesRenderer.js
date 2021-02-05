@@ -1,6 +1,6 @@
 import React from "react";
 
-class CanvasNotes extends React.PureComponent {
+class NotesRenderer extends React.PureComponent {
     constructor(props) {
       super(props);
   
@@ -569,6 +569,7 @@ class CanvasNotes extends React.PureComponent {
   
     //TODO: split on different canvas for print
     render() {
+      console.log('Render NotesRenderer');
       return <div className="canvas_notes_wrapper" style={this.props.style}>
           <canvas className="canvas_notes" width={this.cWidth} height={this.cHeight}></canvas>
       </div>
@@ -579,4 +580,4 @@ class CanvasNotes extends React.PureComponent {
 }
 
   
-export default CanvasNotes;
+export default NotesRenderer;
