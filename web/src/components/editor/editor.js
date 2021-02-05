@@ -1,8 +1,8 @@
 import React from "react";
 import axios from 'axios';
 
-import Track from "../track/track";
-import {tracksData} from "./tracksData";
+import Track from "./track/track";
+import {tracksData} from "../../assets/data/tracksData";
 import UserFileReader from "../userFileReader/userFileReader";
 
 const requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame;
