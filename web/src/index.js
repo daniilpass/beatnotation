@@ -3,6 +3,11 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './components/app/App';
 
+// suppress log
+if (process.env.NODE_ENV !== 'development') {
+  console.log = () => {}
+}
+
 ReactDOM.render(
   <React.StrictMode>
     <App />
