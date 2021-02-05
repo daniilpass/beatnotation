@@ -51,7 +51,6 @@ export default class Editor extends React.Component {
         state: "stop",
         connect: true,
         dtu: false,
-        realtimeRender: true,
         playbackNotes: false,
         timeSignature: [4,4]
       }
@@ -219,7 +218,7 @@ export default class Editor extends React.Component {
     let value = event.target.checked;
 
     if (name === 'realtimeRender') {
-        this.props.onChangeRealtimeRender && this.props.onChangeRealtimeRender(value);
+        this.props.setRealtimeRender(value);
     }
 
     this.setState({
@@ -326,7 +325,7 @@ export default class Editor extends React.Component {
 */
 
   tryDrawNotes(force) {
-    if (!this.state.realtimeRender && !force) {
+    if (!this.props.realtimeRender && !force) {
       return;
     }
 
@@ -755,7 +754,7 @@ export default class Editor extends React.Component {
         </div> */}
         <div>
           Show notation: 
-          <input name="realtimeRender" value={this.state.realtimeRender} onChange={this.handleBooleanInputChange} checked={this.state.realtimeRender} type="checkbox"></input>
+          <input name="realtimeRender" onChange={this.handleBooleanInputChange} checked={this.props.realtimeRender} type="checkbox"></input>
         </div>
         <div>
           Playback notes: 

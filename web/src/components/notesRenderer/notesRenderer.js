@@ -1,6 +1,6 @@
 import React from "react";
 
-class NotesRenderer extends React.PureComponent {
+class NotesRenderer extends React.Component {
     constructor(props) {
       super(props);
   
@@ -88,12 +88,12 @@ class NotesRenderer extends React.PureComponent {
       let maxTaktInRow  = Math.trunc(this.cWidth / taktWidthInPx);
       maxTaktInRow = maxTaktInRow < 1 ? 1 : maxTaktInRow;
 
-      console.log('taktWidthInPx', taktWidthInPx);
-      console.log('maxTaktInRow', maxTaktInRow);
+     // console.log('taktWidthInPx', taktWidthInPx);
+     // console.log('maxTaktInRow', maxTaktInRow);
 
       this.notesInLine = this.notesInTakt * maxTaktInRow;
 
-      console.log('notesInLine', taktWidthInPx);
+      //console.log('notesInLine', taktWidthInPx);
 
       // Вычисляю сколько нужно строк, чтобы уместить все ноты
       this.groupsCount  =  this.groupsPerPage; //Math.ceil(taktCountLimit / this.notesInLine);
@@ -569,8 +569,8 @@ class NotesRenderer extends React.PureComponent {
   
     //TODO: split on different canvas for print
     render() {
-      console.log('Render NotesRenderer');
-      return <div className="canvas_notes_wrapper" style={this.props.style}>
+      console.log('Render NotesRenderer', this.props.realtimeRender);
+      return <div className="canvas_notes_wrapper" style={{...this.props.style, display: this.props.realtimeRender ? "block" : "none" }}>
           <canvas className="canvas_notes" width={this.cWidth} height={this.cHeight}></canvas>
       </div>
       

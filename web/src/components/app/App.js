@@ -5,17 +5,12 @@ import './App.css';
 
 import Header from "./header/header";
 import Version from "./version/version";
-import Editor from "../editor/editor";
-import NotesRenderer from "../notesRenderer/notesRenderer";
+import Editor from "../editor/editorContainer";
+import NotesRenderer from "../notesRenderer/notesRenderContainer";
 
 export default class App extends React.Component {
   constructor (props) {
     super(props);
-
-    this.state = {
-      realtimeRender: true
-    }
-
     this.canvasRef = React.createRef();
   }
 
@@ -30,17 +25,13 @@ export default class App extends React.Component {
     }     
   }
 
-  handleChangeRealtimeRender = (value) => {
-    this.setState({realtimeRender: value})
-  }
-
   render () {
     console.log('Render App');
 
     return <div className="App">
       <Header />
-      <Editor onRenderNotes={this.handleRenderNotes} onChangeRealtimeRender={this.handleChangeRealtimeRender}/>
-      <NotesRenderer ref={this.canvasRef} style={{display: this.state.realtimeRender ? 'block' : 'none'}}/>
+      <Editor onRenderNotes={this.handleRenderNotes} />
+      <NotesRenderer ref={this.canvasRef} />
       <Version value="1.0.1"/>
     </div>
   }
