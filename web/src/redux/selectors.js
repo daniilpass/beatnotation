@@ -6,7 +6,7 @@ export const CanPlay = state => {
 }
 
 export const CanStop = state => {
-    return state.editor.playerState === PlayerStates.PLAY || state.editor.playerState === PlayerStates.PAUSE;
+    return true;
 }
 
 export const CanPause = state => {

@@ -1,7 +1,7 @@
 import {SET_REALTIME_RENDER, SET_PLAYER_STATE, SET_PLAYBACK_NOTES, SET_BPM, SET_TIME_SIGNATURE
     //,INIT_TRACKS
     ,TAKT_COPY, TAKT_PASTE, TAKT_CLEAR, TAKT_DELETE, TAKT_ADD
-    ,LOAD_TRACKS, SET_END_OF_TRACK, SET_TRACK_VOLUME
+    ,LOAD_TRACKS, SET_END_OF_TRACK, SET_TRACK_VOLUME, SET_BASETIME
 } from '../types'
 
 import {tracksData} from "../../assets/data/tracksData";
@@ -10,6 +10,9 @@ import * as PlayerState from "../dictionary/playerStates";
 const initialState = {
     //Track settings
     playerState: "stop",
+    baseTime: 0,
+    playerStartedAt: 0, 
+    playerStoppedAt: 0, 
     endOfTrack: false,
     bpm: 120,
     timeSignature: [4,4],
@@ -71,22 +74,41 @@ export default function editorReducer(state = initialState, action) {
         case SET_END_OF_TRACK:
             return setEndOfTrack(state, action.payload);
         case SET_TRACK_VOLUME:
-            return setTrackVolume(state, action.payload);            
+            return setTrackVolume(state, action.payload);
+        case SET_BASETIME:
+            return setBaseTime(state, action.payload);            
         default:
             return state;
     }
 }
 
 function setPlayerState(state, payload) {
-    //TODO: обходное решение
-    let eot = state.endOfTrack;
+    let newPlayerStartedAt = state.playerStartedAt;
+    let newPlayerStoppedAt = state.playerStoppedAt;    
+    let newBaseTime = state.baseTime;
+
+    let eot = state.endOfTrack; //TODO: обходное решение
     if (payload.playerState === PlayerState.STOP) {
         eot = false;
+        //newPlayerStartedAt = 0;
+        newPlayerStoppedAt = Date.now();        
+        newBaseTime = 0;
+        newPlayerStoppedAt = Date.now();
+    } else if (payload.playerState === PlayerState.PAUSE) {
+        // newPlayerStartedAt = 0;
+        newPlayerStoppedAt = Date.now();
+        newBaseTime = newBaseTime + Date.now() - state.playerStartedAt;
+    } else if (payload.playerState === PlayerState.PLAY) {
+        newPlayerStartedAt = Date.now();
+        newPlayerStoppedAt = 0;
     }
 
     return {
         ...state, 
         playerState: payload.playerState,
+        baseTime: newBaseTime,
+        playerStartedAt: newPlayerStartedAt,
+        playerStoppedAt: newPlayerStoppedAt,
         endOfTrack: false
     };
 }
@@ -384,3 +406,12 @@ function setTrackVolume (state, payload) {
         tracks: tmpTracks
     }
 }
+
+function setBaseTime(state, payload) {
+    return {
+        ...state, 
+        playerStartedAt: payload.playerStartedAt || state.playerStartedAt,
+        baseTime: payload.baseTime
+    }
+}
+

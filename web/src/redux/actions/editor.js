@@ -1,7 +1,7 @@
 import {SET_REALTIME_RENDER, SET_PLAYER_STATE, SET_PLAYBACK_NOTES, SET_BPM, SET_TIME_SIGNATURE 
 ,INIT_TRACKS
 ,TAKT_COPY, TAKT_PASTE, TAKT_CLEAR, TAKT_DELETE, TAKT_ADD
-,LOAD_TRACKS, SET_END_OF_TRACK, SET_TRACK_VOLUME } from '../types'
+,LOAD_TRACKS, SET_END_OF_TRACK, SET_TRACK_VOLUME, SET_BASETIME } from '../types'
 
 
 export const setPlayerState = (value) => {
@@ -121,6 +121,16 @@ export const setTrackVolume = (index, value) => {
         payload: {
             index: index,
             volume: value            
+        }
+    }
+}
+
+export const setBaseTime = (value, playerStartedAt) => {
+    return {
+        type: SET_BASETIME,
+        payload: {
+            baseTime: value,
+            playerStartedAt: playerStartedAt
         }
     }
 }

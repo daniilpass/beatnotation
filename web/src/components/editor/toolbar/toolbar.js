@@ -34,7 +34,6 @@ class Toolbar extends React.Component {
     }
 
     handleKeyDown= (e) => {
-        console.log('handleKeyDown');
         e.preventDefault();
         switch (e.keyCode) {
           // Space

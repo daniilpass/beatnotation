@@ -15,3 +15,5 @@ export const TAKT_COPY = "TAKT_COPY";
 export const TAKT_PASTE = "TAKT_PASTE";
 export const TAKT_CLEAR =  "TAKT_CLEAR";
 export const TAKT_DELETE =  "TAKT_DELETE";
+
+export const SET_BASETIME = "SET_BASETIME";
