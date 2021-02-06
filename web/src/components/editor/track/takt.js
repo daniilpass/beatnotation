@@ -49,9 +49,9 @@ export default class Takt extends React.Component {
         //console.log("use shift")
       }
   
-  
       let els = []
       let notes = this.props.takt.notes;
+
       for (let i = 0; i < notes.length; i++) {
   
       //  let indexInQuarter = i % 16 + 1;
