@@ -34,24 +34,18 @@ export default class Editor extends React.Component {
       this.tryDrawNotes();
     }
     
-    //if (this.props.playerState !== prevProps.playerState) {
+    // Изменилось время начала проигрывания или статус плеера, то перерисую контролы зависящие от времени
     if (this.props.baseTime !== prevProps.baseTime || this.props.playerState !== prevProps.playerState) {
-          this.updateTimeControls();
+      this.updateTimeControls();
     }
     
     //Auto scroll
     //Получаю координату клика внутри временной шкалы
     if (this.props.tracksLengthInTakts > prevProps.tracksLengthInTakts) {      
-      console.log("Auto scroll");
-      let el = this.tracksContainerRef.current; 
-      el.scrollLeft=el.scrollLeft+this.props.noteWidth*this.props.notesInTakt;
-    }
-     
+      this.scrollTracksConatiner();
+    }     
   }
 
-
-
-  // INIT FUNCTIONS
   addEvents() {
     document.addEventListener("keyup", this.handleKeyDown);
     document.addEventListener('keydown', function (e) {
@@ -62,6 +56,11 @@ export default class Editor extends React.Component {
     this.tracksContainerRef.current.addEventListener('wheel', this.handleTracksWheel);
   }
 
+  scrollTracksConatiner = () => {
+    console.log("Auto scroll");
+    let el = this.tracksContainerRef.current; 
+    el.scrollLeft=el.scrollLeft+this.props.noteWidth*this.props.notesInTakt;
+  }
 
   // DRAW NOTES
   tryDrawNotes(force) {
@@ -84,9 +83,7 @@ export default class Editor extends React.Component {
 
     this.props.onRenderNotes && this.props.onRenderNotes(this.props.tracks, maxTaktCount, this.props.bpm, this.props.timeSignature, this.props.notesInTakt);
   }
-
-  //TODO: проработать все вызовы
-  //  PLAY CYCLE
+ 
   updateTimeControls() {    
     requestAnimationFrame(() => {
       this.timeTextRef.current.innerText = "Time: " + this.getFormattedTime;
