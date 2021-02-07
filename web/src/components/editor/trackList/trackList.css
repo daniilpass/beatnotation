@@ -96,3 +96,18 @@ TRACK-CONTROL
 .workspace__track__takt:last-child {
     margin-right: 100px;
 }
+
+/*
+* USER_AUDIO
+*/
+.user-audio{
+  display: inline-block;
+  height: 31px;
+  background-color: rgb(80 83 151);
+  cursor: pointer;
+  border: 1px solid #080E73;
+}
+
+.user-audio-loaded{
+  background-color: #FF8E00;  
+}

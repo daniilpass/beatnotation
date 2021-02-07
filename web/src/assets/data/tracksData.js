@@ -14,6 +14,12 @@ import SoundTomLow from '../../assets/sounds/tom_low.mp3';
 // 3 - cross with o
 export const tracksData = [
     {
+        audioUrl: null,
+        volume: 1,
+        title: "Audio",
+        type: 0, //0 - audio
+    },
+    {
         audioUrl: SoundCrash,
         volume: 1,
         takts:[],

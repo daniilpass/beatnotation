@@ -37,7 +37,8 @@ export default class TrackList extends React.Component {
                             trackControlWidth={this.props.trackControlWidth} addTaktButtonWidth={this.props.addTaktButtonWidth} 
                             tracksLengthInNotes={this.props.tracksLengthInNotes} tracksLengthInTakts={this.props.tracksLengthInTakts} 
                             timeSignature={this.props.timeSignature} track={_track} ts={_track.ts}                             
-                            noteClick={this.onNoteClick}  onVolumeChange={this.handleTrackVolumeChange} />
+                            noteClick={this.onNoteClick}  onVolumeChange={this.handleTrackVolumeChange} 
+                            loadUserAudio={this.props.loadUserAudio}/>
             })
         ]
     }

@@ -130,6 +130,7 @@ class Toolbar extends React.Component {
 
         var data = JSON.parse(content);
         this.props.loadTracks(data);
+        //TODO: redner after load, use thunk
     }
 
     handlePrint = () => {

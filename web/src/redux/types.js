@@ -10,6 +10,7 @@ export const SET_TIME_SIGNATURE = "SET_TIME_SIGNATURE";
 export const INIT_TRACKS = "INIT_TRACKS";
 export const LOAD_TRACKS = "LOAD_TRACKS";
 export const SET_TRACK_VOLUME = "SET_TRACK_VOLUME";
+export const SET_TRACK_LOADED = "SET_TRACK_LOADED";
 
 export const TAKT_ADD = "TAKT_ADD";
 export const TAKT_COPY = "TAKT_COPY";
@@ -22,3 +23,6 @@ export const SET_BASETIME = "SET_BASETIME";
 //CANVAS
 export const RENDER_NOTES = "RENDER_NOTES";
 export const PRINT_NOTES = "PRINT_NOTES";
+
+//LOADER
+export const LOAD_USER_AUDIO = "LOAD_USER_AUDIO";

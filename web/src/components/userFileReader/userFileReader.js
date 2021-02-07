@@ -30,7 +30,12 @@ export default class UserFileReader extends React.PureComponent {
       reader.onerror = () => {
         alert("Can't load file");
       }
-      reader.readAsText(file);    
+      if (this.props.readAsArrayBuffer) {
+        reader.readAsArrayBuffer(file); 
+      } else {
+        reader.readAsText(file); 
+      }
+         
     }
     
     onClick = (e) =>{

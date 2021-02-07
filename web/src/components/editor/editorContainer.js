@@ -2,7 +2,7 @@ import {connect} from "react-redux";
 import {
     setRealtimeRender, taktCopy, taktPaste, taktClear, taktDelete, taktAdd 
     ,setPlayerState, setEndOfTrack, setTrackVolume, setBaseTime
-    ,renderNotes
+    ,renderNotes, loadUserAudio, setTrackLoaded
 } from "../../redux/actions";
 import {GetBpms} from "../../redux//selectors";
 
@@ -11,7 +11,8 @@ import Editor from "./editor";
 const mapStateToProps = state => {
     const editor = state.editor;
     const bpms = GetBpms(state);
-    return {...editor, bpms};
+    const loader = state.loader;
+    return {...editor, bpms, loader: {...loader}};
 }
 
 export default connect(
@@ -19,6 +20,6 @@ export default connect(
     {
         setRealtimeRender, taktCopy, taktPaste, taktClear, taktDelete, 
         taktAdd, setPlayerState, setEndOfTrack, setTrackVolume, setBaseTime,
-        renderNotes
+        renderNotes, loadUserAudio, setTrackLoaded
     }
 ) (Editor)

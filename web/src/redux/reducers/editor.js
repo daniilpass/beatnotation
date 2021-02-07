@@ -2,6 +2,7 @@ import {SET_REALTIME_RENDER, SET_PLAYER_STATE, SET_PLAYBACK_NOTES, SET_BPM, SET_
     //,INIT_TRACKS
     ,TAKT_COPY, TAKT_PASTE, TAKT_CLEAR, TAKT_DELETE, TAKT_ADD
     ,LOAD_TRACKS, SET_END_OF_TRACK, SET_TRACK_VOLUME, SET_BASETIME
+    ,SET_TRACK_LOADED
 } from '../types'
 
 import {tracksData} from "../../assets/data/tracksData";
@@ -11,6 +12,7 @@ const initialState = {
     //Track settings
     playerState: "stop",
     baseTime: 0,
+    baseTimeUpdated: 0,
     playerStartedAt: 0, 
     playerStoppedAt: 0, 
     endOfTrack: false,
@@ -76,7 +78,9 @@ export default function editorReducer(state = initialState, action) {
         case SET_TRACK_VOLUME:
             return setTrackVolume(state, action.payload);
         case SET_BASETIME:
-            return setBaseTime(state, action.payload);            
+            return setBaseTime(state, action.payload);     
+        case SET_TRACK_LOADED:
+            return setTrackLoaded(state, action.payload);           
         default:
             return state;
     }
@@ -86,6 +90,7 @@ function setPlayerState(state, payload) {
     let newPlayerStartedAt = state.playerStartedAt;
     let newPlayerStoppedAt = state.playerStoppedAt;    
     let newBaseTime = state.baseTime;
+    let newBaseTimeUpdated = state.baseTimeUpdated;
 
     let eot = state.endOfTrack; //TODO: обходное решение
     if (payload.playerState === PlayerState.STOP) {
@@ -93,11 +98,13 @@ function setPlayerState(state, payload) {
         //newPlayerStartedAt = 0;
         newPlayerStoppedAt = Date.now();        
         newBaseTime = 0;
+        newBaseTimeUpdated = Date.now();
         newPlayerStoppedAt = Date.now();
     } else if (payload.playerState === PlayerState.PAUSE) {
         // newPlayerStartedAt = 0;
         newPlayerStoppedAt = Date.now();
         newBaseTime = newBaseTime + Date.now() - state.playerStartedAt;
+        newBaseTimeUpdated = Date.now();
     } else if (payload.playerState === PlayerState.PLAY) {
         newPlayerStartedAt = Date.now();
         newPlayerStoppedAt = 0;
@@ -107,6 +114,7 @@ function setPlayerState(state, payload) {
         ...state, 
         playerState: payload.playerState,
         baseTime: newBaseTime,
+        baseTimeUpdated: newBaseTimeUpdated,
         playerStartedAt: newPlayerStartedAt,
         playerStoppedAt: newPlayerStoppedAt,
         endOfTrack: eot
@@ -161,30 +169,36 @@ function setTimeSignature(state, payload) {
     let tmpTracks = [...state.tracks]; 
 
     for (let i = 0; i < tmpTracks.length; i++) {
-      let tmpTrack = {...tmpTracks[i]};
+        let tmpTrack = {...tmpTracks[i]};
 
-      //Поулчаю ноты в плоском виде, чтобы легче их распихать по новым тактам
-      let plainNotes = [];      
-      tmpTrack.takts.forEach(takt => {
-        plainNotes = plainNotes.concat(takt.notes);
-      });
-
-      //Заполняю новую структуру
-      let noteCounter = 0;
-      tmpTrack.takts = [];
-      for (let tIdx = 0; tIdx < newTracksLengthInTakts; tIdx++) { 
-        tmpTrack.ts =   Date.now()+"_"+tIdx       
-        tmpTrack.takts[tIdx] = {
-          ts: Date.now()+"_"+tIdx,
-          notes: []
-        }      
-        for (let nIdx = 0; nIdx < newNotesInTakt; nIdx++) {
-          tmpTrack.takts[tIdx].notes[nIdx] = plainNotes[noteCounter] || 0;  
-          noteCounter++;         
+        if (tmpTrack.type === 0) {
+            //Skip audio tracks
+            tmpTracks[i] = tmpTrack;
+            continue;
         }
-      }
 
-      tmpTracks[i] = tmpTrack;      
+        //Поулчаю ноты в плоском виде, чтобы легче их распихать по новым тактам
+        let plainNotes = [];      
+        tmpTrack.takts.forEach(takt => {
+            plainNotes = plainNotes.concat(takt.notes);
+        });
+
+        //Заполняю новую структуру
+        let noteCounter = 0;
+        tmpTrack.takts = [];
+        for (let tIdx = 0; tIdx < newTracksLengthInTakts; tIdx++) { 
+            tmpTrack.ts =   Date.now()+"_"+tIdx       
+            tmpTrack.takts[tIdx] = {
+            ts: Date.now()+"_"+tIdx,
+            notes: []
+            }      
+            for (let nIdx = 0; nIdx < newNotesInTakt; nIdx++) {
+            tmpTrack.takts[tIdx].notes[nIdx] = plainNotes[noteCounter] || 0;  
+            noteCounter++;         
+            }
+        }
+
+        tmpTracks[i] = tmpTrack;      
     }
 
     return {
@@ -201,17 +215,20 @@ function setTimeSignature(state, payload) {
 function initTracks(state) {
     const tracks = [...tracksData];
     //Init empty tracks
-    tracks.forEach(track => {        
-      for (let tIdx = 0; tIdx < state.tracksLengthInTakts; tIdx++) { 
-        track.ts =   Date.now()+"_"+tIdx       
-        track.takts[tIdx] = {
-          ts: Date.now()+"_"+tIdx,
-          notes: []
-        }      
-        for (let nIdx = 0; nIdx < state.notesInTakt; nIdx++) {
-          track.takts[tIdx].notes[nIdx] = 0;           
+    tracks.forEach(track => {       
+        if (track.type === 0) {
+            return;
+        } 
+        for (let tIdx = 0; tIdx < state.tracksLengthInTakts; tIdx++) { 
+            track.ts =   Date.now()+"_"+tIdx       
+            track.takts[tIdx] = {
+                ts: Date.now()+"_"+tIdx,
+                notes: []
+            }      
+            for (let nIdx = 0; nIdx < state.notesInTakt; nIdx++) {
+                track.takts[tIdx].notes[nIdx] = 0;           
+            }
         }
-      }
     });    
 
     return tracks;
@@ -222,7 +239,10 @@ function taktCopy(state, payload) {
     let clipboard = [];
 
     state.tracks.forEach( (track, trackIndex) => { 
-      clipboard[trackIndex] = [...track.takts[payload.index].notes];
+        if (track.type === 0) {
+            return;
+        } 
+        clipboard[trackIndex] = [...track.takts[payload.index].notes];
     });
 
     console.log('clipboard', clipboard);
@@ -234,6 +254,10 @@ function taktPaste(state, payload) {
     let taktIndex = payload.index;
 
     tmpTracks.forEach( (track, trackIndex) => { 
+        if (track.type === 0) {
+            return;
+        } 
+
         let tmpTrack = {...tmpTracks[trackIndex]};
         tmpTrack.ts = Date.now();
         tmpTrack.takts[taktIndex] = {};
@@ -257,6 +281,10 @@ function taktClear(state, payload) {
     let taktIndex = payload.index;
 
     tmpTracks.forEach( (track, trackIndex) => { 
+        if (track.type === 0) {
+            return;
+        } 
+
         let tmpTrack = {...tmpTracks[trackIndex]};
         tmpTrack.ts = Date.now();
         tmpTrack.takts[taktIndex] = {};
@@ -282,6 +310,10 @@ function taktDelete(state, payload) {
     let tmpTracks = [...state.tracks]; 
 
     tmpTracks.forEach( (track, trackIndex) => { 
+        if (track.type === 0) {
+            return;
+        } 
+
         let tmpTrack = {...tmpTracks[trackIndex]};
         tmpTrack.ts = Date.now();
         var tmpArr = [...tmpTrack.takts];
@@ -304,6 +336,10 @@ function taktAdd(state) {
 
     let tmpTracks = [...state.tracks]; 
     tmpTracks.forEach( (track, trackIndex) => { 
+        if (track.type === 0) {
+            return;
+        } 
+
         let tmpTrack = {...tmpTracks[trackIndex]};
         tmpTrack.takts = [
             ...tmpTrack.takts,
@@ -335,6 +371,11 @@ function loadTracks(state, payload) {
 
     let tmpTracks = [...state.tracks]; 
     for (let it = 0; it < tmpTracks.length; it++) {
+        //TODO: загрузка пользовательского трека
+        if (state.tracks[it].type === 0) {
+            continue;
+        } 
+
         const tmpTrack = {...state.tracks[it]};
         const loadedTrack = data.tracks[it];
         tmpTrack.volume = loadedTrack.volume;
@@ -375,13 +416,14 @@ function loadTracks(state, payload) {
     return {
         ...state,
         baseTime: 0,
+        newBaseTimeUpdated: Date.now(),
         bpm: data.bpm,
         timeSignature: data.timeSignature,
         notesInTakt: newNotesInTakt,
         tracksLengthInTakts: newTracksLengthInTakts,
         tracksLengthInNotes: newTracksLengthInNotes,
         noteWidth: newNoteWidth,
-        tracks: [...tmpTracks]      
+        tracks: [...tmpTracks]              
     };  
 }
 
@@ -410,7 +452,23 @@ function setBaseTime(state, payload) {
     return {
         ...state, 
         playerStartedAt: payload.playerStartedAt || state.playerStartedAt,
-        baseTime: payload.baseTime
+        baseTime: payload.baseTime,
+        baseTimeUpdated: Date.now()
     }
 }
 
+function setTrackLoaded(state, payload) {
+    let trackIndex = payload.index;
+    let loaded = payload.loaded;
+
+    let tmpTracks = [...state.tracks];
+    let tmpTrack = {...tmpTracks[trackIndex]};
+    tmpTrack.loaded = loaded;
+    tmpTrack.ts = Date.now();
+    tmpTracks[trackIndex] = tmpTrack;
+
+    return {
+        ...state,
+        tracks: tmpTracks
+    }
+}

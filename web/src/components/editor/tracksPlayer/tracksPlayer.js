@@ -23,15 +23,34 @@ export default class TracksPlayer extends React.Component {
 
     componentDidUpdate(prevProps) {
         //PLAY STATE
-        if (this.props.playerState === PlayerStates.PLAY && prevProps.playerState  !== PlayerStates.PLAY) {
+        if (this.props.playerState === PlayerStates.PLAY && prevProps.playerState  !== PlayerStates.PLAY) 
+        {
             console.log("PLAY NOW")    
             this.timerId = setInterval(this.step, this.stepDelay);
-        } else if (this.props.playerState === PlayerStates.STOP && prevProps.playerState  !== PlayerStates.STOP) {
+            this.startAllUserAudio(this.props.baseTime / 1000);
+        } 
+        else if (this.props.playerState === PlayerStates.STOP && prevProps.playerState  !== PlayerStates.STOP) 
+        {
             console.log("STOP NOW")  
             clearInterval(this.timerId);
-        } else if (this.props.playerState === PlayerStates.PAUSE && prevProps.playerState  !== PlayerStates.PAUSE){
+            this.stopAllUserAudio();
+        } 
+        else if (this.props.playerState === PlayerStates.PAUSE && prevProps.playerState  !== PlayerStates.PAUSE)
+        {
             console.log("PAUSE NOW")  
             clearInterval(this.timerId);
+            this.stopAllUserAudio();
+        }
+
+        if (this.props.loader.buffer !== prevProps.loader.buffer ) {
+            this.loadUserAudio(this.props.loader.trackIndex, this.props.loader.buffer);
+        }
+
+        //Идет проигрышь и изменилось базовое время(предвинули указатель времени), то запустим треки с нужного отрезка
+        if (this.props.baseTimeUpdated !== prevProps.baseTimeUpdated && this.props.playerState === PlayerStates.PLAY) {
+            this.stopAllUserAudio();
+            let offest = this.props.baseTime + (Date.now() - this.props.playerStartedAt)
+            this.startAllUserAudio(offest / 1000);
         }
     }
 
@@ -42,18 +61,16 @@ export default class TracksPlayer extends React.Component {
 
     initSoundBuffer() {
         this.props.tracks.forEach( (_track, trackIndex) => {
-        //Init empty item
-        this.soundBuffer[trackIndex] = {};      
+            //Init empty item
+            this.soundBuffer[trackIndex] = {};      
 
-        this.loadAudioSample(_track.audioUrl, audioBuffer => {
-                //save audio buffer
-                this.soundBuffer[trackIndex].audioBuffer = audioBuffer;
+            if (_track.type === 0) {
+                return;
+            }
 
-                //save gain node for track
-                this.soundBuffer[trackIndex].gainNode = this.audioCtx.createGain()              
-                this.soundBuffer[trackIndex].gainNode.connect(this.audioCtx.destination)
-                //console.log("Sample loaded", _track.audioUrl);
-            })      
+            this.loadAudioSample(_track.audioUrl, audioBuffer => {
+                    this.setSoundBufferForTrack(trackIndex, audioBuffer);
+                })      
         });
     }
 
@@ -64,6 +81,39 @@ export default class TracksPlayer extends React.Component {
                 this.audioCtx.decodeAudioData(response.data, callback, (e) => { console.log("decodeAudioData failed", e); });
             })   
     }  
+
+    loadUserAudio(trackIndex, arrayBuffer) {        
+        console.log("===> Player. Load user audio...")
+        this.props.setTrackLoaded(trackIndex, false);
+        this.audioCtx.decodeAudioData(arrayBuffer, 
+            audioBuffer => {
+                this.setSoundBufferForTrack(trackIndex, audioBuffer, {audio: true})
+                this.props.setTrackLoaded(trackIndex, true);
+            }, 
+            error => { console.log("decodeAudioData failed", error); }
+        );
+    }
+
+    setSoundBufferForTrack = (trackIndex, audioBuffer, props) => {
+        this.soundBuffer[trackIndex] = {...props}; 
+        //save audio buffer
+        this.soundBuffer[trackIndex].audioBuffer = audioBuffer;
+
+        //save gain node for track
+        this.soundBuffer[trackIndex].gainNode = this.audioCtx.createGain()              
+        this.soundBuffer[trackIndex].gainNode.connect(this.audioCtx.destination)
+        //console.log("Sample loaded", _track.audioUrl);
+
+        //Оказывается так нельзя
+        //Пользовательский звук создается всегда один раз
+        // if (this.soundBuffer[trackIndex].audio) {
+        //     let item = this.soundBuffer[trackIndex];
+        //     let source = this.audioCtx.createBufferSource();
+        //     source.buffer = item.audioBuffer;
+        //     source.connect(item.gainNode);
+        //     item.source = source;
+        // }
+    }
 
     // PLAY CYCLES
     //TODO: при перемотке на последнюю ноту -она не играется
@@ -99,6 +149,10 @@ export default class TracksPlayer extends React.Component {
 
         //console.log(noteIndex);
         for (let trackIndex = 0; trackIndex < this.props.tracks.length; trackIndex++) {
+            if ( this.props.tracks[trackIndex].type === 0) {
+                continue;
+            }
+
             const track = this.props.tracks[trackIndex];
             const takt = track.takts[taktIndex];
             if (takt.notes[noteIndexInTakt] > 0) {
@@ -118,6 +172,36 @@ export default class TracksPlayer extends React.Component {
         source.connect(this.soundBuffer[trackIndex].gainNode);
         source.start();
     } 
+
+    startAllUserAudio(offest) {    
+        // this.soundBuffer.forEach((item, trackIndex) => {
+        //     if (!!item.audioBuffer && item.audio) {
+        //         item.gainNode.gain.value = this.props.tracks[trackIndex].volume;  
+        //         item.source.start(0,offest);
+        //         item.state = "play";
+        //     }
+        // });
+        this.soundBuffer.forEach((item, trackIndex) => {
+            if (!!item.audioBuffer && item.audio) {
+                item.gainNode.gain.value = this.props.tracks[trackIndex].volume;  
+                let source = this.audioCtx.createBufferSource();
+                source.buffer = item.audioBuffer;
+                source.connect(item.gainNode);
+                source.start(0,offest);
+                item.state = "play";
+                item.source = source;
+            }
+        });
+    }
+
+    stopAllUserAudio() {
+        this.soundBuffer.forEach((item, trackIndex) => {
+            if (!!item.audioBuffer && item.audio && item.state ==="play" ) {
+                item.state = "stop";
+                item.source.stop();
+            }
+        });
+    }
 
     //TODO: дубликат когда и editor.js ((
     get timestamp() {

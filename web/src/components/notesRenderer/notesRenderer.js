@@ -66,9 +66,16 @@ class NotesRenderer extends React.Component {
 
       // Подготовка данных
       let maxTaktCount = 0;
+      let tracksForDraw = [];
+
       for (let tIdx = 0; tIdx < this.props.tracks.length; tIdx++) {
         const _track = this.props.tracks[tIdx];
-        
+        if (_track.type === 0 ) {
+          continue;
+        }
+
+        tracksForDraw.push(_track);
+
         for (let taktIdx = 0; taktIdx < _track.takts.length; taktIdx++) {
           const _takt = _track.takts[taktIdx];
           let tmpMaxTaktCount = (taktIdx + 1); // make +1 to convert index to count
@@ -77,7 +84,7 @@ class NotesRenderer extends React.Component {
       } 
 
       // Отрисовка
-      this.draw(this.props.tracks, maxTaktCount, this.props.bpm, this.props.timeSignature, this.props.notesInTakt);
+      this.draw(tracksForDraw, maxTaktCount, this.props.bpm, this.props.timeSignature, this.props.notesInTakt);
 
       // Вызов функции печати при необходимости
       if (print) {
