@@ -364,9 +364,6 @@ function loadTracks(state, payload) {
     const newTracksLengthInTakts = maxTaktCount;
     const newTracksLengthInNotes = newTracksLengthInTakts * newNotesInTakt;
 
-    //TODO: add interaction
-    //this.timestamp = 0;
-
     //updateNotesSacle
     //Масштабируем размер нот так, чтобы помещались элементы управления такта
     let newNoteWidth = state.defaultNotewWidth;
@@ -377,6 +374,7 @@ function loadTracks(state, payload) {
 
     return {
         ...state,
+        baseTime: 0,
         bpm: data.bpm,
         timeSignature: data.timeSignature,
         notesInTakt: newNotesInTakt,
