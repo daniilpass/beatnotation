@@ -6,6 +6,20 @@ import "./trackList.css";
 
 export default class TrackList extends React.Component {  
 
+    shouldComponentUpdate(nextProps){ 
+        if (this.props.trackControlWidth !== nextProps.trackControlWidth            
+            || this.props.noteHeight !== nextProps.noteHeight
+            || this.props.noteWidth !== nextProps.noteWidth
+            || this.props.addTaktButtonWidth !== nextProps.addTaktButtonWidth
+            || this.props.tracksLengthInNotes !== nextProps.tracksLengthInNotes            
+            || this.props.tracksLengthInTakts !== nextProps.tracksLengthInTakts            
+            || this.props.timeSignature !== nextProps.timeSignature
+            || this.props.tracks !== nextProps.tracks) {
+        return true;
+      }
+      return false;
+    }
+
     handleTrackVolumeChange = (trackIndex, value) => {
         console.log("handleTrackVolumeChange", trackIndex, value);
         this.props.setTrackVolume(trackIndex, value);

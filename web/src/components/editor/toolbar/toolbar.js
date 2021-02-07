@@ -20,6 +20,24 @@ class Toolbar extends React.Component {
           
       this.fileReaderRef = React.createRef();  
     }
+
+    shouldComponentUpdate (nextProps) {
+        if (this.props.timeSignature !== nextProps.timeSignature
+            || this.props.bpm !== nextProps.bpm
+            || this.props.canPlay !== nextProps.canPlay
+            || this.props.canStop !== nextProps.canStop
+            || this.props.canPause !== nextProps.canPause
+            || this.props.canSave !== nextProps.canSave
+            || this.props.canLoad !== nextProps.canLoad
+            || this.props.canPrint !== nextProps.canPrint
+            || this.props.realtimeRender !== nextProps.realtimeRender
+            || this.props.playbackNotes !== nextProps.playbackNotes
+            ) {
+            return true;
+        }
+        
+        return false;
+    }
     
     componentDidMount () {
         document.addEventListener("keyup", this.handleKeyDown);

@@ -38,6 +38,14 @@ class NotesRenderer extends React.Component {
       this.lastNoteIndex = 0;
     }
 
+    shouldComponentUpdate(nextProps) {
+      if (this.props.printTime !== nextProps.printTime || this.props.renderTime !== nextProps.renderTime) {
+          return true;
+        }
+
+      return false;
+    }
+
     componentDidUpdate(prevProps) {
       if (this.props.printTime !== prevProps.printTime) {
         this.drawFromStore(true);
