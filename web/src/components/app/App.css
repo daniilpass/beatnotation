@@ -23,303 +23,13 @@ body {
   background: #2F3485;
 }
 
-
 /*
-app-toolbar
+track-container
 */
-
-.app-toolbar {
-  /* position: inherit; */
-  display: inline-block;
-  /* width: 100%; */
-  top: 40px;
-  margin-top: 40px;
-  height: 40px;
-  width: 100%;
-  background-color: #7277D8;
-  padding: 8px;
-  white-space: nowrap;
-  z-index: 3;
-}
-
-.app-toolbar__button {
-  height: 21px;
-  margin-right: 8px;
-  background-color: #2F3485;
-  color: #FFC173;
-  border: 2px solid #2F3485;
-  box-shadow: 2px 2px 0px rgb(0 0 0 / 30%);
-  vertical-align: top;
-}
-
-.app-toolbar__button:hover {
-  cursor: pointer;
-}
-
-.app-toolbar__button:disabled {
-  cursor: default;
-  background-color: #7277D8;
-  color: #2F3485;
-  border: 2px solid #2F3485;
-}
-
-.app-toolbar > div {
-  display: inline-block;
-  margin-right: 8px;
-  height: 21px;
-  vertical-align: top;
-  color: #FFC173;
-  line-height: 21px;
-}
-
-.app-toolbar__bpm input{
-  border: 2px solid #2F3485;
-  margin-left: 8px;
-  background-color: #7277D8;
-  color: #FFC173;
-  box-shadow: 2px 2px 0px rgb(0 0 0 / 30%);
-  box-sizing: border-box;
-  vertical-align: top;
-}
-/* .app-toolbar__time {
-  display: inline-block;
-  margin-right: 8px;
-}
-
-.app-toolbar__part{
-  display: inline-block;
-  margin-right: 8px;
-} */
-
-/*
-WORKSPACE
-*/
-/*.workspace{
-  background-color: #2F3485;
-  height: 100px;
-  margin: 20px; 
-}*/
 
 .track-container {
- /* margin-top: 80px; */
- /* margin-left:150px; */
  overflow-x: scroll;
 }
-
-/*
-TIMELINE
-*/
-.timeline{
-  display: block;
-  height: 20px;
-  background-color: #2F3485;
-  margin-bottom: -10px;
-}
-
-.timeline__takt{
-  display: inline-block;
-  height: 12px;
-  /* border-left: 1px solid #080E73; */
-  border-right: 1px solid #080E73;
-  vertical-align: top;
-  user-select: none;
-  -webkit-user-select: none;
-  margin-top: 4px;
-  /* margin-bottom: 5px;*/
-}
-
-.timeline__takt:first-child{
-  border-left: 1px solid #080E73;
-}
-
-.takt__number{
-  color: #FFAA40;
-  height: 20px;
-  display: block;
-  font-size: 12px;
-  line-height: 20px;
-  margin-left: 4px;
-  margin-top: -5px;
-}
-
-/*
-TAKT-ADD button
-*/
-.takt-add {
-  width: 100px;
-  height: 250px;
-  right: 0;
-  /* margin-top: -250px; */
-  z-index: 0;
-  position: absolute;
-  display: table;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-.takt-add__content{
-  text-align: center;
-  color: #FFC173;
-  font-size: 70px;
-  cursor: pointer;
-  display: table-cell;
-  vertical-align: middle;
-  padding-bottom: 14px;
-}
-
-/*
-TIME-POINTER
-*/
-.time-pointer{
-  position: relative;
-  width: 10px;
-  height: 10px;
-  background-color: #FFAA40;
-  border-radius: 50%;
-  z-index: 2;
-}
-
-.time-pointer__stick{
-    width: 2px;
-    height: 100px;
-    background-color: #FFAA40;
-    margin-left: 4px;
-}
-
-/*
-WORKSPACE__TRACK
-*/
-.workspace__track {
-  /* background-color: #717171; */
-  /* height: 24px; */
-  /* width: auto; */
-  position: relative;
-  width: 100%;
-  white-space: nowrap;
-  z-index: 1;
-}
-
-/*Cause bad performance then playing*/
-/* .workspace__track:hover .note{ 
-  box-shadow:inset 0px -31px 0px rgb(255 193 115 / 15%);
-}*/
-.workspace__track:hover .track-control{
-  box-shadow:inset 0px -31px 0px rgb(255 193 115 / 15%);
-}  
-
-/*
-TRACK-CONTROL
-*/
-.track-control{  
-  position: sticky;
-  left: 0;
-  display: inline-block;
-  width: 150px;
-  /* height: 31px; */
-  background-color: #2F3485;
-  z-index: 2;
-  border: 1px solid #080E73;
-  border-right: 8px solid #080E73;
-  border-left: 0px;
-  color: #FFC173;
-}
-
-.track-control__title{
-  position: absolute;
-  padding-left: 8px;
-  left: 48px;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-.track-control__volume {
-  position: absolute;
-  left: 8px;
-  width: 40px;
-  height: 23px;
-  overflow: hidden;
-  /* background: linear-gradient(transparent 50%, green 50%); */
-  text-align: center;
-  margin-top: 3px;
-  border: 1px solid rgb(13 136 0 / 52%);
-  color: #329D27;
-  font-weight: 500;
-  cursor: pointer;
-  user-select: none;
-  -webkit-user-select: none;
-}
-/*
-TAKT-CONTROLS
-*/
-.takt-controls{
-  display: block;
-  height: 31px;
-  background-color: #2F3485;
-}
-
-.takt-control{
-  display: inline-block;
-  height: 31px;
-  /* border-left: 1px solid #080E73; */
-  border-right: 1px solid #080E73;
-  vertical-align: top;  
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-.takt-control:first-child{
-  border-left: 1px solid #080E73;
-}
-
-.takt-control__button.button{
-  color: #FFAA40;
-  height: 20px;
-  /* display: inline-block; */
-  float: right;
-  margin-top: 5px;
-  box-shadow: 1px 1px 0px 2px rgb(0 0 0 / 30%);
-}
-
-/*
-Note
-*/
-.note{
-  border: 1px solid #080E73;
-  display: inline-block;
-  background-color:#7277D8 ;
-}
-
-/* .note:last-child{
-  margin-right: 100px;
-} */
-
-.note.note_filled, .note.note_filled.note.note_level_0 {
-  background-color:#2F3485 ;
-}
-
-.note.note_level_1 {
-  background-color:#FFC173 ;
-} 
-
-/*
-CANVASE
-*/
-.canvas_notes {
-  background-color: white;
-  margin: 48px auto;
-  display: block;
-  left: 0;
-    right: 0;
-}
-
-
-
-/* Основной Цвет:
-#1921B1	#2F3485	#080E73	#4D54D8	#7277D8
-Вторичный Цвет A:
-#FFE500	#BFB130	#A69500	#FFEC40	#FFF173
-Вторичный Цвет B:
-#FF8E00	#BF8030	#A65C00	#FFAA40	#FFC173 */
 
 .track-container::-webkit-scrollbar {
   width: 1em;
@@ -353,6 +63,27 @@ CANVASE
 
 
 /*
+CANVASE
+*/
+.canvas_notes {
+  background-color: white;
+  margin: 48px auto;
+  display: block;
+  left: 0;
+    right: 0;
+}
+
+
+
+/* Основной Цвет:
+#1921B1	#2F3485	#080E73	#4D54D8	#7277D8
+Вторичный Цвет A:
+#FFE500	#BFB130	#A69500	#FFEC40	#FFF173
+Вторичный Цвет B:
+#FF8E00	#BF8030	#A65C00	#FFAA40	#FFC173 */
+
+
+/*
 CONTROLS
 */
 .button{
@@ -374,13 +105,4 @@ CONTROLS
   background-color: #7277D8;
   color: #2F3485;
   border: 2px solid #2F3485;
-}
-
-
-.workspace__track__takt{
-  display: inline-block;
-}
-
-.workspace__track__takt:last-child {
-  margin-right: 100px;
 }

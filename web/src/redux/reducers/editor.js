@@ -109,7 +109,7 @@ function setPlayerState(state, payload) {
         baseTime: newBaseTime,
         playerStartedAt: newPlayerStartedAt,
         playerStoppedAt: newPlayerStoppedAt,
-        endOfTrack: false
+        endOfTrack: eot
     };
 }
 

@@ -123,7 +123,7 @@ export default class TracksPlayer extends React.Component {
     get timestamp() {
         if (this.props.playerState === PlayerStates.STOP || this.props.playerState === PlayerStates.PAUSE) {
             return this.props.baseTime
-        } else if (this.props.playerState === PlayerStates.PLAY) {
+        } else {
             return this.props.baseTime + (Date.now() - this.props.playerStartedAt);
         }    
     }

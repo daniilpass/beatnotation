@@ -1,0 +1,26 @@
+
+
+/*
+TAKT-ADD button
+*/
+.takt-add {
+    width: 100px;
+    height: 250px;
+    right: 0;
+    /* margin-top: -250px; */
+    z-index: 0;
+    position: absolute;
+    display: table;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  
+  .takt-add__content{
+    text-align: center;
+    color: #FFC173;
+    font-size: 70px;
+    cursor: pointer;
+    display: table-cell;
+    vertical-align: middle;
+    padding-bottom: 14px;
+  }

@@ -1,0 +1,31 @@
+/*
+TAKT-CONTROLS
+*/
+.takt-controls{
+    display: block;
+    height: 31px;
+    background-color: #2F3485;
+  }
+  
+  .takt-control{
+    display: inline-block;
+    height: 31px;
+    /* border-left: 1px solid #080E73; */
+    border-right: 1px solid #080E73;
+    vertical-align: top;  
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  
+  .takt-control:first-child{
+    border-left: 1px solid #080E73;
+  }
+  
+  .takt-control__button.button{
+    color: #FFAA40;
+    height: 20px;
+    /* display: inline-block; */
+    float: right;
+    margin-top: 5px;
+    box-shadow: 1px 1px 0px 2px rgb(0 0 0 / 30%);
+  }

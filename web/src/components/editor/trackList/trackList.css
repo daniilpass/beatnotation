@@ -1,0 +1,98 @@
+
+
+/*
+WORKSPACE__TRACK
+*/
+.workspace__track {
+    position: relative;
+    width: 100%;
+    white-space: nowrap;
+    z-index: 1;
+  }
+
+  
+/*Cause bad performance then playing*/
+/* .workspace__track:hover .note{ 
+  box-shadow:inset 0px -31px 0px rgb(255 193 115 / 15%);
+}*/
+.workspace__track:hover .track-control{
+    box-shadow:inset 0px -31px 0px rgb(255 193 115 / 15%);
+  }  
+
+  
+
+
+/*
+TRACK-CONTROL
+*/
+.track-control{  
+    position: sticky;
+    left: 0;
+    display: inline-block;
+    width: 150px;
+    /* height: 31px; */
+    background-color: #2F3485;
+    z-index: 2;
+    border: 1px solid #080E73;
+    border-right: 8px solid #080E73;
+    border-left: 0px;
+    color: #FFC173;
+  }
+  
+  .track-control__title{
+    position: absolute;
+    padding-left: 8px;
+    left: 48px;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  
+  .track-control__volume {
+    position: absolute;
+    left: 8px;
+    width: 40px;
+    height: 23px;
+    overflow: hidden;
+    /* background: linear-gradient(transparent 50%, green 50%); */
+    text-align: center;
+    margin-top: 3px;
+    border: 1px solid rgb(13 136 0 / 52%);
+    color: #329D27;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  
+  
+  /*
+  Note
+  */
+  .note{
+    border: 1px solid #080E73;
+    display: inline-block;
+    background-color:#7277D8 ;
+  }
+  
+  /* .note:last-child{
+    margin-right: 100px;
+  } */
+  
+  .note.note_filled, .note.note_filled.note.note_level_0 {
+    background-color:#2F3485 ;
+  }
+  
+  .note.note_level_1 {
+    background-color:#FFC173 ;
+  } 
+
+  
+
+
+.workspace__track__takt{
+    display: inline-block;
+}
+
+.workspace__track__takt:last-child {
+    margin-right: 100px;
+}

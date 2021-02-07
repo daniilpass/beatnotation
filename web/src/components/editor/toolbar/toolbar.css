@@ -1,0 +1,60 @@
+
+
+
+/*
+app-toolbar
+*/
+
+.app-toolbar {
+    /* position: inherit; */
+    display: inline-block;
+    /* width: 100%; */
+    top: 40px;
+    margin-top: 40px;
+    height: 40px;
+    width: 100%;
+    background-color: #7277D8;
+    padding: 8px;
+    white-space: nowrap;
+    z-index: 3;
+  }
+  
+  .app-toolbar__button {
+    height: 21px;
+    margin-right: 8px;
+    background-color: #2F3485;
+    color: #FFC173;
+    border: 2px solid #2F3485;
+    box-shadow: 2px 2px 0px rgb(0 0 0 / 30%);
+    vertical-align: top;
+  }
+  
+  .app-toolbar__button:hover {
+    cursor: pointer;
+  }
+  
+  .app-toolbar__button:disabled {
+    cursor: default;
+    background-color: #7277D8;
+    color: #2F3485;
+    border: 2px solid #2F3485;
+  }
+  
+  .app-toolbar > div {
+    display: inline-block;
+    margin-right: 8px;
+    height: 21px;
+    vertical-align: top;
+    color: #FFC173;
+    line-height: 21px;
+  }
+  
+  .app-toolbar__bpm input{
+    border: 2px solid #2F3485;
+    margin-left: 8px;
+    background-color: #7277D8;
+    color: #FFC173;
+    box-shadow: 2px 2px 0px rgb(0 0 0 / 30%);
+    box-sizing: border-box;
+    vertical-align: top;
+  }

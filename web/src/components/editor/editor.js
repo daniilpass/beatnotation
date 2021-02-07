@@ -1,9 +1,12 @@
 import React from "react";
 
 import Toolbar from "./toolbar/toolbar";
-import Track from "./track/track";
 import * as PlayerStates from "../../redux/dictionary/playerStates";
 import TracksPlayer from "./tracksPlayer/tracksPlayer";
+import Timeline from "./timeline/timeline";
+import TaktControls from "./taktControls/taktControls";
+import ButtonAddTakt from "./buttonAddTakt/buttonAddTakt";
+import TrackList from "./trackList/trackList";
 
 const requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame;
 
@@ -42,7 +45,7 @@ export default class Editor extends React.Component {
     //Auto scroll
     //Получаю координату клика внутри временной шкалы
     if (this.props.tracksLengthInTakts > prevProps.tracksLengthInTakts) {      
-      this.scrollTracksConatiner();
+      this.scrollTracksConatinerToEnd();
     }     
   }
 
@@ -56,7 +59,7 @@ export default class Editor extends React.Component {
     this.tracksContainerRef.current.addEventListener('wheel', this.handleTracksWheel);
   }
 
-  scrollTracksConatiner = () => {
+  scrollTracksConatinerToEnd = () => {
     console.log("Auto scroll");
     let el = this.tracksContainerRef.current; 
     el.scrollLeft=el.scrollLeft+this.props.noteWidth*this.props.notesInTakt;
@@ -112,11 +115,6 @@ export default class Editor extends React.Component {
     this.tryDrawNotes();
   }
 
-  handleTrackVolumeChange = (trackIndex, value) => {
-    console.log("handleTrackVolumeChange", trackIndex, value);
-    this.props.setTrackVolume(trackIndex, value);
-  }
-
   handleTimelineClick = (e) => {   
     console.log('handleTimelineClick'); 
     e.preventDefault();
@@ -142,41 +140,6 @@ export default class Editor extends React.Component {
   }
 
 
-  /*
-  TAKT ACTIONs
-  */
-  handleAddTakt = (e) => {
-    console.log('Add takt');
-    this.props.taktAdd();
-  }
-
-  handleDeleteClick = (taktIndex) => {
-    console.log('Delete', taktIndex);
-    this.props.taktDelete(taktIndex)  
-  }
-
-  handleClearClick = (taktIndex) => {
-    console.log('Clear', taktIndex);
-    this.props.taktClear(taktIndex)    
-  }
-
-  handleCopyClick = (taktIndex) => {
-    console.log('Copy', taktIndex);
-    this.props.taktCopy(taktIndex)
-  }
-
-  handlePasteClick = (taktIndex) => {
-    console.log('Paste', taktIndex, this.props.clipboard);
-
-    if (this.props.clipboard.length === 0) {
-      console.log('Empty clipboard');
-      return;
-    }
-
-    this.props.taktPaste(taktIndex);
-  }
-
-
   handlePlayerStep = () => {
       this.updateTimeControls();
   }
@@ -184,15 +147,12 @@ export default class Editor extends React.Component {
   /*
   * GETTERS
   */
-  get timePointerHeight() {
-    return this.props.tracks.length * this.props.noteHeight + this.props.timePointerWidth;
-  }
 
   get timestamp() {
     //console.log('getTimestamp',this.props.getTimestamp);
     if (this.props.playerState === PlayerStates.STOP || this.props.playerState === PlayerStates.PAUSE) {
       return this.props.baseTime
-    } else if (this.props.playerState === PlayerStates.PLAY) {
+    } else {
       return this.props.baseTime + (Date.now() - this.props.playerStartedAt);
     }    
   }
@@ -220,64 +180,22 @@ export default class Editor extends React.Component {
       {/* TODO: pass needed props or connect to redux */}
       <TracksPlayer onStep={this.handlePlayerStep} {...this.props} ref={this.tracksPlayerRef}/>
 
-      <div className="workspace no-print"> 
-        <Toolbar timeTextRef={this.timeTextRef}/>
+      <Toolbar timeTextRef={this.timeTextRef}/>
 
-        <div className="track-container" ref={this.tracksContainerRef}>
-          {/* TIMELINE */}
-          <div className="timeline" style={{width:this.props.noteWidth * this.props.tracksLengthInNotes + "px", marginLeft: this.props.trackControlWidth+"px"}} onClick={this.handleTimelineClick}>
-            {
-               [...Array(Math.ceil(this.props.tracksLengthInNotes / this.props.notesInTakt))].map((i,k) => {
-                return <div key={k} className="timeline__takt" style={{width: this.props.notesInTakt * this.props.noteWidth}}>
-                    <div className="takt__number">{k+1}</div>
-                  </div>
-              })
-            }
-          </div>
-          {/* TIME POINTER */}
-          <div className="time-pointer" ref={this.timePointerRef}> 
-            <div className="time-pointer__stick" style={{height: this.timePointerHeight+"px"}}>
-            </div>
-          </div>
+      <div className="track-container" ref={this.tracksContainerRef}>
+        {/* TIMELINE */}
+        <Timeline onClick={this.handleTimelineClick} timePointerRef={this.timePointerRef} {...this.props}/>        
 
-          {/* TRACKS */}
-          {
-            this.props.tracks.map((_track,i) => {
-              return <Track key={"track_"+i} index={i} noteWidth={this.props.noteWidth} noteHeight={this.props.noteHeight} noteClick={this.handleNoteClick} 
-                              tracksLengthInNotes={this.props.tracksLengthInNotes} tracksLengthInTakts={this.props.tracksLengthInTakts} 
-                              timeSignature={this.props.timeSignature}
-                              track={_track} ts={_track.ts} 
-                              trackControlWidth={this.props.trackControlWidth} addTaktButtonWidth={this.props.addTaktButtonWidth}
-                              onVolumeChange={this.handleTrackVolumeChange}
-                              />
-            })
-          }
+        {/* TRACKS */}
+        <TrackList onNoteClick={this.handleNoteClick} {...this.props}/>
 
-          {/* TAKT CONTROLS */}
-          <div className="takt-controls" style={{width:this.props.noteWidth * this.props.tracksLengthInNotes + "px", marginLeft: this.props.trackControlWidth+"px"}}>
-            {
-               [...Array(Math.ceil(this.props.tracksLengthInTakts))].map((i,k) => {
-                return <div key={k} className="takt-control" style={{width: this.props.notesInTakt * this.props.noteWidth}}>
-                    <button className="takt-control__button button" onClick={this.handlePasteClick.bind(this, k)}>Paste</button>
-                    <button className="takt-control__button button" onClick={this.handleCopyClick.bind(this, k)}>Copy</button>
-                    <button className="takt-control__button button" onClick={this.handleClearClick.bind(this, k)}>Clear</button>
-                    <button className="takt-control__button button" onClick={this.handleDeleteClick.bind(this, k)}>Delete</button>
-                    <div style={{clear: "both"}}></div>
-                  </div>
-              })
-            }
-          </div>
+        {/* TAKT CONTROLS */}
+        <TaktControls {...this.props}/>
 
-          {/* BUTTON ADD TAKT */}
-          <div className="takt-add" style={{width:this.props.addTaktButtonWidth, height: this.props.tracks.length * this.props.noteHeight + this.props.taktControlHeight + "px", marginTop: -this.props.tracks.length * this.props.noteHeight - this.props.taktControlHeight + "px"}}
-                onClick={this.handleAddTakt}> 
-                <div className="takt-add__content">+</div>           
-          </div>
-
-        </div>
-        
-       
+        {/* BUTTON ADD TAKT */}
+        <ButtonAddTakt {...this.props}/>
       </div>
+
     </div>
   }
 }
