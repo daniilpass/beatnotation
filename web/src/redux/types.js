@@ -1,3 +1,4 @@
+//EDITOR
 export const SET_REALTIME_RENDER = "SET_REALTIME_RENDER";
 export const SET_PLAYBACK_NOTES = "SET_PLAYBACK_NOTES";
 
@@ -17,3 +18,6 @@ export const TAKT_CLEAR =  "TAKT_CLEAR";
 export const TAKT_DELETE =  "TAKT_DELETE";
 
 export const SET_BASETIME = "SET_BASETIME";
+
+//CANVAS
+export const RENDER_NOTES = "RENDER_NOTES";

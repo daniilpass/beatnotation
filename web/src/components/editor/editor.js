@@ -27,14 +27,14 @@ export default class Editor extends React.Component {
 
   componentDidMount () {
     this.addEvents();
-    this.tryDrawNotes();
+    this.DrawNotes();
     this.updateTimeControls();
   }
 
   componentDidUpdate(prevProps) {
     // Если изменился параметр отрисовки, то перерисую ноты
     if (this.props.realtimeRender === true && prevProps.realtimeRender === false) {
-      this.tryDrawNotes();
+      this.DrawNotes();
     }
     
     // Изменилось время начала проигрывания или статус плеера, то перерисую контролы зависящие от времени
@@ -66,25 +66,8 @@ export default class Editor extends React.Component {
   }
 
   // DRAW NOTES
-  tryDrawNotes(force) {
-    if (!this.props.realtimeRender && !force) {
-      return;
-    }
-
-    //console.log('tryDrawNotes');
-    let maxTaktCount = 0;
-
-    for (let tIdx = 0; tIdx < this.props.tracks.length; tIdx++) {
-      const _track = this.props.tracks[tIdx];
-      
-      for (let taktIdx = 0; taktIdx < _track.takts.length; taktIdx++) {
-        const _takt = _track.takts[taktIdx];
-        let tmpMaxTaktCount = (taktIdx + 1); // make +1 to convert index to count
-        maxTaktCount = (_takt.notes.lastIndexOf(1) >= 0 && tmpMaxTaktCount > maxTaktCount) ?  tmpMaxTaktCount : maxTaktCount; 
-      }
-    } 
-
-    this.props.onRenderNotes && this.props.onRenderNotes(this.props.tracks, maxTaktCount, this.props.bpm, this.props.timeSignature, this.props.notesInTakt);
+  DrawNotes() {
+    this.props.renderNotes();
   }
  
   updateTimeControls() {    
@@ -112,7 +95,7 @@ export default class Editor extends React.Component {
     }
 
     // Рисую ноты
-    this.tryDrawNotes();
+    this.DrawNotes();
   }
 
   handleTimelineClick = (e) => {   

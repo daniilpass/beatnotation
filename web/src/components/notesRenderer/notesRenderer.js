@@ -34,15 +34,41 @@ class NotesRenderer extends React.Component {
   
     componentDidMount() { 
       this.canvasWrapper = document.getElementsByClassName('canvas_notes_wrapper')[0];
-      //this.draw();
-      
+      //this.draw();      
       this.lastNoteIndex = 0;
     }
+
+    componentDidUpdate(prevProps) {
+      if (this.props.renderTime !== prevProps.renderTime) {
+        this.drawFromStore();
+      }
+    }
+
   
     initCanvasContext() {
       let allCanvasElements = document.getElementsByClassName('canvas_notes')
       this.canvas = allCanvasElements[allCanvasElements.length - 1];
       this.ctx = this.canvas.getContext('2d');
+    }
+
+    drawFromStore(){      
+      if (!this.props.realtimeRender) {
+        return;
+      }
+      console.log("NotesRenderer: drawFromStore()");
+      let maxTaktCount = 0;
+
+      for (let tIdx = 0; tIdx < this.props.tracks.length; tIdx++) {
+        const _track = this.props.tracks[tIdx];
+        
+        for (let taktIdx = 0; taktIdx < _track.takts.length; taktIdx++) {
+          const _takt = _track.takts[taktIdx];
+          let tmpMaxTaktCount = (taktIdx + 1); // make +1 to convert index to count
+          maxTaktCount = (_takt.notes.lastIndexOf(1) >= 0 && tmpMaxTaktCount > maxTaktCount) ?  tmpMaxTaktCount : maxTaktCount; 
+        }
+      } 
+
+      this.draw(this.props.tracks, maxTaktCount, this.props.bpm, this.props.timeSignature, this.props.notesInTakt);
     }
 
     draw(tracks, taktCountLimit, bpm, timeSignature, notesInTakt) {
@@ -569,7 +595,7 @@ class NotesRenderer extends React.Component {
   
     //TODO: split on different canvas for print
     render() {
-      console.log('Render NotesRenderer', this.props.realtimeRender);
+      console.log('Render NotesRenderer');
       return <div className="canvas_notes_wrapper" style={{...this.props.style, display: this.props.realtimeRender ? "block" : "none" }}>
           <canvas className="canvas_notes" width={this.cWidth} height={this.cHeight}></canvas>
       </div>

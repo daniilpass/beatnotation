@@ -1,7 +1,7 @@
 import React from "react";
 import {connect} from "react-redux";
 
-import {setPlayerState, setRealtimeRender, setPlaybackNotes, setBpm, setTimeSignature, loadTracks} from "../../../redux/actions";
+import {setPlayerState, setRealtimeRender, setPlaybackNotes, setBpm, setTimeSignature, loadTracks, renderNotes} from "../../../redux/actions";
 import {CanPlay, CanStop, CanPause, CanSave, CanLoad, CanPrint} from "../../../redux/selectors";
 import * as PlayerStates from "../../../redux/dictionary/playerStates";
 
@@ -116,8 +116,7 @@ class Toolbar extends React.Component {
 
     handlePrint = () => {
         console.log("print");
-        //TODO: redraw before print
-        //this.tryDrawNotes(true);
+        this.props.renderNotes();        
         window.print();
     }
     
@@ -213,4 +212,4 @@ const mapStateToProps = state => {
     return {...editor, canPlay, canStop, canPause, canSave, canLoad, canPrint};
 }
 
-export default connect(mapStateToProps, {setPlayerState, setRealtimeRender, setPlaybackNotes, setBpm, setTimeSignature, loadTracks}) (Toolbar)
+export default connect(mapStateToProps, {setPlayerState, setRealtimeRender, setPlaybackNotes, setBpm, setTimeSignature, loadTracks, renderNotes}) (Toolbar)
