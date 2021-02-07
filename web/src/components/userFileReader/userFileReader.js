@@ -33,11 +33,14 @@ export default class UserFileReader extends React.PureComponent {
       reader.readAsText(file);    
     }
     
+    onClick = (e) =>{
+      e.target.value = null
+    }
     
   
     render() {
       return <div style={{display:"none"}}> 
-              <input type="file" ref={this.input} onChange={this.fileInputChange} accept={this.props.accept}></input>
+              <input type="file" ref={this.input} onChange={this.fileInputChange} onClick={this.onClick} accept={this.props.accept}></input>
             </div>
     }
   }
