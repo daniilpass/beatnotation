@@ -21,3 +21,4 @@ export const SET_BASETIME = "SET_BASETIME";
 
 //CANVAS
 export const RENDER_NOTES = "RENDER_NOTES";
+export const PRINT_NOTES = "PRINT_NOTES";

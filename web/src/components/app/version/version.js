@@ -5,6 +5,6 @@ export default class Version extends React.PureComponent {
   
   /*Major.Minor.Fixes*/
   render() {
-    return <div className={styles['app-ver']}>{this.props.value}</div>  
+    return <div className={styles['app-ver'] + " no-print"}>{this.props.value}</div>  
   }
 }

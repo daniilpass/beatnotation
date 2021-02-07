@@ -39,8 +39,10 @@ class NotesRenderer extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-      if (this.props.renderTime !== prevProps.renderTime) {
-        this.drawFromStore();
+      if (this.props.printTime !== prevProps.printTime) {
+        this.drawFromStore(true);
+      } else if (this.props.renderTime !== prevProps.renderTime) {
+        this.drawFromStore(false);
       }
     }
 
@@ -51,13 +53,11 @@ class NotesRenderer extends React.Component {
       this.ctx = this.canvas.getContext('2d');
     }
 
-    drawFromStore(){      
-      if (!this.props.realtimeRender) {
-        return;
-      }
-      console.log("NotesRenderer: drawFromStore()");
-      let maxTaktCount = 0;
+    drawFromStore(print){
+      console.log(`NotesRenderer: drawFromStore(${print})`);
 
+      // Подготовка данных
+      let maxTaktCount = 0;
       for (let tIdx = 0; tIdx < this.props.tracks.length; tIdx++) {
         const _track = this.props.tracks[tIdx];
         
@@ -68,7 +68,13 @@ class NotesRenderer extends React.Component {
         }
       } 
 
+      // Отрисовка
       this.draw(this.props.tracks, maxTaktCount, this.props.bpm, this.props.timeSignature, this.props.notesInTakt);
+
+      // Вызов функции печати при необходимости
+      if (print) {
+        window.print();
+      }
     }
 
     draw(tracks, taktCountLimit, bpm, timeSignature, notesInTakt) {
@@ -596,7 +602,7 @@ class NotesRenderer extends React.Component {
     //TODO: split on different canvas for print
     render() {
       console.log('Render NotesRenderer');
-      return <div className="canvas_notes_wrapper" style={{...this.props.style, display: this.props.realtimeRender ? "block" : "none" }}>
+      return <div className="canvas_notes_wrapper print" style={{...this.props.style, display: this.props.realtimeRender ? "block" : "none" }}>
           <canvas className="canvas_notes" width={this.cWidth} height={this.cHeight}></canvas>
       </div>
       

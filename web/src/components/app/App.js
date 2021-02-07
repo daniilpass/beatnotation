@@ -9,7 +9,7 @@ import Editor from "../editor/editorContainer";
 import NotesRenderer from "../notesRenderer/notesRenderContainer";
 
 export default class App extends React.Component {
-  render () {
+  render () { 
     console.log('Render App');
 
     return <div className="App">

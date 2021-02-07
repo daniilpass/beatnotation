@@ -66,8 +66,10 @@ export default class Editor extends React.Component {
   }
 
   // DRAW NOTES
-  DrawNotes() {
-    this.props.renderNotes();
+  DrawNotes() {          
+    if (this.props.realtimeRender) {
+      this.props.renderNotes();
+    }
   }
  
   updateTimeControls() {    
@@ -159,7 +161,7 @@ export default class Editor extends React.Component {
   render () {
     console.log('Render Editor');
 
-    return <div className="Editor">
+    return <div className="Editor no-print">
       {/* TODO: pass needed props or connect to redux */}
       <TracksPlayer onStep={this.handlePlayerStep} {...this.props} ref={this.tracksPlayerRef}/>
 
