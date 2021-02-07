@@ -317,6 +317,7 @@ function taktAdd(state) {
 
     return {
         ...state,
+        endOfTrack: false,
         tracksLengthInTakts: newTracksLengthInTakts,
         tracksLengthInNotes: newTracksLengthInNotes,
         tracks: [...tmpTracks]      
