@@ -460,10 +460,12 @@ function setBaseTime(state, payload) {
 function setTrackLoaded(state, payload) {
     let trackIndex = payload.index;
     let loaded = payload.loaded;
+    let audioBuffer = payload.audioBuffer;
 
     let tmpTracks = [...state.tracks];
     let tmpTrack = {...tmpTracks[trackIndex]};
     tmpTrack.loaded = loaded;
+    tmpTrack.audioBuffer = audioBuffer;
     tmpTrack.ts = Date.now();
     tmpTracks[trackIndex] = tmpTrack;
 

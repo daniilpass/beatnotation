@@ -106,6 +106,7 @@ TRACK-CONTROL
   background-color: rgb(80 83 151);
   cursor: pointer;
   border: 1px solid #080E73;
+  overflow: hidden;
 }
 
 .user-audio-loaded{

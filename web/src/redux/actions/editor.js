@@ -136,12 +136,13 @@ export const setBaseTime = (value, playerStartedAt) => {
     }
 }
 
-export const setTrackLoaded = (index, value) => {
+export const setTrackLoaded = (index, value, audioBuffer) => {
     return {
         type: SET_TRACK_LOADED,
         payload: {
             index: index,
-            loaded: value
+            loaded: value,
+            audioBuffer: audioBuffer
         }
     }
 }
