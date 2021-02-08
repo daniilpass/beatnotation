@@ -43,7 +43,7 @@ export default class TracksPlayer extends React.Component {
         }
 
         if (this.props.loader.buffer !== prevProps.loader.buffer ) {
-            this.loadUserAudio(this.props.loader.trackIndex, this.props.loader.buffer);
+            this.loadUserAudio(this.props.loader.trackIndex, this.props.loader.buffer, this.props.loader.offset);
         }
 
         //Идет проигрышь и изменилось базовое время(предвинули указатель времени) или сдвинулись аудио дорожки, то запустим треки с нужного отрезка
@@ -82,13 +82,13 @@ export default class TracksPlayer extends React.Component {
             })   
     }  
 
-    loadUserAudio(trackIndex, arrayBuffer) {        
+    loadUserAudio(trackIndex, arrayBuffer, offset) {        
         console.log("===> Player. Load user audio...")
-        this.props.setTrackLoaded(trackIndex, false);
+        this.props.setTrackLoaded(trackIndex, false, [], offset);
         this.audioCtx.decodeAudioData(arrayBuffer.slice(0), 
             audioBuffer => {
                 this.setSoundBufferForTrack(trackIndex, audioBuffer, {audio: true});
-                this.props.setTrackLoaded(trackIndex, true, arrayBuffer.slice(0));
+                this.props.setTrackLoaded(trackIndex, true, arrayBuffer.slice(0), offset);
             }, 
             error => { console.log("decodeAudioData failed", error); }
         );

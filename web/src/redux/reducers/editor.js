@@ -371,21 +371,22 @@ function loadTracks(state, payload) {
     //-notes
     //-trackLength
     var maxTaktCount = 0;
-
     let tmpTracks = [...state.tracks]; 
     for (let it = 0; it < tmpTracks.length; it++) {
-        //TODO: загрузка пользовательского трека
-        if (state.tracks[it].type === 0) {
-            continue;
-        } 
-
         const tmpTrack = {...state.tracks[it]};
         const loadedTrack = data.tracks[it];
-        tmpTrack.volume = loadedTrack.volume;
-        tmpTrack.takts = [...loadedTrack.takts];
+
+        tmpTrack.volume = loadedTrack.volume; 
         tmpTrack.ts = Date.now();
+        if (state.tracks[it].type === 0) {
+            //загрузка пользовательского трека
+            tmpTrack.offset = loadedTrack.offset;
+        } else {
+            tmpTrack.takts = [...loadedTrack.takts];
+            maxTaktCount = tmpTrack.takts.length > maxTaktCount ? tmpTrack.takts.length : maxTaktCount;
+        }
+
         tmpTracks[it] = tmpTrack;
-        maxTaktCount = tmpTrack.takts.length > maxTaktCount ? tmpTrack.takts.length : maxTaktCount;
     }
 
     //TODO: убрать дубликаты кода (подобие при смене сигнатуры)
@@ -464,12 +465,13 @@ function setTrackLoaded(state, payload) {
     let trackIndex = payload.index;
     let loaded = payload.loaded;
     let arrayBuffer = payload.arrayBuffer;
+    let offset = payload.offset;
 
     let tmpTracks = [...state.tracks];
     let tmpTrack = {...tmpTracks[trackIndex]};
     tmpTrack.loaded = loaded;
     tmpTrack.arrayBuffer = arrayBuffer;
-    tmpTrack.offset = 0;
+    tmpTrack.offset = offset || 0;
     tmpTrack.ts = Date.now();
     tmpTracks[trackIndex] = tmpTrack;
 

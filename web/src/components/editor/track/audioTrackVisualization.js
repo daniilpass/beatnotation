@@ -5,7 +5,7 @@ export default class AudioTrackVisualization extends React.Component {
       super(props);
   
       this.state = {
-        tmpPosition: 0
+        tmpPosition: -1
       }
   
       this.drag = {
@@ -88,7 +88,7 @@ export default class AudioTrackVisualization extends React.Component {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const actx = new AudioContext();
                     
-        console.log(this.track.arrayBuffer);
+        //console.log(this.track.arrayBuffer);
         actx.decodeAudioData(this.track.arrayBuffer.slice(), 
             audioBuffer => {  
                 this.draw(canvas_name, audioBuffer);
@@ -99,14 +99,14 @@ export default class AudioTrackVisualization extends React.Component {
 
 
     filterData = (_buffer, _samples) => {
-    const rawData = _buffer;
-    const samples = _samples;
-    const blockSize = Math.floor(rawData.length / samples);
-    const filteredData = [];
-    for (let i = 0; i < samples; i++) {
-        filteredData.push(rawData[i * blockSize]); 
-    }
-    return filteredData;
+        const rawData = _buffer;
+        const samples = _samples;
+        const blockSize = Math.floor(rawData.length / samples);
+        const filteredData = [];
+        for (let i = 0; i < samples; i++) {
+            filteredData.push(rawData[i * blockSize]); 
+        }
+        return filteredData;
     }
 
     draw = (canvas_name, audioBuffer) => {
@@ -174,7 +174,8 @@ export default class AudioTrackVisualization extends React.Component {
     }
   
     render() {
-      return <canvas id="audio_canvas_inside" className="user-audio-visualization"  ref={this.canvasRef} width="0" height={this.props.noteHeight} style={{marginLeft: this.offset + "px"}}></canvas>
+      console.log("Render AudioTrackVisualization");
+      return <canvas id="audio_canvas_inside" className="user-audio-visualization"  ref={this.canvasRef} width="1" height={this.props.noteHeight} style={{marginLeft: (this.state.tmpPosition > -1 ? this.state.tmpPosition : this.props.track.offset) + "px"}}></canvas>
     }
     
   }

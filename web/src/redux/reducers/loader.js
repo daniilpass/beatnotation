@@ -18,6 +18,7 @@ function loadUserAudio(state, payload) {
     return {
         ...state,
         trackIndex: payload.trackIndex,
-        buffer: payload.buffer
+        buffer: payload.buffer,
+        offset: payload.offset || 0
     }
 }
