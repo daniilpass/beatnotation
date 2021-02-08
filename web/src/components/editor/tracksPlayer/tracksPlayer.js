@@ -85,10 +85,10 @@ export default class TracksPlayer extends React.Component {
     loadUserAudio(trackIndex, arrayBuffer) {        
         console.log("===> Player. Load user audio...")
         this.props.setTrackLoaded(trackIndex, false);
-        this.audioCtx.decodeAudioData(arrayBuffer, 
+        this.audioCtx.decodeAudioData(arrayBuffer.slice(0), 
             audioBuffer => {
                 this.setSoundBufferForTrack(trackIndex, audioBuffer, {audio: true});
-                this.props.setTrackLoaded(trackIndex, true, audioBuffer);
+                this.props.setTrackLoaded(trackIndex, true, arrayBuffer.slice(0));
             }, 
             error => { console.log("decodeAudioData failed", error); }
         );

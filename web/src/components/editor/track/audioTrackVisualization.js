@@ -80,72 +80,98 @@ export default class AudioTrackVisualization extends React.Component {
     get track() {
       return this.props.track;
     }
-  
-    filterData = (_buffer, _samples) => {
-      const rawData = _buffer;
-      const samples = _samples;
-      const blockSize = Math.floor(rawData.length / samples);
-      const filteredData = [];
-      for (let i = 0; i < samples; i++) {
-        filteredData.push(rawData[i * blockSize]); 
-      }
-      return filteredData;
-    }
+
+    
   
     visualize = (canvas_name) => {
-      console.log("Visualize");
-      //Пуолчаю холст
-      const canvas  = document.getElementById(canvas_name);
-      const canvasCtx = canvas.getContext('2d');
-  
-      //Вычисляю и задаю новую длину холста
-      let durationInMs  = this.track.audioBuffer.duration * 1000;
-      let lengthInPx = durationInMs * this.props.bpms * this.props.notesInPartCount *  this.props.noteWidth;
-      canvas.width = lengthInPx;
-  
-      //Константы размеров холста
-      const WIDTH = canvas.width;
-      const HEIGHT = canvas.height;
-  
-      //Полдготовка данных
-      var dataArrayRaw = this.props.track.audioBuffer.getChannelData(0);    
-      let dataArray = this.filterData(dataArrayRaw, dataArrayRaw.length / 256);
-      let bufferLength = dataArray.length;
-      //TODO: Нормализовать тихие дорожки
-  
-      var sliceWidth = WIDTH / bufferLength;
-      var x = 0;
-      var dy = HEIGHT / 2;
-      
-      //clear
-      canvasCtx.beginPath();
-      canvasCtx.fillStyle =  "#FF8E00";
-      canvasCtx.fillRect(0,0,WIDTH,HEIGHT);
-      canvasCtx.stroke();
-      //init brush
-      canvasCtx.fillStyle = "#ffffff";
-      canvasCtx.strokeStyle = "#ffffff";
-      // canvasCtx.lineWidth = 3;
-      //draw
-      let maxVal = 0
-      for(var i = 0; i < bufferLength; i = i + 1) {
-        var v = dataArray[i];
-        var y = dy + v * dy;
-  
-        if(i === 0) {
-          canvasCtx.moveTo(x, y);
-        } else {
-          canvasCtx.lineTo(x, y);
-        }
-        x += sliceWidth;
-  
-        if (v > maxVal)
-          maxVal = v;
-      }
-      //fill
-      canvasCtx.lineTo(WIDTH, dy);
-      canvasCtx.stroke();
+        console.log("Visualize");
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const actx = new AudioContext();
+                    
+        console.log(this.track.arrayBuffer);
+        actx.decodeAudioData(this.track.arrayBuffer.slice(), 
+            audioBuffer => {  
+                this.draw(canvas_name, audioBuffer);
+            }, 
+            error => { console.log("decodeAudioData failed", error); }
+        );
     }  
+
+
+    filterData = (_buffer, _samples) => {
+    const rawData = _buffer;
+    const samples = _samples;
+    const blockSize = Math.floor(rawData.length / samples);
+    const filteredData = [];
+    for (let i = 0; i < samples; i++) {
+        filteredData.push(rawData[i * blockSize]); 
+    }
+    return filteredData;
+    }
+
+    draw = (canvas_name, audioBuffer) => {
+        //Пуолчаю холст
+        const canvas  = document.getElementById(canvas_name);
+        const canvasCtx = canvas.getContext('2d');
+
+        //Вычисляю и задаю новую длину холста
+        let durationInMs  = audioBuffer.duration * 1000;
+        let lengthInPx = durationInMs * this.props.bpms * this.props.notesInPartCount *  this.props.noteWidth;
+        canvas.width = lengthInPx;
+
+        //Константы размеров холста
+        const WIDTH = canvas.width;
+        const HEIGHT = canvas.height;
+
+        // //TEST
+        // canvasCtx.beginPath();
+        // canvasCtx.fillStyle =  "#FF8E00";
+        // canvasCtx.fillRect(0,0,WIDTH,HEIGHT);
+        // canvasCtx.stroke();
+        // return;
+
+        //Полдготовка данных
+        let dataArrayRaw = audioBuffer.getChannelData(0);
+        let dataArray = this.filterData(dataArrayRaw, dataArrayRaw.length / 256);
+        let bufferLength = dataArray.length;
+        //TODO: Нормализовать тихие дорожки
+
+        var sliceWidth = WIDTH / bufferLength;
+        var x = 0;
+        var dy = HEIGHT / 2;
+
+        //clear
+        canvasCtx.beginPath();
+        canvasCtx.fillStyle =  "#FF8E00";
+        canvasCtx.fillRect(0,0,WIDTH,HEIGHT);
+        canvasCtx.stroke();
+        //init brush
+        canvasCtx.fillStyle = "#ffffff";
+        canvasCtx.strokeStyle = "#ffffff";
+        // canvasCtx.lineWidth = 3;
+        //draw
+        let maxVal = 0
+        for(var i = 0; i < bufferLength; i = i + 1) {
+            var v = dataArray[i];
+            var y = dy + v * dy;
+
+            if(i === 0) {
+            canvasCtx.moveTo(x, y);
+            } else {
+            canvasCtx.lineTo(x, y);
+            }
+            x += sliceWidth;
+
+            if (v > maxVal)
+            maxVal = v;
+        }
+        //fill
+        canvasCtx.lineTo(WIDTH, dy);
+        canvasCtx.stroke();
+
+        dataArrayRaw=null;
+        dataArray=null;
+    }
   
     render() {
       return <canvas id="audio_canvas_inside" className="user-audio-visualization"  ref={this.canvasRef} width="0" height={this.props.noteHeight} style={{marginLeft: this.offset + "px"}}></canvas>
