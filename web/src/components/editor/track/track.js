@@ -57,7 +57,10 @@ export default class Track extends React.Component {
       if (this.props.track.type !== 0) {
         return this.renderTakts()
       } else {
-        return <AudioTrack {...this.props} loaded={this.props.track.loaded}/>
+        return [
+          <AudioTrack key={"audioTrack"+this.props.index} {...this.props} loaded={this.props.track.loaded}/>,
+          <UserFileReader key={"audioTrackloader"+this.props.index}  ref={this.fileReaderRef} onFileLoaded={this.handleFileLoaded} readAsArrayBuffer accept=".mp3"/>
+        ]
       }
     }
 
@@ -78,13 +81,12 @@ export default class Track extends React.Component {
     render() {
       console.log('Render Track');
   
-      return <div className="workspace__track" style={{...this.props.style, height: this.props.noteHeight, width:this.props.noteWidth * this.props.tracksLengthInNotes + this.props.trackControlWidth}}>
+      return <div className="workspace__track" style={{...this.props.style, height: this.props.noteHeight, width:this.props.noteWidth * this.props.tracksLengthInNotes + this.props.trackControlWidth}}>          
         <TrackControl track={this.props.track} width={this.props.trackControlWidth} height={this.props.noteHeight} onVolumeChange={this.onVolumeChange} maxVolume={100} 
                       onLoadClick={this.handleLoadClick}/>
         {
           this.renderTrack()
-        }
-        <UserFileReader key="user-audio-track-loader"  ref={this.fileReaderRef} onFileLoaded={this.handleFileLoaded} readAsArrayBuffer accept=".mp3"/>     
+        }           
       </div>
     }
   }
