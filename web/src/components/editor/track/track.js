@@ -114,7 +114,7 @@ class AudioTrack extends React.Component {
     <div key="user-audio" className={"user-audio" + (this.trackLoaded ? " user-audio-loaded" : "")} style={{width: this.width + "px"}} onClick={this.handeAudioClick}>
       <AudioTrackVisualization {...this.props}/>
     </div>,
-    <UserFileReader key="user-audio-loader"  ref={this.fileReaderRef} onFileLoaded={this.handleFileLoaded} readAsArrayBuffer/>]
+    <UserFileReader key="user-audio-loader"  ref={this.fileReaderRef} onFileLoaded={this.handleFileLoaded} readAsArrayBuffer accept=".mp3"/>]
   }
 }
 
