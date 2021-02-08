@@ -2,7 +2,7 @@ import {connect} from "react-redux";
 import {
     setRealtimeRender, taktCopy, taktPaste, taktClear, taktDelete, taktAdd 
     ,setPlayerState, setEndOfTrack, setTrackVolume, setBaseTime
-    ,renderNotes, loadUserAudio, setTrackLoaded
+    ,renderNotes, loadUserAudio, setTrackLoaded, setTrackOffset
 } from "../../redux/actions";
 import {GetBpms} from "../../redux//selectors";
 
@@ -20,6 +20,6 @@ export default connect(
     {
         setRealtimeRender, taktCopy, taktPaste, taktClear, taktDelete, 
         taktAdd, setPlayerState, setEndOfTrack, setTrackVolume, setBaseTime,
-        renderNotes, loadUserAudio, setTrackLoaded
+        renderNotes, loadUserAudio, setTrackLoaded, setTrackOffset
     }
 ) (Editor)

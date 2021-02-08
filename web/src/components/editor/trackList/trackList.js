@@ -39,7 +39,7 @@ export default class TrackList extends React.Component {
                             timeSignature={this.props.timeSignature} track={_track} ts={_track.ts}                             
                             noteClick={this.onNoteClick}  onVolumeChange={this.handleTrackVolumeChange} 
                             loadUserAudio={this.props.loadUserAudio}
-                            bpms = {this.props.bpms} notesInPartCount={this.props.notesInPartCount}/>
+                            bpms = {this.props.bpms} notesInPartCount={this.props.notesInPartCount} setTrackOffset={this.props.setTrackOffset}/>
             })
         ]
     }

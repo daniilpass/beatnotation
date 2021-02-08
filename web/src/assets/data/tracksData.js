@@ -18,6 +18,7 @@ export const tracksData = [
         volume: 1,
         title: "Audio",
         type: 0, //0 - audio
+        offset: 0
     },
     {
         audioUrl: SoundCrash,

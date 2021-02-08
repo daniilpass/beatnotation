@@ -11,6 +11,7 @@ export const INIT_TRACKS = "INIT_TRACKS";
 export const LOAD_TRACKS = "LOAD_TRACKS";
 export const SET_TRACK_VOLUME = "SET_TRACK_VOLUME";
 export const SET_TRACK_LOADED = "SET_TRACK_LOADED";
+export const SET_TRACK_OFFSET = "SET_TRACK_OFFSET";
 
 export const TAKT_ADD = "TAKT_ADD";
 export const TAKT_COPY = "TAKT_COPY";

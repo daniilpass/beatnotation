@@ -3,6 +3,8 @@ import React from "react";
 
 import TrackControl from "./trackControl";
 import Takt from "./takt";
+import AudioTrackVisualization from "./audioTrackVisualization";
+
 import UserFileReader from "../../userFileReader/userFileReader";
 
 export default class Track extends React.Component {
@@ -96,7 +98,10 @@ class AudioTrack extends React.Component {
   shouldComponentUpdate(nextProps) {
     if (this.props.noteWidth !== nextProps.noteWidth
       || this.props.tracksLengthInNotes !== nextProps.tracksLengthInNotes
-      || this.props.loaded !== nextProps.loaded) {
+      || this.props.loaded !== nextProps.loaded
+      || this.props.bpms !== nextProps.bpms 
+      || this.props.notesInPartCount !== nextProps.notesInPartCount 
+      || this.props.track.offset !== nextProps.track.offset) {
       return true;
     }
     return false;
@@ -111,111 +116,10 @@ class AudioTrack extends React.Component {
   }
 
   render() {
+    console.log("Render AudioTrack");
     return [
     <div key="user-audio-track" className={"user-audio-track" + (this.trackLoaded ? " user-audio-track-loaded" : "")} style={{width: this.width + "px"}}>
-      <AudioTrackVisualization {...this.props}/>
+      <AudioTrackVisualization {...this.props} parentWidth={this.width}/>
     </div>]
   }
-}
-
-class AudioTrackVisualization extends React.Component {
-  constructor(props){
-    super(props);
-    this.rednerMultiplayer = 1;
-  }
-  
-  shouldComponentUpdate(nextProps) {
-    if (this.props.loaded !== nextProps.loaded
-      || this.props.bpms !== nextProps.bpms 
-      || this.props.notesInPartCount !== nextProps.notesInPartCount 
-      || this.props.noteWidth !== nextProps.noteWidth) {
-      return true;
-    }
-    return false;
-  }
-
-  componentDidUpdate(prevProps) {
-    if (prevProps.loaded === false && this.props.loaded === true) {      
-      //this.visualize("audio_canvas", 1);
-      this.visualize("audio_canvas_inside", this.rednerMultiplayer);
-    } else if (this.props.loaded === true 
-      && (this.props.bpms !== prevProps.bpms || this.props.notesInPartCount !== prevProps.notesInPartCount || this.props.noteWidth !== prevProps.noteWidth)) {
-      this.visualize("audio_canvas_inside", this.rednerMultiplayer);
-    }
-  }
-
-  get track() {
-    return this.props.track;
-  }
-
-  filterData = (_buffer, _samples) => {
-    const rawData = _buffer;
-    const samples = _samples;
-    const blockSize = Math.floor(rawData.length / samples);
-    const filteredData = [];
-    for (let i = 0; i < samples; i++) {
-      filteredData.push(rawData[i * blockSize]); 
-    }
-    return filteredData;
-  }
-
-  visualize = (canvas_name) => {
-    console.log("Visualize");
-    //Пуолчаю холст
-    const canvas  = document.getElementById(canvas_name);
-    const canvasCtx = canvas.getContext('2d');
-
-    //Вычисляю и задаю новую длину холста
-    let durationInMs  = this.track.audioBuffer.duration * 1000;
-    let lengthInPx = durationInMs * this.props.bpms * this.props.notesInPartCount *  this.props.noteWidth;
-    canvas.width = lengthInPx;
-
-    //Константы размеров холста
-    const WIDTH = canvas.width;
-    const HEIGHT = canvas.height;
-
-    //Полдготовка данных
-    var dataArrayRaw = this.props.track.audioBuffer.getChannelData(0);    
-    let dataArray = this.filterData(dataArrayRaw, dataArrayRaw.length / 256);
-    let bufferLength = dataArray.length;
-    //TODO: Нормализовать тихие дорожки
-
-    var sliceWidth = WIDTH / bufferLength;
-    var x = 0;
-    var dy = HEIGHT / 2;
-    
-    //clear
-    canvasCtx.beginPath();
-    canvasCtx.fillStyle =  "#FF8E00";
-    canvasCtx.fillRect(0,0,WIDTH,HEIGHT);
-    canvasCtx.stroke();
-    //init brush
-    canvasCtx.fillStyle = "#ffffff";
-    canvasCtx.strokeStyle = "#ffffff";
-    // canvasCtx.lineWidth = 3;
-    //draw
-    let maxVal = 0
-    for(var i = 0; i < bufferLength; i = i + 1) {
-      var v = dataArray[i];
-      var y = dy + v * dy;
-
-      if(i === 0) {
-        canvasCtx.moveTo(x, y);
-      } else {
-        canvasCtx.lineTo(x, y);
-      }
-      x += sliceWidth;
-
-      if (v > maxVal)
-        maxVal = v;
-    }
-    //fill
-    canvasCtx.lineTo(WIDTH, dy);
-    canvasCtx.stroke();
-  }  
-
-  render() {
-    return <canvas id="audio_canvas_inside" className="user-audio-visualization" width="0" height={this.props.noteHeight}></canvas>
-  }
-  
 }

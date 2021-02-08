@@ -46,11 +46,11 @@ export default class TracksPlayer extends React.Component {
             this.loadUserAudio(this.props.loader.trackIndex, this.props.loader.buffer);
         }
 
-        //Идет проигрышь и изменилось базовое время(предвинули указатель времени), то запустим треки с нужного отрезка
-        if (this.props.baseTimeUpdated !== prevProps.baseTimeUpdated && this.props.playerState === PlayerStates.PLAY) {
+        //Идет проигрышь и изменилось базовое время(предвинули указатель времени) или сдвинулись аудио дорожки, то запустим треки с нужного отрезка
+        if ((this.props.baseTimeUpdated !== prevProps.baseTimeUpdated || this.props.audioTracksPositionChanged !== prevProps.audioTracksPositionChanged) && this.props.playerState === PlayerStates.PLAY) {
             this.stopAllUserAudio();
-            let offest = this.props.baseTime + (Date.now() - this.props.playerStartedAt)
-            this.startAllUserAudio(offest / 1000);
+            let offset = this.props.baseTime + (Date.now() - this.props.playerStartedAt)
+            this.startAllUserAudio(offset / 1000);
         }
     }
 
@@ -173,21 +173,25 @@ export default class TracksPlayer extends React.Component {
         source.start();
     } 
 
-    startAllUserAudio(offest) {    
-        // this.soundBuffer.forEach((item, trackIndex) => {
-        //     if (!!item.audioBuffer && item.audio) {
-        //         item.gainNode.gain.value = this.props.tracks[trackIndex].volume;  
-        //         item.source.start(0,offest);
-        //         item.state = "play";
-        //     }
-        // });
+    startAllUserAudio(offset) { 
         this.soundBuffer.forEach((item, trackIndex) => {
-            if (!!item.audioBuffer && item.audio) {
+            if (!!item.audioBuffer && item.audio) {              
+                let  whenInPx    = this.props.tracks[trackIndex].offset
+                let  whenInSec = whenInPx / ( this.props.bpms * this.props.notesInPartCount *  this.props.noteWidth) / 1000;
+               
+                whenInSec = whenInSec - offset;                
+                if (whenInSec >= 0) {
+                    offset = 0;
+                } else {        
+                    offset = -whenInSec;                                
+                    whenInSec = 0;
+                }
+
                 item.gainNode.gain.value = this.props.tracks[trackIndex].volume;  
                 let source = this.audioCtx.createBufferSource();
                 source.buffer = item.audioBuffer;
                 source.connect(item.gainNode);
-                source.start(0,offest);
+                source.start(this.audioCtx.currentTime + whenInSec,offset);
                 item.state = "play";
                 item.source = source;
             }

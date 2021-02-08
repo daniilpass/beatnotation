@@ -2,7 +2,7 @@ import {SET_REALTIME_RENDER, SET_PLAYER_STATE, SET_PLAYBACK_NOTES, SET_BPM, SET_
     //,INIT_TRACKS
     ,TAKT_COPY, TAKT_PASTE, TAKT_CLEAR, TAKT_DELETE, TAKT_ADD
     ,LOAD_TRACKS, SET_END_OF_TRACK, SET_TRACK_VOLUME, SET_BASETIME
-    ,SET_TRACK_LOADED
+    ,SET_TRACK_LOADED, SET_TRACK_OFFSET
 } from '../types'
 
 import {tracksData} from "../../assets/data/tracksData";
@@ -42,6 +42,7 @@ const initialState = {
     addTaktButtonWidth: 100,
     timePointerWidth: 10,
     //TRAAAAAAAAAACK
+    audioTracksPositionChanged: 0,
     tracks: initTracks({tracksLengthInTakts: 4, notesInTakt: 16}), //TODO: что-то не так делаю явно
     clipboard: []
 }
@@ -80,7 +81,9 @@ export default function editorReducer(state = initialState, action) {
         case SET_BASETIME:
             return setBaseTime(state, action.payload);     
         case SET_TRACK_LOADED:
-            return setTrackLoaded(state, action.payload);           
+            return setTrackLoaded(state, action.payload);  
+        case SET_TRACK_OFFSET:
+            return setTrackOffset(state, action.payload);         
         default:
             return state;
     }
@@ -466,11 +469,29 @@ function setTrackLoaded(state, payload) {
     let tmpTrack = {...tmpTracks[trackIndex]};
     tmpTrack.loaded = loaded;
     tmpTrack.audioBuffer = audioBuffer;
+    tmpTrack.offset = 0;
     tmpTrack.ts = Date.now();
     tmpTracks[trackIndex] = tmpTrack;
 
     return {
         ...state,
+        tracks: tmpTracks
+    }
+}
+
+function setTrackOffset(state, payload) {
+    let trackIndex = payload.index;
+    let offset = payload.offset;
+
+    let tmpTracks = [...state.tracks];
+    let tmpTrack = {...tmpTracks[trackIndex]};   
+    tmpTrack.offset = offset;
+    tmpTrack.ts = Date.now();
+    tmpTracks[trackIndex] = tmpTrack;
+
+    return {
+        ...state,
+        audioTracksPositionChanged: Date.now(),
         tracks: tmpTracks
     }
 }
