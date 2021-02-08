@@ -80,6 +80,10 @@ class TrackControl extends React.Component {
       //console.log(deltaX, deltaY, this.tmpVolume);
     }
 
+    onLoadClick = () => {
+      this.props.onLoadClick();
+    }
+
     render() {  
       //console.log("Render TrackControl");
       return <div className="track-control" style={{width: this.props.width, height: this.props.height}}>
@@ -87,6 +91,7 @@ class TrackControl extends React.Component {
             {this.Volume}
           </div>
           <div className="track-control__title" style={{lineHeight: this.props.height-2+"px"}}>{this.Title}</div>
+         {this.props.track.type === 0 && <button className="track-control__load button" onClick={this.onLoadClick}>Load</button>}
           
       </div>
     }

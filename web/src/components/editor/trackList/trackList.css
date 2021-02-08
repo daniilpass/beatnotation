@@ -65,6 +65,16 @@ TRACK-CONTROL
   }
   
   
+
+  .track-control__load{
+    color: #FFAA40;
+    height: 20px;
+    /* display: inline-block; */
+    float: right;
+    margin-top: 4px;
+    box-shadow: 1px 1px 0px 2px rgb(0 0 0 / 30%);
+  }
+
   /*
   Note
   */
@@ -100,15 +110,18 @@ TRACK-CONTROL
 /*
 * USER_AUDIO
 */
-.user-audio{
+.user-audio-track{
   display: inline-block;
   height: 31px;
   background-color: rgb(80 83 151);
-  cursor: pointer;
+  /* cursor: pointer; */
   border: 1px solid #080E73;
   overflow: hidden;
 }
 
-.user-audio-loaded{
+.user-audio-track-loaded{
   /* background-color: #FF8E00;   */
+}
+.user-audio-visualization{
+  cursor: move;
 }

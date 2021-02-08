@@ -6,10 +6,11 @@ import Takt from "./takt";
 import UserFileReader from "../../userFileReader/userFileReader";
 
 export default class Track extends React.Component {
-    // constructor(props) {
-    //   super(props);
-      
-    // }
+    constructor(props) {
+      super(props);     
+
+      this.fileReaderRef = React.createRef(); 
+    }
   
     shouldComponentUpdate(nextProps, nextState){
       if (this.props.trackControlWidth !== nextProps.trackControlWidth
@@ -26,6 +27,16 @@ export default class Track extends React.Component {
         return true;
       }
       return false;
+    }
+
+    handleLoadClick = () => {
+      this.fileReaderRef.current.selectFile();
+    }
+  
+    handleFileLoaded = (buffer) => {
+      console.log("user audio loaded");
+      //console.log(buffer);
+      this.props.loadUserAudio(this.props.index, buffer);
     }
 
     handleNoteClick = (taktIndex, noteIndex, newlevel) => {
@@ -66,10 +77,12 @@ export default class Track extends React.Component {
       console.log('Render Track');
   
       return <div className="workspace__track" style={{...this.props.style, height: this.props.noteHeight, width:this.props.noteWidth * this.props.tracksLengthInNotes + this.props.trackControlWidth}}>
-        <TrackControl track={this.props.track} width={this.props.trackControlWidth} height={this.props.noteHeight} onVolumeChange={this.onVolumeChange} maxVolume={100}/>
+        <TrackControl track={this.props.track} width={this.props.trackControlWidth} height={this.props.noteHeight} onVolumeChange={this.onVolumeChange} maxVolume={100} 
+                      onLoadClick={this.handleLoadClick}/>
         {
           this.renderTrack()
-        }        
+        }
+        <UserFileReader key="user-audio-track-loader"  ref={this.fileReaderRef} onFileLoaded={this.handleFileLoaded} readAsArrayBuffer accept=".mp3"/>     
       </div>
     }
   }
@@ -78,8 +91,6 @@ export default class Track extends React.Component {
 class AudioTrack extends React.Component {
   constructor(props) {
     super(props);
-
-    this.fileReaderRef = React.createRef();
   }
 
   shouldComponentUpdate(nextProps) {
@@ -89,16 +100,6 @@ class AudioTrack extends React.Component {
       return true;
     }
     return false;
-  }
-
-  handeAudioClick = () => {
-    this.fileReaderRef.current.selectFile();
-  }
-
-  handleFileLoaded = (buffer) => {
-    console.log("user audio loaded");
-    //console.log(buffer);
-    this.props.loadUserAudio(this.props.index, buffer);
   }
 
   get width() {
@@ -111,10 +112,9 @@ class AudioTrack extends React.Component {
 
   render() {
     return [
-    <div key="user-audio" className={"user-audio" + (this.trackLoaded ? " user-audio-loaded" : "")} style={{width: this.width + "px"}} onClick={this.handeAudioClick}>
+    <div key="user-audio-track" className={"user-audio-track" + (this.trackLoaded ? " user-audio-track-loaded" : "")} style={{width: this.width + "px"}}>
       <AudioTrackVisualization {...this.props}/>
-    </div>,
-    <UserFileReader key="user-audio-loader"  ref={this.fileReaderRef} onFileLoaded={this.handleFileLoaded} readAsArrayBuffer accept=".mp3"/>]
+    </div>]
   }
 }
 
@@ -215,7 +215,7 @@ class AudioTrackVisualization extends React.Component {
   }  
 
   render() {
-    return <canvas id="audio_canvas_inside" width={this.width + "px"} height={this.props.noteHeight}></canvas>
+    return <canvas id="audio_canvas_inside" className="user-audio-visualization" width="0" height={this.props.noteHeight}></canvas>
   }
   
 }
