@@ -146,7 +146,7 @@ class Toolbar extends React.Component {
         //load use audio files  
         //TODO: использовать асинхронно, когда появится поддержка нескольких дорожек      
         data.tracks.forEach((track, trackIndex) => {
-            if (track.type === 0) {
+            if (track.type === 0 &&  track.arrayBuffer && track.arrayBuffer.length > 0) {
                 var buffer = new Uint8Array(track.arrayBuffer.slice(0)).buffer;
                 this.props.loadUserAudio(trackIndex, buffer, track.offset);
             }            
