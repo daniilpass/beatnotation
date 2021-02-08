@@ -148,77 +148,69 @@ class AudioTrackVisualization extends React.Component {
     return this.props.track;
   }
 
-  //TODO: improve
-  visualize (canvas_name, di) {
+  filterData = (_buffer, _samples) => {
+    const rawData = _buffer;
+    const samples = _samples;
+    const blockSize = Math.floor(rawData.length / samples);
+    const filteredData = [];
+    for (let i = 0; i < samples; i++) {
+      filteredData.push(rawData[i * blockSize]); 
+    }
+    return filteredData;
+  }
+
+  visualize = (canvas_name) => {
     console.log("Visualize");
+    //Пуолчаю холст
     const canvas  = document.getElementById(canvas_name);
     const canvasCtx = canvas.getContext('2d');
 
-    //Вычисляю длину холста
-    //canvas.width = this.props.
+    //Вычисляю и задаю новую длину холста
     let durationInMs  = this.track.audioBuffer.duration * 1000;
-    let lengthInPx = durationInMs * this.props.bpms * this.props.notesInPartCount *  this.props.noteWidth ;
-    //console.log("===========>", durationInMs, this.props.bpms, this.props.notesInPartCount,  this.props.noteWidth, lengthInPx);
-    console.log("canvas width in px:", lengthInPx)
+    let lengthInPx = durationInMs * this.props.bpms * this.props.notesInPartCount *  this.props.noteWidth;
     canvas.width = lengthInPx;
 
-    // get timelineNote() {
-    //   return this.timestamp * this.props.bpms * this.props.notesInPartCount;
-    // }
-  
-    // get timePointerXPos() {
-    //   return this.timelineNote * this.props.noteWidth - this.props.timePointerWidth/2 + 2 + this.props.trackControlWidth;
-    // }
-
-
+    //Константы размеров холста
     const WIDTH = canvas.width;
     const HEIGHT = canvas.height;
 
-    AudioContext = window.AudioContext || window.webkitAudioContext;
-    const audioContext = new AudioContext();
-    const audioBuffer = this.props.track.audioBuffer
-
-    //Анализатор
-    const analyser = audioContext.createAnalyser();
-    analyser.fftSize = 128;
-
-    const bufferLength = audioBuffer.getChannelData(0).length;
-    var dataArray = new Float32Array(audioBuffer.getChannelData(0));
-    analyser.getFloatTimeDomainData(dataArray);
-
-    //console.log(dataArray.length, bufferLength, dataArray);
+    //Полдготовка данных
+    var dataArrayRaw = this.props.track.audioBuffer.getChannelData(0);    
+    let dataArray = this.filterData(dataArrayRaw, dataArrayRaw.length / 256);
+    let bufferLength = dataArray.length;
+    //TODO: Нормализовать тихие дорожки
 
     var sliceWidth = WIDTH / bufferLength;
     var x = 0;
-    var dy = canvas.height / 2;
-
+    var dy = HEIGHT / 2;
+    
+    //clear
     canvasCtx.beginPath();
     canvasCtx.fillStyle =  "#FF8E00";
     canvasCtx.fillRect(0,0,WIDTH,HEIGHT);
     canvasCtx.stroke();
-    //canvasCtx.clearRect(0,0,WIDTH,HEIGHT);
-
+    //init brush
     canvasCtx.fillStyle = "#ffffff";
     canvasCtx.strokeStyle = "#ffffff";
-    canvasCtx.lineWidth = 1;
+    // canvasCtx.lineWidth = 3;
+    //draw
+    let maxVal = 0
+    for(var i = 0; i < bufferLength; i = i + 1) {
+      var v = dataArray[i];
+      var y = dy + v * dy;
 
-    for(var i = 0; i < bufferLength; i = i + di) {
-        // var v = dataArray[i] * 2;
-        // var y = v + (HEIGHT / 4.0); // Dividing height by 4 places the waveform in the center of the canvas for some reason
+      if(i === 0) {
+        canvasCtx.moveTo(x, y);
+      } else {
+        canvasCtx.lineTo(x, y);
+      }
+      x += sliceWidth;
 
-        var v = dataArray[i];
-        var y = dy + v * ((HEIGHT-4)/2);
-
-        if(i === 0) {
-          canvasCtx.moveTo(x, y);
-        } else {
-          canvasCtx.lineTo(x, y);
-        }
-
-        x += sliceWidth * di;
+      if (v > maxVal)
+        maxVal = v;
     }
-
-    canvasCtx.lineTo(canvas.width, canvas.height / 2);
+    //fill
+    canvasCtx.lineTo(WIDTH, dy);
     canvasCtx.stroke();
   }  
 
