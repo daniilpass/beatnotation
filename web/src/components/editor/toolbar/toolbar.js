@@ -1,7 +1,7 @@
 import React from "react";
 import {connect} from "react-redux";
 
-import {setPlayerState, setRealtimeRender, setPlaybackNotes, setBpm, setTimeSignature, loadTracks, renderNotes, printNotes, loadUserAudio, exportAsWav} from "../../../redux/actions";
+import {setPlayerState, setRealtimeRender, setPlaybackNotes, setBpm, setTimeSignature, loadTracks, renderNotes, printNotes, loadUserAudio, exportAsWav, setAppBusy} from "../../../redux/actions";
 import {CanPlay, CanStop, CanPause, CanSave, CanLoad, CanPrint, CanExport} from "../../../redux/selectors";
 import * as PlayerStates from "../../../redux/dictionary/playerStates";
 
@@ -139,18 +139,30 @@ class Toolbar extends React.Component {
     handleFileLoaded = (content) => {
         console.log("loaded");
 
-        var data = JSON.parse(content);
-        this.props.loadTracks(data);
-        this.props.renderNotes();
+        this.props.setAppBusy(true, "Processing ...");
+        setTimeout(() => {
+            var data = JSON.parse(content);
+            this.props.loadTracks(data);
+            this.props.renderNotes();
+    
+            //load use audio files  
+            //TODO: использовать асинхронно, когда появится поддержка нескольких дорожек      
+            data.tracks.forEach((track, trackIndex) => {
 
-        //load use audio files  
-        //TODO: использовать асинхронно, когда появится поддержка нескольких дорожек      
-        data.tracks.forEach((track, trackIndex) => {
-            if (track.type === 0 &&  track.arrayBuffer && track.arrayBuffer.length > 0) {
-                var buffer = new Uint8Array(track.arrayBuffer.slice(0)).buffer;
-                this.props.loadUserAudio(trackIndex, buffer, track.offset);
-            }            
-        });
+                if (track.type === 0) {
+                    if (track.arrayBuffer && track.arrayBuffer.length > 0) {
+                        var buffer = new Uint8Array(track.arrayBuffer.slice(0)).buffer;
+                        this.props.loadUserAudio(trackIndex, buffer, track.offset);
+                    } else {                       
+                        this.props.loadUserAudio(trackIndex, [], 0);
+                    }
+                    
+                }            
+            });
+    
+            this.props.setAppBusy(false);
+        }, 500)
+        
     }
 
     handlePrint = () => {
@@ -257,4 +269,4 @@ const mapStateToProps = state => {
     return {...editor, canPlay, canStop, canPause, canSave, canLoad, canPrint, canExport};
 }
 
-export default connect(mapStateToProps, {setPlayerState, setRealtimeRender, setPlaybackNotes, setBpm, setTimeSignature, loadTracks, renderNotes, printNotes, loadUserAudio, exportAsWav}) (Toolbar)
+export default connect(mapStateToProps, {setPlayerState, setRealtimeRender, setPlaybackNotes, setBpm, setTimeSignature, loadTracks, renderNotes, printNotes, loadUserAudio, exportAsWav, setAppBusy}) (Toolbar)

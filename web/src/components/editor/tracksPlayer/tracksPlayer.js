@@ -47,6 +47,7 @@ export default class TracksPlayer extends React.Component {
         }
 
         if (this.props.loader.buffer !== prevProps.loader.buffer ) {
+            this.props.setAppBusy(true, "Processing ...");
             this.loadUserAudio(this.props.loader.trackIndex, this.props.loader.buffer, this.props.loader.offset);
         }
 
@@ -64,7 +65,7 @@ export default class TracksPlayer extends React.Component {
 
 
         // Экспорт
-        if (this.props.exportAsWav != prevProps.exportAsWav) {
+        if (this.props.exportAsWav !== prevProps.exportAsWav) {
             this.handleExportAsWav();
         }
     }
