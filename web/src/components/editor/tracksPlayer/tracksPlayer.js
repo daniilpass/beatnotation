@@ -17,8 +17,6 @@ export default class TracksPlayer extends React.Component {
         this.soundBuffer = [];
         this.audioCtx = this.initAudioContext();
         this.resumed = false;
-
-        window.save = this.handleSaveFile;
     }
 
     componentDidMount () {
@@ -62,6 +60,12 @@ export default class TracksPlayer extends React.Component {
 
         if (this.props.audioTracksVolumeChanged !== prevProps.audioTracksVolumeChanged && this.props.playerState === PlayerStates.PLAY) {
             this.updateAllUserAudioVolume();
+        }
+
+
+        // Экспорт
+        if (this.props.exportAsWav != prevProps.exportAsWav) {
+            this.handleExportAsWav();
         }
     }
 
@@ -245,7 +249,7 @@ export default class TracksPlayer extends React.Component {
     ///SAVE TO WAVE
     ///
 
-    handleSaveFile = () => {
+    handleExportAsWav = () => {
         //this.props.setAppBusy(true);
         this.props.setAppBusy(true, "Processing ...");
         setTimeout(() => {this.saveFile()}, 500); //TODO: requestAnimationFrame polifill

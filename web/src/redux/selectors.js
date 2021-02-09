@@ -25,6 +25,10 @@ export const CanLoad = state => {
     return state.editor.playerState === PlayerStates.STOP || state.editor.playerState === PlayerStates.PAUSE;
 }
 
+export const CanExport = state => {
+    return state.editor.playerState === PlayerStates.STOP || state.editor.playerState === PlayerStates.PAUSE;
+}
+
 export const GetBpms = state => {
     return state.editor.bpm / 60 / 1000;
 }

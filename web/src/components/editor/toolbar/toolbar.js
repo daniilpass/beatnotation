@@ -1,8 +1,8 @@
 import React from "react";
 import {connect} from "react-redux";
 
-import {setPlayerState, setRealtimeRender, setPlaybackNotes, setBpm, setTimeSignature, loadTracks, renderNotes, printNotes, loadUserAudio} from "../../../redux/actions";
-import {CanPlay, CanStop, CanPause, CanSave, CanLoad, CanPrint} from "../../../redux/selectors";
+import {setPlayerState, setRealtimeRender, setPlaybackNotes, setBpm, setTimeSignature, loadTracks, renderNotes, printNotes, loadUserAudio, exportAsWav} from "../../../redux/actions";
+import {CanPlay, CanStop, CanPause, CanSave, CanLoad, CanPrint, CanExport} from "../../../redux/selectors";
 import * as PlayerStates from "../../../redux/dictionary/playerStates";
 
 
@@ -158,6 +158,11 @@ class Toolbar extends React.Component {
         this.props.printNotes();
     }
     
+    handleExport = () => {
+        console.log("export");
+        this.props.exportAsWav();
+    }
+
     handleBpmInputChange = (event) => {
         let value = event.target.value;
         value = value === '' ? '1' : value;
@@ -199,9 +204,10 @@ class Toolbar extends React.Component {
                 <button className="app-toolbar__button" onClick={this.handlePlay} disabled={!this.props.canPlay}>Play</button>
                 <button className="app-toolbar__button" onClick={this.handleStop} disabled={!this.props.canStop}>Stop</button>
                 <button className="app-toolbar__button" onClick={this.handlePause} disabled={!this.props.canPause}>Pause</button>
-                <button className="app-toolbar__button" onClick={this.handlePrint} disabled={!this.props.canPrint}>Print notation</button>
-                <button className="app-toolbar__button" onClick={this.handleSave} disabled={!this.props.canSave}>Save project</button>
-                <button className="app-toolbar__button" onClick={this.handleLoad} disabled={!this.props.canLoad}>Load project</button>
+                <button className="app-toolbar__button" onClick={this.handlePrint} disabled={!this.props.canPrint}>Print</button>
+                <button className="app-toolbar__button" onClick={this.handleSave} disabled={!this.props.canSave}>Save</button>
+                <button className="app-toolbar__button" onClick={this.handleLoad} disabled={!this.props.canLoad}>Load</button>
+                <button className="app-toolbar__button" onClick={this.handleExport} disabled={!this.props.canExport}>Export as WAV</button>
 
                 {/* <div className="app-toolbar__part" >
                     Part: {Math.trunc(this.timelineNote) + 1 }
@@ -247,7 +253,8 @@ const mapStateToProps = state => {
     const canSave = CanSave(state);
     const canLoad = CanLoad(state);
     const canPrint = CanPrint(state);
-    return {...editor, canPlay, canStop, canPause, canSave, canLoad, canPrint};
+    const canExport = CanExport(state);
+    return {...editor, canPlay, canStop, canPause, canSave, canLoad, canPrint, canExport};
 }
 
-export default connect(mapStateToProps, {setPlayerState, setRealtimeRender, setPlaybackNotes, setBpm, setTimeSignature, loadTracks, renderNotes, printNotes, loadUserAudio}) (Toolbar)
+export default connect(mapStateToProps, {setPlayerState, setRealtimeRender, setPlaybackNotes, setBpm, setTimeSignature, loadTracks, renderNotes, printNotes, loadUserAudio, exportAsWav}) (Toolbar)

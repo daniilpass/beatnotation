@@ -6,6 +6,7 @@ export const SET_PLAYER_STATE = "SET_PLAYER_STATE";
 export const SET_END_OF_TRACK = "SET_END_OF_TRACK";
 export const SET_BPM = "SET_BPM";
 export const SET_TIME_SIGNATURE = "SET_TIME_SIGNATURE";
+export const EXPORT_AS_WAV = "EXPORT_AS_WAV";
 
 export const INIT_TRACKS = "INIT_TRACKS";
 export const LOAD_TRACKS = "LOAD_TRACKS";

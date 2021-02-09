@@ -3,6 +3,7 @@ import {SET_REALTIME_RENDER, SET_PLAYER_STATE, SET_PLAYBACK_NOTES, SET_BPM, SET_
     ,TAKT_COPY, TAKT_PASTE, TAKT_CLEAR, TAKT_DELETE, TAKT_ADD
     ,LOAD_TRACKS, SET_END_OF_TRACK, SET_TRACK_VOLUME, SET_BASETIME
     ,SET_TRACK_LOADED, SET_TRACK_OFFSET, SET_TRACK_MUTE
+    ,EXPORT_AS_WAV
 } from '../types'
 
 import {tracksData} from "../../assets/data/tracksData";
@@ -42,6 +43,7 @@ const initialState = {
     addTaktButtonWidth: 100,
     timePointerWidth: 10,
     //TRAAAAAAAAAACK
+    exportAsWav: 0,
     audioTracksPositionChanged: 0,
     audioTracksVolumeChanged: 0,
     tracks: initTracks({tracksLengthInTakts: 4, notesInTakt: 16}), //TODO: что-то не так делаю явно
@@ -92,6 +94,8 @@ export default function editorReducer(state = initialState, action) {
             return setTrackOffset(state, action.payload); 
         case SET_TRACK_MUTE:
             return setTrackIsMute(state, action.payload); 
+        case EXPORT_AS_WAV:
+            return exportAsWav(state); 
         default:
             return state;
     }
@@ -522,5 +526,12 @@ function setTrackIsMute (state, payload) {
         ...state,
         audioTracksVolumeChanged: Date.now(),
         tracks: tmpTracks
+    }
+}
+
+function exportAsWav(state) {
+    return {
+        ...state,
+        exportAsWav: Date.now()
     }
 }
