@@ -76,6 +76,17 @@ export default class Editor extends React.Component {
     requestAnimationFrame(() => {
       this.timeTextRef.current.innerText = "Time: " + this.getFormattedTime;
       this.timePointerRef.current.style.left = this.timePointerXPos + "px";
+
+      if (this.props.playerState === PlayerStates.PLAY) {
+        let scrollContainer = this.tracksContainerRef.current;
+        let scrollLeft = scrollContainer.scrollLeft;
+        let timePointerPosOnScreen = this.timePointerXPos - scrollLeft;
+        let clientWidht = document.body.clientWidth;
+  
+        if (timePointerPosOnScreen > clientWidht){
+          scrollContainer.scrollLeft = scrollContainer.scrollLeft + document.body.clientWidth - this.props.trackControlWidth;
+        }
+      }      
     });    
   }
 
