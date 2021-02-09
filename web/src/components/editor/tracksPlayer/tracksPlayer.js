@@ -56,6 +56,10 @@ export default class TracksPlayer extends React.Component {
             let offset = this.props.baseTime + (Date.now() - this.props.playerStartedAt)
             this.startAllUserAudio(offset / 1000);
         }
+
+        if (this.props.audioTracksVolumeChanged !== prevProps.audioTracksVolumeChanged && this.props.playerState === PlayerStates.PLAY) {
+            this.updateAllUserAudioVolume();
+        }
     }
 
     enshureAudioContextBeforeAction = (action) => {
@@ -219,6 +223,14 @@ export default class TracksPlayer extends React.Component {
             if (!!item.audioBuffer && item.audio && item.state ==="play" ) {
                 item.state = "stop";
                 item.source.stop();
+            }
+        });
+    }
+
+    updateAllUserAudioVolume() {
+        this.soundBuffer.forEach((item, trackIndex) => {
+            if (!!item.audioBuffer && item.audio) {
+                item.gainNode.gain.value = this.props.tracks[trackIndex].isMute ? 0 : this.props.tracks[trackIndex].volume;
             }
         });
     }

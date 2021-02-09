@@ -43,6 +43,7 @@ const initialState = {
     timePointerWidth: 10,
     //TRAAAAAAAAAACK
     audioTracksPositionChanged: 0,
+    audioTracksVolumeChanged: 0,
     tracks: initTracks({tracksLengthInTakts: 4, notesInTakt: 16}), //TODO: что-то не так делаю явно
     clipboard: []
 }
@@ -451,6 +452,7 @@ function setTrackVolume (state, payload) {
 
     return {
         ...state,
+        audioTracksVolumeChanged: tmpTrack.type === 0 ? Date.now() : state.audioTracksVolumeChanged,
         tracks: tmpTracks
     }
 }
@@ -513,6 +515,7 @@ function setTrackIsMute (state, payload) {
 
     return {
         ...state,
+        audioTracksVolumeChanged: Date.now(),
         tracks: tmpTracks
     }
 }

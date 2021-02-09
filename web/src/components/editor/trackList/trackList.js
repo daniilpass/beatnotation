@@ -21,7 +21,6 @@ export default class TrackList extends React.Component {
     }
 
     handleTrackVolumeChange = (trackIndex, value) => {
-        console.log("handleTrackVolumeChange", trackIndex, value);
         this.props.setTrackVolume(trackIndex, value);
     }
 
