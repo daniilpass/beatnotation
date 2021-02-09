@@ -93,9 +93,9 @@ export default class Track extends React.Component {
 
 
 class AudioTrack extends React.Component {
-  constructor(props) {
-    super(props);
-  }
+  // constructor(props) {
+  //   super(props);
+  // }
 
   shouldComponentUpdate(nextProps) {
     if (this.props.noteWidth !== nextProps.noteWidth

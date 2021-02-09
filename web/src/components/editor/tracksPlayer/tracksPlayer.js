@@ -15,6 +15,7 @@ export default class TracksPlayer extends React.Component {
       //Init AudioContext
       this.soundBuffer = [];
       this.audioCtx = this.initAudioContext();
+      this.resumed = false;
     }
   
     componentDidMount () {
@@ -25,9 +26,11 @@ export default class TracksPlayer extends React.Component {
         //PLAY STATE
         if (this.props.playerState === PlayerStates.PLAY && prevProps.playerState  !== PlayerStates.PLAY) 
         {
-            console.log("PLAY NOW")    
-            this.timerId = setInterval(this.step, this.stepDelay);
-            this.startAllUserAudio(this.props.baseTime / 1000);
+            console.log("PLAY NOW")      
+            this.enshureAudioContextBeforeAction(() => {
+                this.timerId = setInterval(this.step, this.stepDelay);
+                this.startAllUserAudio(this.props.baseTime / 1000);
+            });            
         } 
         else if (this.props.playerState === PlayerStates.STOP && prevProps.playerState  !== PlayerStates.STOP) 
         {
@@ -52,6 +55,16 @@ export default class TracksPlayer extends React.Component {
             let offset = this.props.baseTime + (Date.now() - this.props.playerStartedAt)
             this.startAllUserAudio(offset / 1000);
         }
+    }
+
+    enshureAudioContextBeforeAction = (action) => {
+        if (this.resumed === false) {
+            console.log("Resume AutioContext");
+            this.resumed = true;
+            this.audioCtx.resume().then(action);
+        } else {
+            action();
+        }   
     }
 
     initAudioContext() {
@@ -164,13 +177,15 @@ export default class TracksPlayer extends React.Component {
     }
 
     playTrackSound(trackIndex) {
-        //set gain
-        this.soundBuffer[trackIndex].gainNode.gain.value = this.props.tracks[trackIndex].volume; 
-        // play sound
-        let source = this.audioCtx.createBufferSource();
-        source.buffer = this.soundBuffer[trackIndex].audioBuffer;
-        source.connect(this.soundBuffer[trackIndex].gainNode);
-        source.start();
+        this.enshureAudioContextBeforeAction(() => {
+            //set gain
+            this.soundBuffer[trackIndex].gainNode.gain.value = this.props.tracks[trackIndex].volume; 
+            // play sound
+            let source = this.audioCtx.createBufferSource();
+            source.buffer = this.soundBuffer[trackIndex].audioBuffer;
+            source.connect(this.soundBuffer[trackIndex].gainNode);
+            source.start();
+        });        
     } 
 
     startAllUserAudio(offset) { 
