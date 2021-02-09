@@ -193,7 +193,7 @@ export default class Editor extends React.Component {
         <ButtonAddTakt {...this.props}/>
       </div>
 
-      <BusyIndicator busy={this.props.app.busy}/>
+      <BusyIndicator busy={this.props.app.busy} text={this.props.app.text}/>
     </div>
   }
 }

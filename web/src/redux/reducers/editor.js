@@ -49,7 +49,12 @@ const initialState = {
 }
 
 export default function editorReducer(state = initialState, action) {
-    console.log("store reducer", action);
+    if (process.env.NODE_ENV !== 'production') {
+        console.log("store reducer", action);
+    }
+    
+
+
     switch (action.type) {
         case SET_PLAYER_STATE:
             return setPlayerState(state, action.payload);

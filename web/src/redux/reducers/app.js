@@ -16,6 +16,7 @@ export default function appReducer(state = initialState, action) {
 function setAppBusy(state, payload) {
     return {
         ...state,
-        busy: payload.busy
+        busy: payload.busy,
+        text: payload.text || ""
     }
 }

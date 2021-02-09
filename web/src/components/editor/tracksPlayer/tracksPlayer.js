@@ -1,25 +1,24 @@
 import React from "react";
 import axios from 'axios';
 
-import {setAppBusy} from "../../../redux/actions";
 import * as PlayerStates from "../../../redux/dictionary/playerStates";
 import {audioBufferToWave} from "../../../utils/audioUtils";
 
 export default class TracksPlayer extends React.Component {
     constructor(props) {
-      super(props)
+        super(props)
 
-      //Player vars
-      this.timerId = 0;
-      this.stepDelay = 20;
-      this.prevNoteIndex = -1;
+        //Player vars
+        this.timerId = 0;
+        this.stepDelay = 20;
+        this.prevNoteIndex = -1;
 
-      //Init AudioContext
-      this.soundBuffer = [];
-      this.audioCtx = this.initAudioContext();
-      this.resumed = false;
+        //Init AudioContext
+        this.soundBuffer = [];
+        this.audioCtx = this.initAudioContext();
+        this.resumed = false;
 
-      window.save = this.handleSaveFile;
+        window.save = this.handleSaveFile;
     }
 
     componentDidMount () {
@@ -248,7 +247,7 @@ export default class TracksPlayer extends React.Component {
 
     handleSaveFile = () => {
         //this.props.setAppBusy(true);
-        this.props.setAppBusy(true);
+        this.props.setAppBusy(true, "Processing ...");
         setTimeout(() => {this.saveFile()}, 500); //TODO: requestAnimationFrame polifill
        
     }
@@ -289,13 +288,36 @@ export default class TracksPlayer extends React.Component {
         // Создаю микс буффер
         let mixBuffer = this.audioCtx.createBuffer(channels, mixLength, sampleRate);
 
+        this.saveFileProcessChunk(16000, 0,0, channels, sampleRate, mixBuffer, mixLength, tracks,
+            () => {
+                // Генерация wave файла
+                let waveBlob = audioBufferToWave(mixBuffer, mixLength)
+
+                //TODO: convert to mp3
+
+                // Загрузка на устройство
+                let filename = "BeatNotation_"+Date.now()+".wav";
+                const a = document.createElement('a');
+                a.href= URL.createObjectURL(waveBlob);
+                a.download = filename;
+                a.click();
+
+                console.log("Download file",  Date.now()-startTs, "ms.");
+                this.props.setAppBusy(false);
+            }
+        );        
+    }
+
+    saveFileProcessChunk = (maxStepInFrame, channelIndex, curSampleIndex, channels, sampleRate, mixBuffer, mixLength, tracks, onFinished) => {
+        let chunkCounter = 0;
+
         // Заполнение микс буфера по канально
-        for (var channel = 0; channel < channels; channel++) {
+        for (let channel = channelIndex; channel < channels; channel++) {
             // Получаем массив данных канала из микс трека
-            var mixBufferChannelData = mixBuffer.getChannelData(channel);
+            let mixBufferChannelData = mixBuffer.getChannelData(channel);
 
             // Сводим дорожки в микс трек
-            for (var sampleIndex = 0; sampleIndex < mixLength; sampleIndex++) {
+            for (let sampleIndex = curSampleIndex; sampleIndex < mixLength; sampleIndex++) {
                 // аудио должно быть в интервале [-1.0; 1.0]
                 for (let trackIndex = 0; trackIndex < tracks.length; trackIndex++) {
                     const track = tracks[trackIndex];
@@ -305,27 +327,27 @@ export default class TracksPlayer extends React.Component {
                         this.writeTrackSampleToBuffer(trackIndex, sampleIndex, sampleRate, mixLength, mixBufferChannelData, tracks, channel);
                     }                    
                 }
-            }
+
+                chunkCounter++;
+                if (chunkCounter > maxStepInFrame) {
+                    //console.log("====> WHAIT NEXT FRAME");
+                    let progress = Math.trunc((sampleIndex /mixLength) * 100 + (channel === 2 ? 50 : 0))
+                    this.props.setAppBusy(true, "Processing "+progress+"%");
+                    window.requestAnimationFrame(() => {
+                        this.saveFileProcessChunk(maxStepInFrame, channel, sampleIndex, channels, sampleRate, mixBuffer, mixLength, tracks, onFinished)
+                    });
+                    // setTimeout(()=>{
+                    //     window.requestAnimationFrame(() => {
+                    //         this.saveFileProcessChunk(maxStepInFrame, channel, sampleIndex, channels, sampleRate, mixBuffer, mixLength, tracks, onFinished)
+                    //     });
+                    // },50)
+                    
+                    return;
+                }
+            }            
         }   
 
-        // Генерация wave файла
-        let waveBlob = audioBufferToWave(mixBuffer, mixLength)
-
-        //TODO: convert to mp3
-
-        // Загрузка на устройство
-        let filename = "BeatNotation_"+Date.now()+".wav";
-        const a = document.createElement('a');
-        a.href= URL.createObjectURL(waveBlob);
-        a.download = filename;
-        a.click();
-
-        console.log("Download file",  Date.now()-startTs, "ms.");
-        this.props.setAppBusy(false);
-    }
-
-    saveFileProcessChunk = (onFinished) => {
-
+        onFinished();  
     }
 
     writeTrackSampleToBuffer = (trackIndex, sampleIndex, sampleRate, mixLength, mixBufferChannelData, tracks, channelIndex) => {  
@@ -358,7 +380,7 @@ export default class TracksPlayer extends React.Component {
         let track = tracks[trackIndex];
 
         // Проверка, что дорожка не была обработана ранее или без звука
-        if ("-9" + channelIndex === track.processed || (!!this.soundBuffer[trackIndex].audio == false) ) {
+        if ("-9" + channelIndex === track.processed || (!!this.soundBuffer[trackIndex].audio === false) ) {
             return;
         }
 
@@ -407,7 +429,6 @@ export default class TracksPlayer extends React.Component {
             mixBufferChannelData[sampleIndex + trackSampleIndex] = value;
         }
     }
-
 
     ///
     /// GETTERS
