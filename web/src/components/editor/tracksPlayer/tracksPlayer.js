@@ -262,6 +262,7 @@ export default class TracksPlayer extends React.Component {
 
         // Данные для обработки (копия трэков)
         let tracks = [...this.props.tracks];
+        
         tracks.forEach( (track, index) => {
             let tmpTrack = {...track};
 
@@ -287,7 +288,7 @@ export default class TracksPlayer extends React.Component {
 
         // Вычисляю размер микс буфреа
         let mixLength = Math.round(sampleRate * mixLengthInSec);
-        console.log({mixLengthInSec, mixLength });
+        //console.log({mixLengthInSec, mixLength });
 
         // Создаю микс буффер
         let mixBuffer = this.audioCtx.createBuffer(channels, mixLength, sampleRate);
@@ -325,6 +326,12 @@ export default class TracksPlayer extends React.Component {
                 // аудио должно быть в интервале [-1.0; 1.0]
                 for (let trackIndex = 0; trackIndex < tracks.length; trackIndex++) {
                     const track = tracks[trackIndex];
+
+                    // Пропускаем заглушенные
+                    if (!!track.isMute) {
+                        continue;
+                    }
+
                     if (track.type === 0) {
                         this.writeUserAudioToBuffer(trackIndex, sampleIndex, sampleRate, mixLength, mixBufferChannelData, tracks, channel);
                     } else {
@@ -335,7 +342,7 @@ export default class TracksPlayer extends React.Component {
                 chunkCounter++;
                 if (chunkCounter > maxStepInFrame) {
                     //console.log("====> WHAIT NEXT FRAME");
-                    let progress = Math.trunc((sampleIndex /mixLength) * 100 + (channel === 2 ? 50 : 0))
+                    let progress = Math.trunc((sampleIndex / (mixLength * channels)) * 100 + (channel === 1 ? 50 : 0))
                     this.props.setAppBusy(true, "Processing "+progress+"%");
                     window.requestAnimationFrame(() => {
                         this.saveFileProcessChunk(maxStepInFrame, channel, sampleIndex, channels, sampleRate, mixBuffer, mixLength, tracks, onFinished)
@@ -348,7 +355,9 @@ export default class TracksPlayer extends React.Component {
                     
                     return;
                 }
-            }            
+            } 
+              
+            curSampleIndex = 0;
         }   
 
         onFinished();  
