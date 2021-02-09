@@ -381,8 +381,11 @@ export default class TracksPlayer extends React.Component {
             return;
         }
 
+        //Звук
+        let volume = track.volume;
+
         // Запись аудио буфера в микс
-        this.writeTrackBufferToOutputBuffert(trackIndex, sampleIndex, mixLength, channelIndex, mixBufferChannelData);
+        this.writeTrackBufferToOutputBuffert(trackIndex, sampleIndex, mixLength, channelIndex, mixBufferChannelData, volume);
 
         // Флаг, что дорожка обработана
         track.takts[taktIndex].notes[noteInTaktIndex] = "-9"+channelIndex;
@@ -405,14 +408,17 @@ export default class TracksPlayer extends React.Component {
             return;
         }
 
+        //Звук
+        let volume = track.volume;
+
         // Запись аудио буфера в микс
-        this.writeTrackBufferToOutputBuffert(trackIndex, sampleIndex, mixLength, channelIndex, mixBufferChannelData);
+        this.writeTrackBufferToOutputBuffert(trackIndex, sampleIndex, mixLength, channelIndex, mixBufferChannelData, volume);
 
         // Флаг, что дорожка обработана
         track.processed = "-9"+channelIndex; // Т.к. аудиодорожка одна на трек, то флаг общий для всего трека
     }
 
-    writeTrackBufferToOutputBuffert (trackIndex, sampleIndex, mixLength, channelIndex, mixBufferChannelData) {
+    writeTrackBufferToOutputBuffert (trackIndex, sampleIndex, mixLength, channelIndex, mixBufferChannelData, volume) {
         //Определяю input канал
         let inputChannel = 0;
         if (channelIndex + 1 <= this.soundBuffer[trackIndex].audioBuffer.numberOfChannels) {
@@ -430,7 +436,7 @@ export default class TracksPlayer extends React.Component {
 
         for (let trackSampleIndex = 0; trackSampleIndex < trackBufferLength; trackSampleIndex++) {
             let value = mixBufferChannelData[sampleIndex + trackSampleIndex];
-            value = value + trackBufferData[trackSampleIndex];
+            value = value + trackBufferData[trackSampleIndex] * volume;
 
             if (value > 1) {
                 value = 1;
