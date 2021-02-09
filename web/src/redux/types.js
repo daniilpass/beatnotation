@@ -28,3 +28,6 @@ export const PRINT_NOTES = "PRINT_NOTES";
 
 //LOADER
 export const LOAD_USER_AUDIO = "LOAD_USER_AUDIO";
+
+//APP
+export const SET_APP_BUSY = "SET_APP_BUSY";

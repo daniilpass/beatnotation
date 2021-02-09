@@ -1,7 +1,9 @@
 import React from "react";
 import axios from 'axios';
 
+import {setAppBusy} from "../../../redux/actions";
 import * as PlayerStates from "../../../redux/dictionary/playerStates";
+import {audioBufferToWave} from "../../../utils/audioUtils";
 
 export default class TracksPlayer extends React.Component {
     constructor(props) {
@@ -16,8 +18,10 @@ export default class TracksPlayer extends React.Component {
       this.soundBuffer = [];
       this.audioCtx = this.initAudioContext();
       this.resumed = false;
+
+      window.save = this.handleSaveFile;
     }
-  
+
     componentDidMount () {
         this.initSoundBuffer();
     }
@@ -87,6 +91,7 @@ export default class TracksPlayer extends React.Component {
             }
 
             this.loadAudioSample(_track.audioUrl, audioBuffer => {
+                    //console.log('_track.audioUrl', audioBuffer);
                     this.setSoundBufferForTrack(trackIndex, audioBuffer);
                 })      
         });
@@ -105,6 +110,7 @@ export default class TracksPlayer extends React.Component {
         this.props.setTrackLoaded(trackIndex, false, [], offset);
         this.audioCtx.decodeAudioData(arrayBuffer.slice(0), 
             audioBuffer => {
+                console.log('user/audio',audioBuffer);
                 this.setSoundBufferForTrack(trackIndex, audioBuffer, {audio: true});
                 this.props.setTrackLoaded(trackIndex, true, arrayBuffer.slice(0), offset);
             }, 
@@ -235,6 +241,177 @@ export default class TracksPlayer extends React.Component {
         });
     }
 
+
+    ///
+    ///SAVE TO WAVE
+    ///
+
+    handleSaveFile = () => {
+        //this.props.setAppBusy(true);
+        this.props.setAppBusy(true);
+        setTimeout(() => {this.saveFile()}, 500); //TODO: requestAnimationFrame polifill
+       
+    }
+
+    saveFile = () => {
+        let startTs = Date.now();
+        console.log("Save file", startTs);
+
+        // Данные для обработки (копия трэков)
+        let tracks = [...this.props.tracks];
+        tracks.forEach( (track, index) => {
+            let tmpTrack = {...track};
+
+            if (tmpTrack.type === 0) {
+                return;
+            }
+
+            tmpTrack.takts = [...track.takts];
+            tmpTrack.takts.forEach( (_takt, index) => {
+                let tmpTakt = {..._takt}
+                tmpTakt.notes = [..._takt.notes];
+                tmpTrack.takts[index] = tmpTakt;
+            });
+            tracks[index] = tmpTrack;
+        });
+
+        // Параметры микс буфера
+        let channels = 2;
+        let sampleRate = this.audioCtx.sampleRate;
+
+        // Вычисляю длину микс трека
+        let mixLengthInSec = this.props.tracksLengthInNotes / this.props.notesInPartCount / (this.props.bpm / 60);
+
+        // Вычисляю размер микс буфреа
+        let mixLength = Math.round(sampleRate * mixLengthInSec);
+        console.log({mixLengthInSec, mixLength });
+
+        // Создаю микс буффер
+        let mixBuffer = this.audioCtx.createBuffer(channels, mixLength, sampleRate);
+
+        // Заполнение микс буфера по канально
+        for (var channel = 0; channel < channels; channel++) {
+            // Получаем массив данных канала из микс трека
+            var mixBufferChannelData = mixBuffer.getChannelData(channel);
+
+            // Сводим дорожки в микс трек
+            for (var sampleIndex = 0; sampleIndex < mixLength; sampleIndex++) {
+                // аудио должно быть в интервале [-1.0; 1.0]
+                for (let trackIndex = 0; trackIndex < tracks.length; trackIndex++) {
+                    const track = tracks[trackIndex];
+                    if (track.type === 0) {
+                        this.writeUserAudioToBuffer(trackIndex, sampleIndex, sampleRate, mixLength, mixBufferChannelData, tracks, channel);
+                    } else {
+                        this.writeTrackSampleToBuffer(trackIndex, sampleIndex, sampleRate, mixLength, mixBufferChannelData, tracks, channel);
+                    }                    
+                }
+            }
+        }   
+
+        // Генерация wave файла
+        let waveBlob = audioBufferToWave(mixBuffer, mixLength)
+
+        //TODO: convert to mp3
+
+        // Загрузка на устройство
+        let filename = "BeatNotation_"+Date.now()+".wav";
+        const a = document.createElement('a');
+        a.href= URL.createObjectURL(waveBlob);
+        a.download = filename;
+        a.click();
+
+        console.log("Download file",  Date.now()-startTs, "ms.");
+        this.props.setAppBusy(false);
+    }
+
+    saveFileProcessChunk = (onFinished) => {
+
+    }
+
+    writeTrackSampleToBuffer = (trackIndex, sampleIndex, sampleRate, mixLength, mixBufferChannelData, tracks, channelIndex) => {  
+        // Трек для чтения
+        let track = tracks[trackIndex];
+
+        // Временные метки
+        let timestamp = (sampleIndex / sampleRate) * 1000; // sample to ms timesatmp
+        let noteIndex = Math.trunc(timestamp * this.props.bpms * this.props.notesInPartCount); // timestamp  to note index
+        let taktIndex = Math.trunc(noteIndex / this.props.notesInTakt);
+        let noteInTaktIndex = noteIndex % this.props.notesInTakt;
+        
+        // Значение ноты (есть, нет, обработана)
+        let noteValue = track.takts[taktIndex].notes[noteInTaktIndex];
+
+        // Если нота обработана для канала или не звучит, то  выхожу
+        if ("-9" + channelIndex === noteValue || noteValue === 0) {
+            return;
+        }
+
+        // Запись аудио буфера в микс
+        this.writeTrackBufferToOutputBuffert(trackIndex, sampleIndex, mixLength, channelIndex, mixBufferChannelData);
+
+        // Флаг, что дорожка обработана
+        track.takts[taktIndex].notes[noteInTaktIndex] = "-9"+channelIndex;
+    }
+
+    writeUserAudioToBuffer = (trackIndex, sampleIndex, sampleRate, mixLength, mixBufferChannelData, tracks, channelIndex) => {  
+        // Трек для чтения
+        let track = tracks[trackIndex];
+
+        // Проверка, что дорожка не была обработана ранее или без звука
+        if ("-9" + channelIndex === track.processed || (!!this.soundBuffer[trackIndex].audio == false) ) {
+            return;
+        }
+
+        // Временные метки
+        let timestamp = (sampleIndex / sampleRate) * 1000; // sample to ms timesatmp
+
+        // Если трэк еще не должен звучать, то выхожу
+        if (timestamp < track.offset) {
+            return;
+        }
+
+        // Запись аудио буфера в микс
+        this.writeTrackBufferToOutputBuffert(trackIndex, sampleIndex, mixLength, channelIndex, mixBufferChannelData);
+
+        // Флаг, что дорожка обработана
+        track.processed = "-9"+channelIndex; // Т.к. аудиодорожка одна на трек, то флаг общий для всего трека
+    }
+
+    writeTrackBufferToOutputBuffert (trackIndex, sampleIndex, mixLength, channelIndex, mixBufferChannelData) {
+        //Определяю input канал
+        let inputChannel = 0;
+        if (channelIndex + 1 <= this.soundBuffer[trackIndex].audioBuffer.numberOfChannels) {
+            inputChannel = channelIndex;
+        }
+
+        // Буффер трэка
+        let trackBufferData = this.soundBuffer[trackIndex].audioBuffer.getChannelData(inputChannel);
+
+        // Запись в микс буфер
+        let trackBufferLength = trackBufferData.length;
+        if (sampleIndex + trackBufferLength > mixLength) {
+            trackBufferLength = mixLength - sampleIndex; //Избегаем переполнения исходного буфера
+        }
+
+        for (let trackSampleIndex = 0; trackSampleIndex < trackBufferLength; trackSampleIndex++) {
+            let value = mixBufferChannelData[sampleIndex + trackSampleIndex];
+            value = value + trackBufferData[trackSampleIndex];
+
+            if (value > 1) {
+                value = 1;
+            }
+            if (value < -1){
+                value = -1;
+            }
+            
+            mixBufferChannelData[sampleIndex + trackSampleIndex] = value;
+        }
+    }
+
+
+    ///
+    /// GETTERS
+    ///
     //TODO: дубликат когда и editor.js ((
     get timestamp() {
         if (this.props.playerState === PlayerStates.STOP || this.props.playerState === PlayerStates.PAUSE) {

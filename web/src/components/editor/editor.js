@@ -7,6 +7,7 @@ import Timeline from "./timeline/timeline";
 import TaktControls from "./taktControls/taktControls";
 import ButtonAddTakt from "./buttonAddTakt/buttonAddTakt";
 import TrackList from "./trackList/trackList";
+import BusyIndicator from "../controls/busyIndicator/busyIndicator";
 
 const requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame;
 
@@ -192,6 +193,7 @@ export default class Editor extends React.Component {
         <ButtonAddTakt {...this.props}/>
       </div>
 
+      <BusyIndicator busy={this.props.app.busy}/>
     </div>
   }
 }
