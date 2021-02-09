@@ -1,4 +1,5 @@
 import React from "react";
+import MuteButton from "../../controls/muteButton/muteButton";
 
 const requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame;
 
@@ -30,6 +31,10 @@ class TrackControl extends React.Component {
       return this.props.maxVolume || 100;
     }
 
+    get isMuted() {
+      return this.props.track.isMute;
+    }
+
     componentDidMount() {
       this.tcVolume.current.onmousedown = this.dragMouseDown;
     }
@@ -37,7 +42,8 @@ class TrackControl extends React.Component {
     shouldComponentUpdate(prevPros, prevState) {
       // console.log('shouldComponentUpdate', this.props, prevPros);
       if (this.props.track.volume !== prevPros.track.volume
-        || this.state.tmpVolume !== prevState.tmpVolume) {
+        || this.state.tmpVolume !== prevState.tmpVolume
+        || this.props.track.isMute !== prevPros.track.isMute) {
         return true;
       }
 
@@ -84,6 +90,10 @@ class TrackControl extends React.Component {
       this.props.onLoadClick();
     }
 
+    handleTrackIsMuteClick = () => {
+      this.props.onTrackIsMute();
+    }
+
     render() {  
       //console.log("Render TrackControl");
       return <div className="track-control" style={{width: this.props.width, height: this.props.height}}>
@@ -91,8 +101,8 @@ class TrackControl extends React.Component {
             {this.Volume}
           </div>
           <div className="track-control__title" style={{lineHeight: this.props.height-2+"px"}}>{this.Title}</div>
-         {this.props.track.type === 0 && <button className="track-control__load button" onClick={this.onLoadClick}>Load</button>}
-          
+          <MuteButton onClick={this.handleTrackIsMuteClick} isMuted={this.isMuted}/>
+          {this.props.track.type === 0 && <button className="track-control__load button" onClick={this.onLoadClick}>Load</button>}
       </div>
     }
   }

@@ -179,7 +179,7 @@ export default class TracksPlayer extends React.Component {
     playTrackSound(trackIndex) {
         this.enshureAudioContextBeforeAction(() => {
             //set gain
-            this.soundBuffer[trackIndex].gainNode.gain.value = this.props.tracks[trackIndex].volume; 
+            this.soundBuffer[trackIndex].gainNode.gain.value = this.props.tracks[trackIndex].isMute ? 0 : this.props.tracks[trackIndex].volume;
             // play sound
             let source = this.audioCtx.createBufferSource();
             source.buffer = this.soundBuffer[trackIndex].audioBuffer;
@@ -202,7 +202,7 @@ export default class TracksPlayer extends React.Component {
                     whenInSec = 0;
                 }
 
-                item.gainNode.gain.value = this.props.tracks[trackIndex].volume;  
+                item.gainNode.gain.value = this.props.tracks[trackIndex].isMute ? 0 : this.props.tracks[trackIndex].volume;  
                 let source = this.audioCtx.createBufferSource();
                 source.buffer = item.audioBuffer;
                 source.connect(item.gainNode);

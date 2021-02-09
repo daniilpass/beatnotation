@@ -25,6 +25,10 @@ export default class TrackList extends React.Component {
         this.props.setTrackVolume(trackIndex, value);
     }
 
+    handleTrackIsMuteChange = (trackIndex) => {
+        this.props.setTrackIsMute(trackIndex);
+    }
+
     onNoteClick = (trackIndex, taktIndex, noteIndex, level) => {
         this.props.onNoteClick && this.props.onNoteClick(trackIndex, taktIndex, noteIndex, level);
     }
@@ -37,7 +41,7 @@ export default class TrackList extends React.Component {
                             trackControlWidth={this.props.trackControlWidth} addTaktButtonWidth={this.props.addTaktButtonWidth} 
                             tracksLengthInNotes={this.props.tracksLengthInNotes} tracksLengthInTakts={this.props.tracksLengthInTakts} 
                             timeSignature={this.props.timeSignature} track={_track} ts={_track.ts}                             
-                            noteClick={this.onNoteClick}  onVolumeChange={this.handleTrackVolumeChange} 
+                            noteClick={this.onNoteClick}  onVolumeChange={this.handleTrackVolumeChange} onTrackIsMute={this.handleTrackIsMuteChange}
                             loadUserAudio={this.props.loadUserAudio}
                             bpms = {this.props.bpms} notesInPartCount={this.props.notesInPartCount} setTrackOffset={this.props.setTrackOffset}/>
             })

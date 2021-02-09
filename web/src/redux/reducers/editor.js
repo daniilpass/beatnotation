@@ -2,7 +2,7 @@ import {SET_REALTIME_RENDER, SET_PLAYER_STATE, SET_PLAYBACK_NOTES, SET_BPM, SET_
     //,INIT_TRACKS
     ,TAKT_COPY, TAKT_PASTE, TAKT_CLEAR, TAKT_DELETE, TAKT_ADD
     ,LOAD_TRACKS, SET_END_OF_TRACK, SET_TRACK_VOLUME, SET_BASETIME
-    ,SET_TRACK_LOADED, SET_TRACK_OFFSET
+    ,SET_TRACK_LOADED, SET_TRACK_OFFSET, SET_TRACK_MUTE
 } from '../types'
 
 import {tracksData} from "../../assets/data/tracksData";
@@ -83,7 +83,9 @@ export default function editorReducer(state = initialState, action) {
         case SET_TRACK_LOADED:
             return setTrackLoaded(state, action.payload);  
         case SET_TRACK_OFFSET:
-            return setTrackOffset(state, action.payload);         
+            return setTrackOffset(state, action.payload); 
+        case SET_TRACK_MUTE:
+            return setTrackIsMute(state, action.payload); 
         default:
             return state;
     }
@@ -377,6 +379,7 @@ function loadTracks(state, payload) {
         const loadedTrack = data.tracks[it];
 
         tmpTrack.volume = loadedTrack.volume; 
+        tmpTrack.isMute = loadedTrack.isMute; 
         tmpTrack.ts = Date.now();
         if (state.tracks[it].type === 0) {
             //загрузка пользовательского трека
@@ -494,6 +497,22 @@ function setTrackOffset(state, payload) {
     return {
         ...state,
         audioTracksPositionChanged: Date.now(),
+        tracks: tmpTracks
+    }
+}
+
+
+function setTrackIsMute (state, payload) {
+    let trackIndex = payload.index;
+
+    let tmpTracks = [...state.tracks];
+    let tmpTrack = {...tmpTracks[trackIndex]};   
+    tmpTrack.isMute = !tmpTrack.isMute;
+    tmpTrack.ts = Date.now();
+    tmpTracks[trackIndex] = tmpTrack;
+
+    return {
+        ...state,
         tracks: tmpTracks
     }
 }

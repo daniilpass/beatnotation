@@ -125,3 +125,10 @@ TRACK-CONTROL
 .user-audio-visualization{
   cursor: move;
 }
+
+.track-control .mute-button{
+  margin-top: 4px;
+  float: right;
+  margin-right: 8px;
+  padding: 8px 0;
+}

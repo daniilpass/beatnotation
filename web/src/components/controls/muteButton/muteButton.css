@@ -1,0 +1,20 @@
+
+
+.mute-button {
+    cursor: pointer;
+}
+
+.mute-button .mute-button__switch {    
+    width: 15px;
+    height: 5px;
+    box-shadow: 2px 2px 0px rgb(0 0 0 / 30%);
+    /* box-shadow: 1px 1px 0px 2px rgb(0 0 0 / 30%); */
+}
+
+.mute-button--muted .mute-button__switch {
+    background-color: #BF3A30;
+}
+
+.mute-button--unmuted .mute-button__switch {
+    background-color: #329D27
+}

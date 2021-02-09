@@ -53,6 +53,10 @@ export default class Track extends React.Component {
       this.props.onVolumeChange && this.props.onVolumeChange(this.props.index, value);
     }
 
+    onTrackIsMute = () => {
+      this.props.onTrackIsMute && this.props.onTrackIsMute(this.props.index);
+    }
+
     renderTrack() {
       if (this.props.track.type !== 0) {
         return this.renderTakts()
@@ -83,7 +87,7 @@ export default class Track extends React.Component {
   
       return <div className="workspace__track" style={{...this.props.style, height: this.props.noteHeight, width:this.props.noteWidth * this.props.tracksLengthInNotes + this.props.trackControlWidth}}>          
         <TrackControl track={this.props.track} width={this.props.trackControlWidth} height={this.props.noteHeight} onVolumeChange={this.onVolumeChange} maxVolume={100} 
-                      onLoadClick={this.handleLoadClick}/>
+                      onLoadClick={this.handleLoadClick} onTrackIsMute={this.onTrackIsMute}/>
         {
           this.renderTrack()
         }           
