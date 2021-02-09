@@ -50,6 +50,7 @@ export default class TracksPlayer extends React.Component {
         }
 
         //Идет проигрышь и изменилось базовое время(предвинули указатель времени) или сдвинулись аудио дорожки, то запустим треки с нужного отрезка
+        //TODO: при изменении mute тоже перезапускать дорожки
         if ((this.props.baseTimeUpdated !== prevProps.baseTimeUpdated || this.props.audioTracksPositionChanged !== prevProps.audioTracksPositionChanged) && this.props.playerState === PlayerStates.PLAY) {
             this.stopAllUserAudio();
             let offset = this.props.baseTime + (Date.now() - this.props.playerStartedAt)
