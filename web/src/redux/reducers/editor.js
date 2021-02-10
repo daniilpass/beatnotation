@@ -182,10 +182,9 @@ function setTimeSignature(state, payload) {
 
     // updateNotesSacle
     //Масштабируем размер нот так, чтобы помещались элементы управления такта
-    let newNoteWidth = state.defaultNotewWidth;
-    let estimatedTaktWidth = state.noteWidth * newNotesInTakt;
-    if (estimatedTaktWidth < state.minTaktControlWidth) {
-        newNoteWidth = Math.ceil(state.minTaktControlWidth / newNotesInTakt)
+    let newNoteWidth = Math.ceil(state.minTaktControlWidth / newNotesInTakt);
+    if (newNoteWidth < state.defaultNotewWidth) {
+        newNoteWidth = state.defaultNotewWidth;
     }
 
     // Изменение структуры трека
@@ -440,10 +439,9 @@ function loadTracks(state, payload) {
 
     //updateNotesSacle
     //Масштабируем размер нот так, чтобы помещались элементы управления такта
-    let newNoteWidth = state.defaultNotewWidth;
-    let estimatedTaktWidth = state.noteWidth * newNotesInTakt;
-    if (estimatedTaktWidth < state.minTaktControlWidth) {
-        newNoteWidth = Math.ceil(state.minTaktControlWidth / newNotesInTakt)
+    let newNoteWidth = Math.ceil(state.minTaktControlWidth / newNotesInTakt);
+    if (newNoteWidth < state.defaultNotewWidth) {
+        newNoteWidth = state.defaultNotewWidth;
     }
 
     return {
