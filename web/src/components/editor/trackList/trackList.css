@@ -75,6 +75,11 @@ TRACK-CONTROL
     box-shadow: 1px 1px 0px 2px rgb(0 0 0 / 30%);
   }
 
+  .track-control__load.button:disabled {
+    background-color: #2F3485;
+    color: rgb(0 0 0 / 30%);
+  }
+
   /*
   Note
   */

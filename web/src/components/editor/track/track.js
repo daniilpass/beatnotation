@@ -25,7 +25,8 @@ export default class Track extends React.Component {
         || this.props.style !== nextProps.style
         || this.props.ts !== nextProps.ts
         || this.props.bpms !== nextProps.bpms
-        || this.props.notesInPartCount !== nextProps.notesInPartCount) {
+        || this.props.notesInPartCount !== nextProps.notesInPartCount
+        || this.props.canImportAudio !== nextProps.canImportAudio) {
         return true;
       }
       return false;
@@ -87,7 +88,7 @@ export default class Track extends React.Component {
   
       return <div className="workspace__track" style={{...this.props.style, height: this.props.noteHeight, width:this.props.noteWidth * this.props.tracksLengthInNotes + this.props.trackControlWidth}}>          
         <TrackControl track={this.props.track} width={this.props.trackControlWidth} height={this.props.noteHeight} onVolumeChange={this.onVolumeChange} maxVolume={100} 
-                      onLoadClick={this.handleLoadClick} onTrackIsMute={this.onTrackIsMute}/>
+                      onLoadClick={this.handleLoadClick} onTrackIsMute={this.onTrackIsMute} canImportAudio={this.props.canImportAudio}/>
         {
           this.renderTrack()
         }           

@@ -15,7 +15,8 @@ export default class TrackList extends React.Component {
             || this.props.tracksLengthInNotes !== nextProps.tracksLengthInNotes            
             || this.props.tracksLengthInTakts !== nextProps.tracksLengthInTakts            
             || this.props.timeSignature !== nextProps.timeSignature
-            || this.props.tracks !== nextProps.tracks) {
+            || this.props.tracks !== nextProps.tracks
+            || this.props.canImportAudio !== nextProps.canImportAudio) {
         return true;
       }
       return false;
@@ -43,7 +44,8 @@ export default class TrackList extends React.Component {
                             timeSignature={this.props.timeSignature} track={_track} ts={_track.ts}                             
                             noteClick={this.onNoteClick}  onVolumeChange={this.handleTrackVolumeChange} onTrackIsMute={this.handleTrackIsMuteChange}
                             loadUserAudio={this.props.loadUserAudio}
-                            bpms = {this.props.bpms} notesInPartCount={this.props.notesInPartCount} setTrackOffset={this.props.setTrackOffset} setAppBusy={this.props.setAppBusy}/>
+                            bpms = {this.props.bpms} notesInPartCount={this.props.notesInPartCount} setTrackOffset={this.props.setTrackOffset} setAppBusy={this.props.setAppBusy}
+                            {...this.props}/>
             })
         ]
     }

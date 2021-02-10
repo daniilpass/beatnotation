@@ -5,7 +5,7 @@ import {
     ,renderNotes, loadUserAudio, setTrackLoaded, setTrackOffset
     ,setTrackIsMute, setAppBusy
 } from "../../redux/actions";
-import {GetBpms} from "../../redux//selectors";
+import {GetBpms, CanImportAudio} from "../../redux//selectors";
 
 import Editor from "./editor";
 
@@ -14,7 +14,8 @@ const mapStateToProps = state => {
     const bpms = GetBpms(state);
     const loader = state.loader;
     const app = state.app;
-    return {...editor, bpms, loader: {...loader}, app: {...app}};
+    const canImportAudio = CanImportAudio(state);
+    return {...editor, bpms, loader: {...loader}, app: {...app}, canImportAudio};
 }
 
 export default connect(

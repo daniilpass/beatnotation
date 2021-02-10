@@ -43,7 +43,8 @@ class TrackControl extends React.Component {
       // console.log('shouldComponentUpdate', this.props, prevPros);
       if (this.props.track.volume !== prevPros.track.volume
         || this.state.tmpVolume !== prevState.tmpVolume
-        || this.props.track.isMute !== prevPros.track.isMute) {
+        || this.props.track.isMute !== prevPros.track.isMute
+        || this.props.canImportAudio !== prevPros.canImportAudio) {
         return true;
       }
 
@@ -102,7 +103,7 @@ class TrackControl extends React.Component {
           </div>
           <div className="track-control__title" style={{lineHeight: this.props.height-2+"px"}}>{this.Title}</div>
           <MuteButton onClick={this.handleTrackIsMuteClick} isMuted={this.isMuted}/>
-          {this.props.track.type === 0 && <button className="track-control__load button" onClick={this.onLoadClick}>Load</button>}
+          {this.props.track.type === 0 && <button className="track-control__load button" onClick={this.onLoadClick} disabled={!this.props.canImportAudio}>Load</button>}
       </div>
     }
   }
