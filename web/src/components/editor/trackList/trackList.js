@@ -32,6 +32,9 @@ export default class TrackList extends React.Component {
 
     handleClearTrack = (trackIndex) => {
         this.props.clearTrack(trackIndex);
+        if (this.props.realtimeRender) {
+            this.props.renderNotes();
+        }
     }
 
 
@@ -50,7 +53,7 @@ export default class TrackList extends React.Component {
                             noteClick={this.onNoteClick}  onVolumeChange={this.handleTrackVolumeChange} onTrackIsMute={this.handleTrackIsMuteChange}
                             loadUserAudio={this.props.loadUserAudio}
                             bpms = {this.props.bpms} notesInPartCount={this.props.notesInPartCount} setTrackOffset={this.props.setTrackOffset} setAppBusy={this.props.setAppBusy}
-                            {...this.props}/>
+                            onClearTrack={this.handleClearTrack} {...this.props}/>
             })
         ]
     }

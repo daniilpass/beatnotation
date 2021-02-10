@@ -17,17 +17,23 @@ export default class TaktControls extends React.Component {
     
     handleDeleteClick = (taktIndex) => {
         console.log('Delete', taktIndex);
-        this.props.taktDelete(taktIndex)  
+        this.props.taktDelete(taktIndex);
+        if (this.props.realtimeRender) {
+            this.props.renderNotes();
+        }  
     }
 
     handleClearClick = (taktIndex) => {
         console.log('Clear', taktIndex);
-        this.props.taktClear(taktIndex)    
+        this.props.taktClear(taktIndex);
+        if (this.props.realtimeRender) {
+            this.props.renderNotes();
+        }      
     }
 
     handleCopyClick = (taktIndex) => {
         console.log('Copy', taktIndex);
-        this.props.taktCopy(taktIndex)
+        this.props.taktCopy(taktIndex);
     }
 
     handlePasteClick = (taktIndex) => {
@@ -39,6 +45,9 @@ export default class TaktControls extends React.Component {
         }
 
         this.props.taktPaste(taktIndex);
+        if (this.props.realtimeRender) {
+            this.props.renderNotes();
+        }  
     }
 
     get taktControlConatinerWidth() {
