@@ -39,7 +39,9 @@ class NotesRenderer extends React.Component {
     }
 
     shouldComponentUpdate(nextProps) {
-      if (this.props.printTime !== nextProps.printTime || this.props.renderTime !== nextProps.renderTime) {
+      if (this.props.printTime !== nextProps.printTime 
+        || this.props.renderTime !== nextProps.renderTime 
+        || this.props.realtimeRender !== nextProps.realtimeRender) {
           return true;
         }
 
