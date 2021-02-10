@@ -146,7 +146,15 @@ function setPlaybackNotes(state, payload) {
 }
 
 function setBpm(state, payload) {
-    return {...state, bpm: payload.bpm};
+    return {
+        ...state, 
+        bpm: payload.bpm,
+        playerState: PlayerState.STOP,
+        baseTime: 0,
+        baseTimeUpdated: Date.now(),
+        playerStoppedAt: Date.now(),
+        endOfTrack: false
+    };
 }
 
 function setTimeSignature(state, payload) {
@@ -223,7 +231,13 @@ function setTimeSignature(state, payload) {
         noteWidth: newNoteWidth,
         tracksLengthInTakts: newTracksLengthInTakts,
         tracksLengthInNotes: newTracksLengthInNotes,
-        tracks: [...tmpTracks]      
+        tracks: [...tmpTracks],
+        //stop player and reset to 0
+        playerState: PlayerState.STOP,
+        baseTime: 0,
+        baseTimeUpdated: Date.now(),
+        playerStoppedAt: Date.now(),
+        endOfTrack: false      
     };
 }
 

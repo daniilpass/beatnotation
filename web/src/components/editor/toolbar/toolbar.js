@@ -15,15 +15,20 @@ class Toolbar extends React.Component {
       super(props)
 
       this.state = {
-
+        tmpBpm: -1
       }
-          
+      this.bpmChangeTimerId = 0;
       this.fileReaderRef = React.createRef();  
     }
 
-    shouldComponentUpdate (nextProps) {
+    get getBpm() {
+        return this.state.tmpBpm > -1 ? this.state.tmpBpm : this.props.bpm;
+    }
+
+    shouldComponentUpdate (nextProps, nextState) {
         if (this.props.timeSignature !== nextProps.timeSignature
             || this.props.bpm !== nextProps.bpm
+            || this.state.tmpBpm !== nextState.tmpBpm
             || this.props.canPlay !== nextProps.canPlay
             || this.props.canStop !== nextProps.canStop
             || this.props.canPause !== nextProps.canPause
@@ -175,16 +180,32 @@ class Toolbar extends React.Component {
     }
 
     handleBpmInputChange = (event) => {
+        clearTimeout(this.bpmChangeTimerId);
+
         let value = event.target.value;
-        value = value === '' ? '1' : value;
+        value = value === '' ? "1" : value;
 
         var regNumber = /^[0-9\b]+$/;
         if (regNumber.test(value)){
             let intValue = parseInt(value);
             intValue = intValue < 1 ?  1 : intValue;
             intValue = intValue > 300 ? 300 : intValue;
-            this.props.setBpm(intValue);
-        }  
+            this.setState({
+                tmpBpm: intValue
+            });
+
+            this.bpmChangeTimerId = setTimeout(() => {this.changeBpm(value)} , 1000);
+        } 
+
+        // if (value === null) {
+        //     this.setState({
+        //         tmpBpm: ""
+        //     });
+        // }
+    }
+
+    changeBpm = (value) => {
+        this.props.setBpm(value);
     }
 
     handleBooleanInputChange = (event) => {
@@ -203,7 +224,7 @@ class Toolbar extends React.Component {
         }
     }
 
-    handleTimeSignatureChange = (event) => {        
+    handleTimeSignatureChange = (event) => {   
         let value = [parseInt(event.target.value.split("/")[0]), parseInt(event.target.value.split("/")[1])]
         this.props.setTimeSignature(value); 
     }
@@ -234,7 +255,7 @@ class Toolbar extends React.Component {
 
                 <div className="app-toolbar__bpm" >
                     BPM: 
-                    <input name="bpm" value={this.props.bpm} onChange={this.handleBpmInputChange} type="number"></input>
+                    <input name="bpm" value={this.getBpm} onChange={this.handleBpmInputChange} type="number"></input>
                 </div>
 
                 <div className="app-toolbar__time" ref={this.props.timeTextRef} >

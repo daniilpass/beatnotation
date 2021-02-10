@@ -11,6 +11,7 @@ export default class TrackList extends React.Component {
             || this.props.noteHeight !== nextProps.noteHeight
             || this.props.noteWidth !== nextProps.noteWidth
             || this.props.addTaktButtonWidth !== nextProps.addTaktButtonWidth
+            || this.props.bpm !== nextProps.bpm
             || this.props.tracksLengthInNotes !== nextProps.tracksLengthInNotes            
             || this.props.tracksLengthInTakts !== nextProps.tracksLengthInTakts            
             || this.props.timeSignature !== nextProps.timeSignature
