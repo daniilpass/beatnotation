@@ -32,11 +32,15 @@ export default class AudioTrackVisualization extends React.Component {
     }
   
     componentDidUpdate(prevProps) {
-      if (prevProps.loaded === false && this.props.loaded === true) {   
+      if (this.props.loaded === true && (this.track.arrayBuffer !== prevProps.track.arrayBuffer
+        || this.props.bpms !== prevProps.bpms 
+        || this.props.notesInPartCount !== prevProps.notesInPartCount 
+        || this.props.noteWidth !== prevProps.noteWidth)) {
         this.handleVisualize("audio_canvas_inside");
-      } else if (this.props.loaded === true 
-        && (this.props.bpms !== prevProps.bpms || this.props.notesInPartCount !== prevProps.notesInPartCount || this.props.noteWidth !== prevProps.noteWidth)) {
-        this.handleVisualize("audio_canvas_inside");
+      }
+
+      if (this.props.loaded === false) {
+        this.clearVisualization("audio_canvas_inside");
       }
     }
   
@@ -88,6 +92,11 @@ export default class AudioTrackVisualization extends React.Component {
         setTimeout(() => {this.visualize(canvas_name)}, 500);
     }  
 
+    clearVisualization = (canvas_name) => {
+      console.log("Clear Visualization");
+      const canvas  = document.getElementById(canvas_name);
+      canvas.width = 0;
+    }
 
     visualize = (canvas_name) => {
       const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -203,7 +212,7 @@ export default class AudioTrackVisualization extends React.Component {
 
     render() {
       console.log("Render AudioTrackVisualization");
-      return <canvas id="audio_canvas_inside" className="user-audio-visualization"  ref={this.canvasRef} width="1" height={this.props.noteHeight} style={{marginLeft: (this.state.tmpPosition > -1 ? this.state.tmpPosition : this.props.track.offset) + "px"}}></canvas>
+      return <canvas id="audio_canvas_inside" className="user-audio-visualization"  ref={this.canvasRef} width="0" height={this.props.noteHeight} style={{marginLeft: this.offset + "px"}}></canvas>
     }
     
   }

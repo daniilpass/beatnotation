@@ -48,7 +48,7 @@ export default class TracksPlayer extends React.Component {
 
         if (this.props.loader.buffer !== prevProps.loader.buffer ) {
             this.props.setAppBusy(true, "Processing ...");
-            this.loadUserAudio(this.props.loader.trackIndex, this.props.loader.buffer, this.props.loader.offset);
+            this.loadUserAudio(this.props.loader.trackIndex, this.props.loader.buffer, this.props.loader.offset, () => {this.props.setAppBusy(false);});
         }
 
         //Идет проигрышь и изменилось базовое время(предвинули указатель времени) или сдвинулись аудио дорожки, то запустим треки с нужного отрезка
@@ -109,7 +109,7 @@ export default class TracksPlayer extends React.Component {
             })   
     }  
 
-    loadUserAudio(trackIndex, arrayBuffer, offset) {        
+    loadUserAudio(trackIndex, arrayBuffer, offset, errorCallback) {        
         console.log("===> Player. Load user audio...")
         this.props.setTrackLoaded(trackIndex, false, [], offset);
         this.audioCtx.decodeAudioData(arrayBuffer.slice(0), 
@@ -118,7 +118,7 @@ export default class TracksPlayer extends React.Component {
                 this.setSoundBufferForTrack(trackIndex, audioBuffer, {audio: true});
                 this.props.setTrackLoaded(trackIndex, true, arrayBuffer.slice(0), offset);
             }, 
-            error => { console.log("decodeAudioData failed", error); }
+            error => { console.log("decodeAudioData failed", error); errorCallback();}
         );
     }
 
@@ -205,7 +205,7 @@ export default class TracksPlayer extends React.Component {
 
     startAllUserAudio(offset) { 
         this.soundBuffer.forEach((item, trackIndex) => {
-            if (!!item.audioBuffer && item.audio) {              
+            if (!!item.audioBuffer && item.audio && this.props.tracks[trackIndex].loaded) {              
                 let  whenInPx    = this.props.tracks[trackIndex].offset
                 let  whenInSec = whenInPx / ( this.props.bpms * this.props.notesInPartCount *  this.props.noteWidth) / 1000;
                

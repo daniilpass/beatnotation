@@ -392,7 +392,9 @@ function loadTracks(state, payload) {
         tmpTrack.isMute = loadedTrack.isMute; 
         tmpTrack.ts = Date.now();
         if (state.tracks[it].type === 0) {
-            //загрузка пользовательского трека
+            //загрузка пользовательского трека            
+            tmpTrack.arrayBuffer = null;
+            tmpTrack.loaded = false;
             tmpTrack.offset = loadedTrack.offset;
         } else {
             tmpTrack.takts = [...loadedTrack.takts];
