@@ -30,6 +30,11 @@ export default class TrackList extends React.Component {
         this.props.setTrackIsMute(trackIndex);
     }
 
+    handleClearTrack = (trackIndex) => {
+        this.props.clearTrack(trackIndex);
+    }
+
+
     onNoteClick = (trackIndex, taktIndex, noteIndex, level) => {
         this.props.onNoteClick && this.props.onNoteClick(trackIndex, taktIndex, noteIndex, level);
     }

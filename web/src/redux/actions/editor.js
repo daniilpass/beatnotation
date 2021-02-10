@@ -2,7 +2,8 @@ import {SET_REALTIME_RENDER, SET_PLAYER_STATE, SET_PLAYBACK_NOTES, SET_BPM, SET_
 ,INIT_TRACKS
 ,TAKT_COPY, TAKT_PASTE, TAKT_CLEAR, TAKT_DELETE, TAKT_ADD
 ,LOAD_TRACKS, SET_END_OF_TRACK, SET_TRACK_VOLUME, SET_BASETIME
-,SET_TRACK_LOADED, SET_TRACK_OFFSET, SET_TRACK_MUTE, EXPORT_AS_WAV } from '../types'
+,SET_TRACK_LOADED, SET_TRACK_OFFSET, SET_TRACK_MUTE, EXPORT_AS_WAV
+,CLEAR_TRACK } from '../types'
 
 
 export const setPlayerState = (value) => {
@@ -170,5 +171,14 @@ export const setTrackIsMute = (index) => {
 export const exportAsWav = () => {
     return {
         type: EXPORT_AS_WAV
+    }
+}
+
+export const clearTrack = (trackIndex) => {
+    return {
+        type: CLEAR_TRACK,
+        payload: {
+            trackIndex: trackIndex
+        }
     }
 }

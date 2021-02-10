@@ -59,7 +59,7 @@ export default class Track extends React.Component {
     }
 
     onClearTrack = () => {
-      console.log("onClearTrack", this.props.index)
+      this.props.clearTrack(this.props.index)
     }
 
     renderTrack() {

@@ -3,7 +3,7 @@ import {SET_REALTIME_RENDER, SET_PLAYER_STATE, SET_PLAYBACK_NOTES, SET_BPM, SET_
     ,TAKT_COPY, TAKT_PASTE, TAKT_CLEAR, TAKT_DELETE, TAKT_ADD
     ,LOAD_TRACKS, SET_END_OF_TRACK, SET_TRACK_VOLUME, SET_BASETIME
     ,SET_TRACK_LOADED, SET_TRACK_OFFSET, SET_TRACK_MUTE
-    ,EXPORT_AS_WAV
+    ,EXPORT_AS_WAV, CLEAR_TRACK
 } from '../types'
 
 import {tracksData} from "../../assets/data/tracksData";
@@ -96,6 +96,8 @@ export default function editorReducer(state = initialState, action) {
             return setTrackIsMute(state, action.payload); 
         case EXPORT_AS_WAV:
             return exportAsWav(state); 
+        case CLEAR_TRACK:
+            return clearTrack(state, action.payload); 
         default:
             return state;
     }
@@ -547,5 +549,44 @@ function exportAsWav(state) {
     return {
         ...state,
         exportAsWav: Date.now()
+    }
+}
+
+function clearTrack(state, payload) {
+    let trackIndex = payload.trackIndex;
+
+    let tmpTracks = [...state.tracks];
+    let tmpTrack = {...tmpTracks[trackIndex]}; 
+    
+    if (tmpTrack.type === 0) {
+        // аудио          
+        tmpTrack.arrayBuffer = null;
+        tmpTrack.loaded = false;
+        tmpTrack.offset = 0;
+    } else {
+        // ноты
+        tmpTrack.takts = [...tmpTrack.takts];
+
+        for (let taktIndex = 0; taktIndex < tmpTrack.takts.length; taktIndex++) {
+            tmpTrack.takts[taktIndex] = {};
+            tmpTrack.takts[taktIndex].notes = [];
+            for (let nIdx = 0; nIdx < state.notesInTakt; nIdx++) {
+                tmpTrack.takts[taktIndex].notes[nIdx] = 0;           
+            }
+            tmpTrack.takts[taktIndex].ts = Date.now()+"_"+taktIndex;
+        }
+    }
+
+    tmpTrack.ts = Date.now();
+    tmpTracks[trackIndex] = tmpTrack;
+
+    return {
+        ...state,
+        tracks: tmpTracks,
+        playerState: PlayerState.STOP, //TODO: не сбрасывать на начало трека
+        baseTime: 0,
+        baseTimeUpdated: Date.now(),
+        playerStoppedAt: Date.now(),
+        endOfTrack: false
     }
 }
