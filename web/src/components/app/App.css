@@ -40,7 +40,7 @@ track-container
 }
 
 .track-container::-webkit-scrollbar:horizontal {
-  height: 20px;
+  height: 18px;
 }
 
 .track-container::-webkit-scrollbar-track {
