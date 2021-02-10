@@ -105,7 +105,7 @@ class TrackControl extends React.Component {
             {this.Volume}
           </div>
           <div className="track-control__title" style={{lineHeight: this.props.height-2+"px"}}>{this.Title}</div>
-          <TrackSettingsButton />
+          <TrackSettingsButton onClearTrack={this.props.onClearTrack}/>
           <MuteButton onClick={this.handleTrackIsMuteClick} isMuted={this.isMuted}/>
           {this.props.track.type === 0 && <button className="track-control__load button" onClick={this.onLoadClick} disabled={!this.props.canImportAudio}>Load</button>}
       </div>
@@ -117,11 +117,15 @@ class TrackControl extends React.Component {
 
   class TrackSettingsButton extends React.Component {
 
+    handleClearTrack = () => {
+      this.props.onClearTrack && this.props.onClearTrack();
+    }
+
     render() {
       const selectInput=<SettingsIcon className="settings-icon"/>;
       return <div className="track-control__settings">
         <Select input={selectInput}>
-          <Option key="clear-track" content="clear-track" value="clear-track"></Option>
+          <Option key="clear-track" content="Clear track" value="Clear-track" onClick={this.handleClearTrack}></Option>
         </Select>
         {/* <SettingsIcon className="settings-icon"/> */}
       </div>

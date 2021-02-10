@@ -140,6 +140,7 @@ export class Option extends React.PureComponent {
         e.preventDefault();
         e.stopPropagation();
         this.props.onSelect && this.props.onSelect(this.props.value);
+        this.props.onClick && this.props.onClick();
     }
 
     render() {
