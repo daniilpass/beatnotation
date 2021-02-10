@@ -9,6 +9,7 @@ import * as PlayerStates from "../../../redux/dictionary/playerStates";
 import UserFileReader from "../../userFileReader/userFileReader";
 
 import "./toolbar.css";
+import {Select, Option} from "../../controls/select/select";
 
 class Toolbar extends React.Component {
     constructor(props) {
@@ -244,13 +245,13 @@ class Toolbar extends React.Component {
                 {/* <div className="app-toolbar__part" >
                     Part: {Math.trunc(this.timelineNote) + 1 }
                 </div> */}
-                <div className="app-toolbar__bpm" >
-                    Time signature: 
-                    <select name='timeSignature' value={this.timeSignatureString} onChange={this.handleTimeSignatureChange}>
-                    {this.props.timeSignatures.map(ts => {
-                        return <option key={ts} value={ts}>{ts}</option>
-                    })}
-                    </select>
+                <div className="app-toolbar__time-signature" >
+                    Time signature:
+                    <Select value={this.timeSignatureString} onChange={this.handleTimeSignatureChange}>
+                        {this.props.timeSignatures.map(ts => {
+                            return <Option key={ts} content={ts} value={ts}></Option>
+                        })}
+                    </Select>
                 </div>
 
                 <div className="app-toolbar__bpm" >

@@ -1,7 +1,10 @@
 import React from "react";
 import MuteButton from "../../controls/muteButton/muteButton";
 
-const requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame;
+
+
+import  {ReactComponent as SettingsIcon}  from "../../../assets/img/settings.svg";
+import { Option, Select } from "../../controls/select/select";
 
 class TrackControl extends React.Component {
     constructor(props) {
@@ -82,7 +85,7 @@ class TrackControl extends React.Component {
       //change volume
       let newVolume = this.state.tmpVolume + deltaY;
       if (newVolume <= this.maxVolume && newVolume >= 0) {
-        requestAnimationFrame( () => { this.setState({tmpVolume: newVolume}) } );
+        window.requestAnimationFrame( () => { this.setState({tmpVolume: newVolume}) } );
       }
       //console.log(deltaX, deltaY, this.tmpVolume);
     }
@@ -102,6 +105,7 @@ class TrackControl extends React.Component {
             {this.Volume}
           </div>
           <div className="track-control__title" style={{lineHeight: this.props.height-2+"px"}}>{this.Title}</div>
+          <TrackSettingsButton />
           <MuteButton onClick={this.handleTrackIsMuteClick} isMuted={this.isMuted}/>
           {this.props.track.type === 0 && <button className="track-control__load button" onClick={this.onLoadClick} disabled={!this.props.canImportAudio}>Load</button>}
       </div>
@@ -109,3 +113,18 @@ class TrackControl extends React.Component {
   }
 
   export default TrackControl;
+
+
+  class TrackSettingsButton extends React.Component {
+
+    render() {
+      const selectInput=<SettingsIcon className="settings-icon"/>;
+      return <div className="track-control__settings">
+        <Select input={selectInput}>
+          <Option key="clear-track" content="clear-track" value="clear-track"></Option>
+        </Select>
+        {/* <SettingsIcon className="settings-icon"/> */}
+      </div>
+    }
+
+  }

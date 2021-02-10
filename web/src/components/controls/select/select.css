@@ -1,0 +1,57 @@
+.app-select{
+    display: inline-block;
+    user-select: none;
+    box-shadow: 2px 2px 0px rgb(0 0 0 / 30%);
+    box-sizing: border-box;    
+    cursor: pointer;
+    color: #FFC173;
+}
+
+.app-select--custom-input{
+    box-shadow: none;
+}
+
+.app-select__input{
+    height: 21px;
+    line-height: 15px;
+    border: 2px solid #2F3485;
+    background-color: #7277D8;
+    color: #FFC173;
+    padding: 0 4px;
+    overflow: hidden;
+}
+
+.app-select__options{
+    position: absolute;
+    /* width: 200px; */
+    /* height: 200px; */
+    z-index: 2;
+    background-color: #2F3485;
+    border: 2px solid #080E73;
+    box-shadow: 2px 2px 0px rgb(0 0 0 / 30%);
+    color: #FFC173;
+}
+
+
+.app-select__options--visible{
+    display: block;
+}
+
+.app-select__options--hidden{
+    display: none;
+}
+
+.app-select-option{
+    cursor: pointer;
+    user-select: none;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+
+
+.app-select-option:hover{
+    background-color: #4e4982;
+}

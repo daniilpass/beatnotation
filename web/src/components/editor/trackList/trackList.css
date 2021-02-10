@@ -80,6 +80,23 @@ TRACK-CONTROL
     color: rgb(0 0 0 / 30%);
   }
 
+  .track-control__settings{
+    float: right;
+    margin-right: 8px;
+    margin-top: 4px;
+    height: 21px;
+  }
+
+  .track-control__settings .settings-icon{
+    width: 20px;
+    height: 20px;
+    filter: drop-shadow(2px 2px 0px rgb(0 0 0 / 30%));
+  }
+
+  .track-control__settings .settings-icon path{
+    fill: #7277d8; /*#080E73;*/
+  }
+
   /*
   Note
   */

@@ -58,3 +58,8 @@ app-toolbar
     box-sizing: border-box;
     vertical-align: top;
   }
+
+  .app-toolbar__time-signature .app-select{
+    vertical-align: top;
+    margin-left: 8px;
+  }

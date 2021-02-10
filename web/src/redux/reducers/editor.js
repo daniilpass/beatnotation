@@ -39,7 +39,7 @@ const initialState = {
     noteHeight: 31,   
     taktControlHeight: 31, 
     minTaktControlWidth: 250,
-    trackControlWidth: 200,
+    trackControlWidth: 300,
     addTaktButtonWidth: 100,
     timePointerWidth: 10,
     //TRAAAAAAAAAACK
