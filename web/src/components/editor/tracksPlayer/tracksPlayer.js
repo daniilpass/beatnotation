@@ -396,6 +396,10 @@ export default class TracksPlayer extends React.Component {
         // Трек для чтения
         let track = tracks[trackIndex];
 
+        if (!track.loaded) {
+            return;
+        }
+
         // Проверка, что дорожка не была обработана ранее или без звука
         if ("-9" + channelIndex === track.processed || (!!this.soundBuffer[trackIndex].audio === false) ) {
             return;
