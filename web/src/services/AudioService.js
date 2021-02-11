@@ -211,8 +211,8 @@ class AudioSercive {
             return;
         }
 
-        // Проверка, что дорожка не была обработана ранее или без звука
-        if ("-9" + channelIndex === track.processed || (!!this.soundBuffer[trackIndex].audio === false) ) {
+        // Проверка, что дорожка не была обработана ранее
+        if ("-9" + channelIndex === track.processed) {
             return;
         }
 
