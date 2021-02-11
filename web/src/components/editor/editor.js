@@ -1,5 +1,7 @@
 import React from "react";
 
+import AudioSercive from "../../services/AudioService";
+
 import Toolbar from "./toolbar/toolbar";
 import * as PlayerStates from "../../redux/dictionary/playerStates";
 import TracksPlayer from "./tracksPlayer/tracksPlayer";
@@ -17,7 +19,6 @@ export default class Editor extends React.Component {
       this.tracksContainerRef = React.createRef();
       this.timePointerRef = React.createRef();
       this.timeTextRef = React.createRef(); 
-      this.tracksPlayerRef = React.createRef();  
   }
 
   //
@@ -101,7 +102,7 @@ export default class Editor extends React.Component {
 
     // Проигрываю выбранную ноту
     if (level > 0 && this.props.playbackNotes) {
-      this.tracksPlayerRef.current.playTrackSound(trackIndex);
+      AudioSercive.playSample(trackIndex, track.volume);
     }
 
     // Рисую ноты
@@ -173,7 +174,7 @@ export default class Editor extends React.Component {
 
     return <div className="Editor no-print">
       {/* TODO: pass needed props or connect to redux */}
-      <TracksPlayer onStep={this.handlePlayerStep} {...this.props} ref={this.tracksPlayerRef}/>
+      <TracksPlayer onStep={this.handlePlayerStep} {...this.props} />
 
       <Toolbar timeTextRef={this.timeTextRef}/>
 

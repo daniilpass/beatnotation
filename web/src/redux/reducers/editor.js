@@ -461,7 +461,6 @@ function loadTracks(state, payload) {
 }
 
 function setEndOfTrack(state, payload) {
-    console.log('===> setEndOfTrack', payload.endOfTrack);
     return {...state, endOfTrack: payload.endOfTrack}
 }
 

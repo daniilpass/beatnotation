@@ -1,8 +1,7 @@
 import React from "react";
-import axios from 'axios';
 
+import AudioService from "../../../services/AudioService";
 import * as PlayerStates from "../../../redux/dictionary/playerStates";
-import {audioBufferToWave} from "../../../utils/audioUtils";
 
 export default class TracksPlayer extends React.Component {
     constructor(props) {
@@ -12,11 +11,6 @@ export default class TracksPlayer extends React.Component {
         this.timerId = 0;
         this.stepDelay = 20;
         this.prevNoteIndex = -1;
-
-        //Init AudioContext
-        this.soundBuffer = [];
-        this.audioCtx = this.initAudioContext();
-        this.resumed = false;
     }
 
     componentDidMount () {
@@ -27,112 +21,103 @@ export default class TracksPlayer extends React.Component {
         // Управление воспроизведением
         if (this.props.playerState === PlayerStates.PLAY && prevProps.playerState  !== PlayerStates.PLAY) 
         {
-            console.log("PLAY NOW")      
-            this.enshureAudioContextBeforeAction(() => {
-                this.timerId = setInterval(this.step, this.stepDelay);
-                this.startAllUserAudio(this.props.baseTime / 1000);
-            });            
+            this.handlePlay()
         } 
         else if (this.props.playerState === PlayerStates.STOP && prevProps.playerState  !== PlayerStates.STOP) 
         {
-            console.log("STOP NOW")  
-            clearInterval(this.timerId);
-            this.stopAllUserAudio();
+            this.handleStop();
         } 
         else if (this.props.playerState === PlayerStates.PAUSE && prevProps.playerState  !== PlayerStates.PAUSE)
         {
-            console.log("PAUSE NOW")  
-            clearInterval(this.timerId);
-            this.stopAllUserAudio();
-        }
-
-        // Загрузка аудио
-        if (this.props.loader.buffer !== prevProps.loader.buffer ) {
-            this.props.setAppBusy(true, "Processing ...");
-            this.loadUserAudio(this.props.loader.trackIndex, this.props.loader.buffer, this.props.loader.offset, () => {this.props.setAppBusy(false);});
+            this.handlePause();
         }
 
         //Идет проигрышь и изменилось базовое время(предвинули указатель времени) или сдвинулись аудио дорожки, то запустим треки с нужного отрезка
-        //TODO: при изменении mute тоже перезапускать дорожки
         if ((this.props.baseTimeUpdated !== prevProps.baseTimeUpdated || this.props.audioTracksPositionChanged !== prevProps.audioTracksPositionChanged) && this.props.playerState === PlayerStates.PLAY) {
-            this.stopAllUserAudio();
-            let offset = this.props.baseTime + (Date.now() - this.props.playerStartedAt)
-            this.startAllUserAudio(offset / 1000);
+            this.handleAudioPositionChangeWhilePlaying();
         }
         
         // Обновление уровня звука
         if (this.props.audioTracksVolumeChanged !== prevProps.audioTracksVolumeChanged && this.props.playerState === PlayerStates.PLAY) {
-            this.updateAllUserAudioVolume();
+            this.handleAudioVolumeChangeWhilePlaying();
         }
 
+        // Загрузка аудио
+        if (this.props.loader.buffer !== prevProps.loader.buffer ) {
+            this.hanldeLoadAudio();
+        }
 
-        // Экспорт
+        // Экспорт аудио
         if (this.props.exportAsWav !== prevProps.exportAsWav) {
             this.handleExportAsWav();
         }
     }
 
-    enshureAudioContextBeforeAction = (action) => {
-        if (this.resumed === false) {
-            console.log("Resume AutioContext");
-            this.resumed = true;
-            this.audioCtx.resume().then(action);
-        } else {
-            action();
-        }   
-    }
-
-    initAudioContext() {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        return new AudioContext();
-    }
-
+    //
+    // Init sound buffers
+    //
     initSoundBuffer() {
         this.props.tracks.forEach( (_track, trackIndex) => {
-            //Init empty item
-            this.soundBuffer[trackIndex] = {};      
-
-            if (_track.type === 0) {
+            if (_track.type === 0) 
                 return;
-            }
-
-            this.loadAudioSample(_track.audioUrl, audioBuffer => {
-                    //console.log('_track.audioUrl', audioBuffer);
-                    this.setSoundBufferForTrack(trackIndex, audioBuffer);
-                })      
+            AudioService.loadAudioSampleFromUrl(trackIndex, _track.audioUrl);      
         });
     }
 
-    loadAudioSample = (url, callback) => {
-        axios.get(url, {responseType: 'arraybuffer'})
-            .then(response => {
-                this.audioCtx.decodeAudioData(response.data, callback, (e) => { console.log("decodeAudioData failed", e); });
-            })   
-    }  
-
-    loadUserAudio(trackIndex, arrayBuffer, offset, errorCallback) {    
-        this.props.setTrackLoaded(trackIndex, false, [], offset);
-        this.audioCtx.decodeAudioData(arrayBuffer.slice(0), 
-            audioBuffer => {
-                this.setSoundBufferForTrack(trackIndex, audioBuffer, {audio: true});
-                this.props.setTrackLoaded(trackIndex, true, arrayBuffer.slice(0), offset);
-            }, 
-            error => { console.log("decodeAudioData failed", error); errorCallback();}
-        );
+    //
+    // Handle player and editor shanges
+    //
+    handlePlay = () => {   
+        this.timerId = setInterval(this.step, this.stepDelay);
+        this.startAllUserAudio(this.props.baseTime / 1000);
     }
 
-    setSoundBufferForTrack = (trackIndex, audioBuffer, props) => {
-        this.soundBuffer[trackIndex] = {...props}; 
-        //save audio buffer
-        this.soundBuffer[trackIndex].audioBuffer = audioBuffer;
-
-        //save gain node for track
-        this.soundBuffer[trackIndex].gainNode = this.audioCtx.createGain();              
-        this.soundBuffer[trackIndex].gainNode.connect(this.audioCtx.destination);
+    handleStop = () => {   
+        clearInterval(this.timerId);
+        this.stopAllUserAudio();
     }
 
-    // PLAY CYCLES
-    //TODO: при перемотке на последнюю ноту -она не играется
+    handlePause = () => {   
+        clearInterval(this.timerId);
+        this.stopAllUserAudio();
+    }
+
+    handleAudioPositionChangeWhilePlaying = () => {
+        this.stopAllUserAudio();
+        let offset = this.props.baseTime + (Date.now() - this.props.playerStartedAt)
+        this.startAllUserAudio(offset / 1000);
+    }
+
+    handleAudioVolumeChangeWhilePlaying = () => {
+        this.updateAllUserAudioVolume();
+    }
+
+    hanldeLoadAudio = () => {
+        // vars
+        let trackIndex = this.props.loader.trackIndex;
+        let arrayBuffer = this.props.loader.buffer;
+        let offset = this.props.loader.offset;
+
+        // Busy and reset track
+        this.props.setAppBusy(true, "Processing ...");
+        this.props.setTrackLoaded(trackIndex, false, [], 0);
+        
+        // calbacks
+        let onSuccess = () => { this.props.setTrackLoaded(trackIndex, true, arrayBuffer.slice(0), offset) };
+        let onError = () => { this.props.setAppBusy(false); }
+
+        // loading
+        AudioService.loadAudioSample(trackIndex, arrayBuffer.slice(0), onSuccess, onError);
+    }
+
+    handleExportAsWav = () => {
+        this.props.setAppBusy(true, "Processing ...");
+        setTimeout(() => {this.exportToWavAndDownload()}, 500);   
+    }
+
+    //
+    // Audio Player step
+    //
     step = () => {
         // console.log("step", this.props.playerStartedAt);
         this.playNotes();
@@ -148,6 +133,9 @@ export default class TracksPlayer extends React.Component {
         }
     }
 
+    //
+    // Simple notes plaing
+    //
     playNotes = () => {    
         let noteIndex = Math.trunc(this.timelineNote);
     
@@ -157,101 +145,84 @@ export default class TracksPlayer extends React.Component {
         let taktIndex = Math.trunc(this.timelineTakt)
         let noteIndexInTakt = noteIndex % this.props.notesInTakt;
 
-        if (taktIndex + 1> this.props.tracksLengthInTakts) {
+        if (taktIndex >= this.props.tracksLengthInTakts) {
             return;
         }
 
-        //console.log('playNotes', taktIndex,noteIndexInTakt);
-
-        //console.log(noteIndex);
         for (let trackIndex = 0; trackIndex < this.props.tracks.length; trackIndex++) {
+            // Пропускаю аудио дорожки, их проигрывание идет отдельно
             if ( this.props.tracks[trackIndex].type === 0) {
                 continue;
             }
 
             const track = this.props.tracks[trackIndex];
             const takt = track.takts[taktIndex];
-            if (takt.notes[noteIndexInTakt] > 0) {
-                this.playTrackSound(trackIndex);
+            const volume = track.isMute ? 0 : track.volume;
+            if (takt.notes[noteIndexInTakt] > 0 && volume > 0) {
+                AudioService.playSample(trackIndex, volume); 
             }
         }    
 
         this.prevNoteIndex = noteIndex;
     }
-
-    playTrackSound(trackIndex) {
-        this.enshureAudioContextBeforeAction(() => {
-            //set gain
-            this.soundBuffer[trackIndex].gainNode.gain.value = this.props.tracks[trackIndex].isMute ? 0 : this.props.tracks[trackIndex].volume;
-            // play sound
-            let source = this.audioCtx.createBufferSource();
-            source.buffer = this.soundBuffer[trackIndex].audioBuffer;
-            source.connect(this.soundBuffer[trackIndex].gainNode);
-            source.start();
-        });        
-    } 
-
+    
+    //
+    // User audio playing
+    //
     startAllUserAudio(offset) { 
-        this.soundBuffer.forEach((item, trackIndex) => {
-            if (!!item.audioBuffer && item.audio && this.props.tracks[trackIndex].loaded) {              
-                let  whenInPx    = this.props.tracks[trackIndex].offset
-                let  whenInSec = whenInPx / ( this.props.bpms * this.props.notesInPartCount *  this.props.noteWidth) / 1000;
-               
-                whenInSec = whenInSec - offset;                
-                if (whenInSec >= 0) {
-                    offset = 0;
-                } else {        
-                    offset = -whenInSec;                                
-                    whenInSec = 0;
-                }
-
-                item.gainNode.gain.value = this.props.tracks[trackIndex].isMute ? 0 : this.props.tracks[trackIndex].volume;  
-                let source = this.audioCtx.createBufferSource();
-                source.buffer = item.audioBuffer;
-                source.connect(item.gainNode);
-                source.start(this.audioCtx.currentTime + whenInSec,offset);
-                item.state = "play";
-                item.source = source;
+        for (let trackIndex = 0; trackIndex < this.props.tracks.length; trackIndex++) {
+            // Обрабатываю только загруженные аудио дорожки
+            if (this.props.tracks[trackIndex].type !== 0 || this.props.tracks[trackIndex].loaded === false) {
+                continue;
             }
-        });
+
+            // Рассчитываю время начала и смещения
+            let  whenInPx    = this.props.tracks[trackIndex].offset
+            let  whenInSec = whenInPx / ( this.props.bpms * this.props.notesInPartCount *  this.props.noteWidth) / 1000;
+           
+            whenInSec = whenInSec - offset;                
+            if (whenInSec >= 0) {
+                offset = 0;
+            } else {        
+                offset = -whenInSec;                                
+                whenInSec = 0;
+            }
+
+            const volume = this.props.tracks[trackIndex].isMute ? 0 : this.props.tracks[trackIndex].volume; 
+            AudioService.playSample(trackIndex, volume, whenInSec, offset); 
+        }
     }
 
     stopAllUserAudio() {
-        this.soundBuffer.forEach((item, trackIndex) => {
-            if (!!item.audioBuffer && item.audio && item.state ==="play" ) {
-                item.state = "stop";
-                item.source.stop();
+        for (let trackIndex = 0; trackIndex < this.props.tracks.length; trackIndex++) {
+            // Обрабатываю только загруженные аудио дорожки
+            if (this.props.tracks[trackIndex].type !== 0) {
+                continue;
             }
-        });
+
+            AudioService.stopSample(trackIndex); 
+        }
     }
 
     updateAllUserAudioVolume() {
-        this.soundBuffer.forEach((item, trackIndex) => {
-            if (!!item.audioBuffer && item.audio) {
-                item.gainNode.gain.value = this.props.tracks[trackIndex].isMute ? 0 : this.props.tracks[trackIndex].volume;
+        for (let trackIndex = 0; trackIndex < this.props.tracks.length; trackIndex++) {
+            // Обрабатываю только загруженные аудио дорожки
+            if (this.props.tracks[trackIndex].type !== 0) {
+                continue;
             }
-        });
+            const volume = this.props.tracks[trackIndex].isMute ? 0 : this.props.tracks[trackIndex].volume
+            AudioService.updateSampleVolume(trackIndex, volume); 
+        }
     }
-
 
     ///
     ///SAVE TO WAVE
     ///
 
-    handleExportAsWav = () => {
-        //this.props.setAppBusy(true);
-        this.props.setAppBusy(true, "Processing ...");
-        setTimeout(() => {this.saveFile()}, 500); //TODO: requestAnimationFrame polifill
-       
-    }
-
-    saveFile = () => {
-        let startTs = Date.now();
-        console.log("Save file", startTs);
-
+    exportToWavAndDownload = () => {
         // Данные для обработки (копия трэков)
         let tracks = [...this.props.tracks];
-        
+
         tracks.forEach( (track, index) => {
             let tmpTrack = {...track};
 
@@ -268,184 +239,42 @@ export default class TracksPlayer extends React.Component {
             tracks[index] = tmpTrack;
         });
 
-        // Параметры микс буфера
-        let channels = 2;
-        let sampleRate = this.audioCtx.sampleRate;
+        // Параметры редактора
+        let settings = {
+            bpm: this.props.bpm,
+            bpms: this.props.bpms,
+            notesInPartCount: this.props.notesInPartCount,
+            notesInTakt: this.props.notesInTakt,
+            tracksLengthInNotes: this.props.tracksLengthInNotes,
+        }
 
-        // Вычисляю длину микс трека
-        let mixLengthInSec = this.props.tracksLengthInNotes / this.props.notesInPartCount / (this.props.bpm / 60);
-
-        // Вычисляю размер микс буфреа
-        let mixLength = Math.round(sampleRate * mixLengthInSec);
-        //console.log({mixLengthInSec, mixLength });
-
-        // Создаю микс буффер
-        let mixBuffer = this.audioCtx.createBuffer(channels, mixLength, sampleRate);
-
-        this.saveFileProcessChunk(16000, 0,0, channels, sampleRate, mixBuffer, mixLength, tracks,
-            () => {
-                // Генерация wave файла
-                let waveBlob = audioBufferToWave(mixBuffer, mixLength)
-
-                //TODO: convert to mp3
-
-                // Загрузка на устройство
-                let filename = "BeatNotation_"+Date.now()+".wav";
-                const a = document.createElement('a');
-                a.href= URL.createObjectURL(waveBlob);
-                a.download = filename;
-                a.click();
-
-                console.log("Download file",  Date.now()-startTs, "ms.");
-                this.props.setAppBusy(false);
-            }
-        );        
+        // Экспорт
+        AudioService.exportToWav(tracks, settings, this.handleExportProgress, this.handleExportSuccess);
     }
 
-    saveFileProcessChunk = (maxStepInFrame, channelIndex, curSampleIndex, channels, sampleRate, mixBuffer, mixLength, tracks, onFinished) => {
-        let chunkCounter = 0;
-
-        // Заполнение микс буфера по канально
-        for (let channel = channelIndex; channel < channels; channel++) {
-            // Получаем массив данных канала из микс трека
-            let mixBufferChannelData = mixBuffer.getChannelData(channel);
-
-            // Сводим дорожки в микс трек
-            for (let sampleIndex = curSampleIndex; sampleIndex < mixLength; sampleIndex++) {
-                // аудио должно быть в интервале [-1.0; 1.0]
-                for (let trackIndex = 0; trackIndex < tracks.length; trackIndex++) {
-                    const track = tracks[trackIndex];
-
-                    // Пропускаем заглушенные
-                    if (!!track.isMute) {
-                        continue;
-                    }
-
-                    if (track.type === 0) {
-                        this.writeUserAudioToBuffer(trackIndex, sampleIndex, sampleRate, mixLength, mixBufferChannelData, tracks, channel);
-                    } else {
-                        this.writeTrackSampleToBuffer(trackIndex, sampleIndex, sampleRate, mixLength, mixBufferChannelData, tracks, channel);
-                    }                    
-                }
-
-                chunkCounter++;
-                if (chunkCounter > maxStepInFrame) {
-                    //console.log("====> WHAIT NEXT FRAME");
-                    let progress = Math.trunc((sampleIndex / (mixLength * channels)) * 100 + (channel === 1 ? 50 : 0))
-                    this.props.setAppBusy(true, "Processing "+progress+"%");
-                    window.requestAnimationFrame(() => {
-                        this.saveFileProcessChunk(maxStepInFrame, channel, sampleIndex, channels, sampleRate, mixBuffer, mixLength, tracks, onFinished)
-                    });
-                    // setTimeout(()=>{
-                    //     window.requestAnimationFrame(() => {
-                    //         this.saveFileProcessChunk(maxStepInFrame, channel, sampleIndex, channels, sampleRate, mixBuffer, mixLength, tracks, onFinished)
-                    //     });
-                    // },50)
-                    
-                    return;
-                }
-            } 
-              
-            curSampleIndex = 0;
-        }   
-
-        onFinished();  
+    handleExportProgress = (progress) => {
+        this.props.setAppBusy(true, "Processing "+progress+"%");
     }
 
-    writeTrackSampleToBuffer = (trackIndex, sampleIndex, sampleRate, mixLength, mixBufferChannelData, tracks, channelIndex) => {  
-        // Трек для чтения
-        let track = tracks[trackIndex];
-
-        // Временные метки
-        let timestamp = (sampleIndex / sampleRate) * 1000; // sample to ms timesatmp
-        let noteIndex = Math.trunc(timestamp * this.props.bpms * this.props.notesInPartCount); // timestamp  to note index
-        let taktIndex = Math.trunc(noteIndex / this.props.notesInTakt);
-        let noteInTaktIndex = noteIndex % this.props.notesInTakt;
-        
-        // Значение ноты (есть, нет, обработана)
-        let noteValue = track.takts[taktIndex].notes[noteInTaktIndex];
-
-        // Если нота обработана для канала или не звучит, то  выхожу
-        if ("-9" + channelIndex === noteValue || noteValue === 0) {
-            return;
-        }
-
-        //Звук
-        let volume = track.volume;
-
-        // Запись аудио буфера в микс
-        this.writeTrackBufferToOutputBuffert(trackIndex, sampleIndex, mixLength, channelIndex, mixBufferChannelData, volume);
-
-        // Флаг, что дорожка обработана
-        track.takts[taktIndex].notes[noteInTaktIndex] = "-9"+channelIndex;
+    handleExportSuccess = (waveBlob) => {
+        this.props.setAppBusy(false);
+        this.donwloadFile(waveBlob, "BeatNotation_"+Date.now()+".wav");
     }
 
-    writeUserAudioToBuffer = (trackIndex, sampleIndex, sampleRate, mixLength, mixBufferChannelData, tracks, channelIndex) => {  
-        // Трек для чтения
-        let track = tracks[trackIndex];
-
-        if (!track.loaded) {
-            return;
-        }
-
-        // Проверка, что дорожка не была обработана ранее или без звука
-        if ("-9" + channelIndex === track.processed || (!!this.soundBuffer[trackIndex].audio === false) ) {
-            return;
-        }
-
-        // Временные метки
-        let timestamp = (sampleIndex / sampleRate) * 1000; // sample to ms timesatmp
-
-        // Если трэк еще не должен звучать, то выхожу
-        if (timestamp < track.offset) {
-            return;
-        }
-
-        //Звук
-        let volume = track.volume;
-
-        // Запись аудио буфера в микс
-        this.writeTrackBufferToOutputBuffert(trackIndex, sampleIndex, mixLength, channelIndex, mixBufferChannelData, volume);
-
-        // Флаг, что дорожка обработана
-        track.processed = "-9"+channelIndex; // Т.к. аудиодорожка одна на трек, то флаг общий для всего трека
+    donwloadFile = (blob, filename) => {
+        // Загрузка на устройство
+        const a = document.createElement('a');
+        a.href= URL.createObjectURL(blob);
+        a.download = filename;
+        a.click();
     }
 
-    writeTrackBufferToOutputBuffert (trackIndex, sampleIndex, mixLength, channelIndex, mixBufferChannelData, volume) {
-        //Определяю input канал
-        let inputChannel = 0;
-        if (channelIndex + 1 <= this.soundBuffer[trackIndex].audioBuffer.numberOfChannels) {
-            inputChannel = channelIndex;
-        }
-
-        // Буффер трэка
-        let trackBufferData = this.soundBuffer[trackIndex].audioBuffer.getChannelData(inputChannel);
-
-        // Запись в микс буфер
-        let trackBufferLength = trackBufferData.length;
-        if (sampleIndex + trackBufferLength > mixLength) {
-            trackBufferLength = mixLength - sampleIndex; //Избегаем переполнения исходного буфера
-        }
-
-        for (let trackSampleIndex = 0; trackSampleIndex < trackBufferLength; trackSampleIndex++) {
-            let value = mixBufferChannelData[sampleIndex + trackSampleIndex];
-            value = value + trackBufferData[trackSampleIndex] * volume;
-
-            if (value > 1) {
-                value = 1;
-            }
-            if (value < -1){
-                value = -1;
-            }
-            
-            mixBufferChannelData[sampleIndex + trackSampleIndex] = value;
-        }
-    }
+    
 
     ///
     /// GETTERS
     ///
-    //TODO: дубликат когда и editor.js ((
+    //TODO: дубликат кода из editor.js ((
     get timestamp() {
         if (this.props.playerState === PlayerStates.STOP || this.props.playerState === PlayerStates.PAUSE) {
             return this.props.baseTime
