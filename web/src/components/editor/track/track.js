@@ -66,7 +66,7 @@ export default class Track extends React.Component {
       } else {
         return [
           <AudioTrack key={"audioTrack"+this.props.index} {...this.props} loaded={this.props.track.loaded}/>,
-          <UserFileReader key={"audioTrackloader"+this.props.index}  ref={this.fileReaderRef} onFileLoaded={this.handleFileLoaded} readAsArrayBuffer accept=".mp3"/>
+          <UserFileReader key={"audioTrackloader"+this.props.index}  ref={this.fileReaderRef} onFileLoaded={this.handleFileLoaded} readAsArrayBuffer accept=".WAV, .MP3, .AAC, .OGG"/>
         ]
       }
     }

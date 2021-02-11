@@ -16,7 +16,7 @@ class AudioSercive {
     // Инициализация AudioContext
     initAudioContext() {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
-        return new AudioContext();
+        return new AudioContext({sampleRate: 44100});
     }
 
     // Проверить состояние контекста и при необходимости возобновить его, а затем выполнить действие
@@ -162,7 +162,7 @@ class AudioSercive {
                     onProgresss && onProgresss(progress);
 
                     window.requestAnimationFrame(() => {
-                        this.exportToWavProcessChunk(maxStepInFrame, channel, sampleIndex, channels, sampleRate, mixBuffer, mixLength, tracks, onFinished)
+                        this.exportToWavProcessChunk(maxStepInFrame, channel, sampleIndex, channels, sampleRate, mixBuffer, mixLength, tracks, settings, onProgresss, onFinished)
                     });
                     
                     return;
