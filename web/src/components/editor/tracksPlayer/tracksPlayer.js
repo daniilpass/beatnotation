@@ -24,7 +24,7 @@ export default class TracksPlayer extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        //PLAY STATE
+        // Управление воспроизведением
         if (this.props.playerState === PlayerStates.PLAY && prevProps.playerState  !== PlayerStates.PLAY) 
         {
             console.log("PLAY NOW")      
@@ -46,6 +46,7 @@ export default class TracksPlayer extends React.Component {
             this.stopAllUserAudio();
         }
 
+        // Загрузка аудио
         if (this.props.loader.buffer !== prevProps.loader.buffer ) {
             this.props.setAppBusy(true, "Processing ...");
             this.loadUserAudio(this.props.loader.trackIndex, this.props.loader.buffer, this.props.loader.offset, () => {this.props.setAppBusy(false);});
@@ -58,7 +59,8 @@ export default class TracksPlayer extends React.Component {
             let offset = this.props.baseTime + (Date.now() - this.props.playerStartedAt)
             this.startAllUserAudio(offset / 1000);
         }
-
+        
+        // Обновление уровня звука
         if (this.props.audioTracksVolumeChanged !== prevProps.audioTracksVolumeChanged && this.props.playerState === PlayerStates.PLAY) {
             this.updateAllUserAudioVolume();
         }
@@ -102,19 +104,16 @@ export default class TracksPlayer extends React.Component {
     }
 
     loadAudioSample = (url, callback) => {
-        //console.log("Loading sample", url);
         axios.get(url, {responseType: 'arraybuffer'})
             .then(response => {
                 this.audioCtx.decodeAudioData(response.data, callback, (e) => { console.log("decodeAudioData failed", e); });
             })   
     }  
 
-    loadUserAudio(trackIndex, arrayBuffer, offset, errorCallback) {        
-        console.log("===> Player. Load user audio...")
+    loadUserAudio(trackIndex, arrayBuffer, offset, errorCallback) {    
         this.props.setTrackLoaded(trackIndex, false, [], offset);
         this.audioCtx.decodeAudioData(arrayBuffer.slice(0), 
             audioBuffer => {
-                console.log('user/audio',audioBuffer);
                 this.setSoundBufferForTrack(trackIndex, audioBuffer, {audio: true});
                 this.props.setTrackLoaded(trackIndex, true, arrayBuffer.slice(0), offset);
             }, 
@@ -128,19 +127,8 @@ export default class TracksPlayer extends React.Component {
         this.soundBuffer[trackIndex].audioBuffer = audioBuffer;
 
         //save gain node for track
-        this.soundBuffer[trackIndex].gainNode = this.audioCtx.createGain()              
-        this.soundBuffer[trackIndex].gainNode.connect(this.audioCtx.destination)
-        //console.log("Sample loaded", _track.audioUrl);
-
-        //Оказывается так нельзя
-        //Пользовательский звук создается всегда один раз
-        // if (this.soundBuffer[trackIndex].audio) {
-        //     let item = this.soundBuffer[trackIndex];
-        //     let source = this.audioCtx.createBufferSource();
-        //     source.buffer = item.audioBuffer;
-        //     source.connect(item.gainNode);
-        //     item.source = source;
-        // }
+        this.soundBuffer[trackIndex].gainNode = this.audioCtx.createGain();              
+        this.soundBuffer[trackIndex].gainNode.connect(this.audioCtx.destination);
     }
 
     // PLAY CYCLES

@@ -46,11 +46,13 @@ class Toolbar extends React.Component {
     }
     
     componentDidMount () {
-        document.addEventListener("keyup", this.handleKeyDown);
+        // События дли отслеживания горячих клавиш -- Добавление
+        document.addEventListener("keydown", this.handleKeyDown);
     }
 
     componentWillUnmount () {
-        document.removeEventListener("keyup", this.handleKeyDown);
+        // События дли отслеживания горячих клавиш -- Удаление
+        document.removeEventListener("keydown", this.handleKeyDown);
     }
 
     get timeSignatureString() {
@@ -58,7 +60,7 @@ class Toolbar extends React.Component {
     }
 
     handleKeyDown= (e) => {
-        e.preventDefault();
+        let defaultAction = false;
         switch (e.keyCode) {
           // Space
           case 32:
@@ -75,9 +77,13 @@ class Toolbar extends React.Component {
             } 
           break;
           default:
+            defaultAction = true;
             break;
         }
-        return false;
+
+        if (!defaultAction) {
+            e.preventDefault();
+        }
       }
 
     /*
@@ -106,6 +112,7 @@ class Toolbar extends React.Component {
     }
 
     handleSave = () => {
+        //TODO: move to service
         console.log("save");
         
         //TODO: improve data to save (add app version)
@@ -143,6 +150,7 @@ class Toolbar extends React.Component {
     }
 
     handleFileLoaded = (content) => {
+        //TODO: move to service
         console.log("loaded");
         let asyncLoading = false;
         this.props.setAppBusy(true, "Processing ...");

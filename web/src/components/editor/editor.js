@@ -20,9 +20,9 @@ export default class Editor extends React.Component {
       this.tracksPlayerRef = React.createRef();  
   }
 
-  /*
-  * LIFECYCLE
-  */
+  //
+  // LIFECYCLE
+  //
 
   componentDidMount () {
     this.addEvents();
@@ -41,41 +41,40 @@ export default class Editor extends React.Component {
       this.updateTimeControls();
     }
     
-    //Auto scroll
-    //Получаю координату клика внутри временной шкалы
+    // При увеличении длины тактов прокручиваю трэки в конец
     if (this.props.tracksLengthInTakts > prevProps.tracksLengthInTakts) {      
       this.scrollTracksConatinerToEnd();
     }     
   }
 
   addEvents() {
-    document.addEventListener("keyup", this.handleKeyDown);
-    document.addEventListener('keydown', function (e) {
-        if (e.keyCode === 32 || e.code === "Space") {
-            e.preventDefault();
-        }
-    }, false)
+    // Событие прокрутки трэков
     this.tracksContainerRef.current.addEventListener('wheel', this.handleTracksWheel);
   }
 
   scrollTracksConatinerToEnd = () => {
+    // Прокрутка трэков в конец
     console.log("Auto scroll");
     let el = this.tracksContainerRef.current; 
     el.scrollLeft=el.scrollLeft+this.props.noteWidth*this.props.notesInTakt;
   }
 
-  // DRAW NOTES
-  DrawNotes() {          
+  DrawNotes() { 
+    // Отрисовка нот         
     if (this.props.realtimeRender) {
       this.props.renderNotes();
     }
   }
  
-  updateTimeControls() {    
+  updateTimeControls() {   
+    // Ручное обновление частей интерфейса зависимых от таймер 
     window.requestAnimationFrame(() => {
+      // Обновление текстового представления времени
       this.timeTextRef.current.innerText = "Time: " + this.getFormattedTime;
+      // Обновление позиции курсора
       this.timePointerRef.current.style.left = this.timePointerXPos + "px";
 
+      // Если идет проигрывание и курсор вышел за пределы экрана, то прокручу треки вперед
       if (this.props.playerState === PlayerStates.PLAY) {
         let scrollContainer = this.tracksContainerRef.current;
         let scrollLeft = scrollContainer.scrollLeft;
@@ -89,17 +88,16 @@ export default class Editor extends React.Component {
     });    
   }
 
-  /*
-  * WORKSPACE EVENTS
-  */
+  //
+  // WORKSPACE EVENTS
+  //
   handleNoteClick = (trackIndex, taktIndex, noteIndex, level) => {
     //console.log('handleNoteClick', trackIndex, taktIndex, noteIndex)
 
-    //HACK: not use redux state update for performance, note update state itself
+    //HACK: not use redux state update for performance
     let track = this.props.tracks[trackIndex];
     let takt = track.takts[taktIndex];
     takt.notes[noteIndex] = level;
-    //track.ts = Date.now();
 
     // Проигрываю выбранную ноту
     if (level > 0 && this.props.playbackNotes) {
@@ -111,8 +109,9 @@ export default class Editor extends React.Component {
   }
 
   handleTimelineClick = (e) => {   
-    console.log('handleTimelineClick'); 
+    // ОБработка клика по временной шкале 
     e.preventDefault();
+
     //Получаю координату клика внутри временной шкалы
     let parentContainer = e.currentTarget.parentNode;
     let targetX = e.pageX - e.currentTarget.offsetLeft + parentContainer.scrollLeft;
@@ -130,18 +129,19 @@ export default class Editor extends React.Component {
   }
 
   handleTracksWheel = (e) => {
+    // Прокрутка трэков колесом
     e.preventDefault();
     this.tracksContainerRef.current.scrollLeft += e.deltaY;;
   }
 
-
   handlePlayerStep = () => {
+      // При каждом шаге плеера обновляю интерфейс
       this.updateTimeControls();
   }
 
-  /*
-  * GETTERS
-  */
+  //
+  // GETTERS
+  //
 
   get timestamp() {
     //console.log('getTimestamp',this.props.getTimestamp);

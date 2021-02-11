@@ -22,6 +22,10 @@ export default class TrackList extends React.Component {
       return false;
     }
 
+    handleUserAudioLoaded = (trackIndex, buffer) => {
+        this.props.loadUserAudio(trackIndex, buffer);
+    }
+
     handleTrackVolumeChange = (trackIndex, value) => {
         this.props.setTrackVolume(trackIndex, value);
     }
@@ -37,7 +41,6 @@ export default class TrackList extends React.Component {
         }
     }
 
-
     onNoteClick = (trackIndex, taktIndex, noteIndex, level) => {
         this.props.onNoteClick && this.props.onNoteClick(trackIndex, taktIndex, noteIndex, level);
     }
@@ -46,14 +49,11 @@ export default class TrackList extends React.Component {
       console.log('Render TrackList');
       return [
             this.props.tracks.map((_track,i) => {
-            return <Track key={"track_"+i} index={i} noteWidth={this.props.noteWidth} noteHeight={this.props.noteHeight} 
-                            trackControlWidth={this.props.trackControlWidth} addTaktButtonWidth={this.props.addTaktButtonWidth} 
-                            tracksLengthInNotes={this.props.tracksLengthInNotes} tracksLengthInTakts={this.props.tracksLengthInTakts} 
-                            timeSignature={this.props.timeSignature} track={_track} ts={_track.ts}                             
-                            noteClick={this.onNoteClick}  onVolumeChange={this.handleTrackVolumeChange} onTrackIsMute={this.handleTrackIsMuteChange}
-                            loadUserAudio={this.props.loadUserAudio}
-                            bpms = {this.props.bpms} notesInPartCount={this.props.notesInPartCount} setTrackOffset={this.props.setTrackOffset} setAppBusy={this.props.setAppBusy}
-                            onClearTrack={this.handleClearTrack} {...this.props}/>
+            return <Track key={"track_"+i} index={i} track={_track} ts={_track.ts}                             
+                            noteClick={this.onNoteClick}  
+                            onUserAudioLoaded={this.handleUserAudioLoaded}
+                            onVolumeChange={this.handleTrackVolumeChange} onTrackIsMute={this.handleTrackIsMuteChange} onClearTrack={this.handleClearTrack} 
+                            {...this.props}/>
             })
         ]
     }

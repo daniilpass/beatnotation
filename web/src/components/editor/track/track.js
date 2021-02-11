@@ -31,23 +31,21 @@ export default class Track extends React.Component {
       }
       return false;
     }
+  
+    get Notes() {
+      return this.props.track.notes;
+    }
 
     handleLoadClick = () => {
       this.fileReaderRef.current.selectFile();
     }
   
     handleFileLoaded = (buffer) => {
-      console.log("user audio loaded");
-      //console.log(buffer);
-      this.props.loadUserAudio(this.props.index, buffer);
+      this.props.onUserAudioLoaded && this.props.onUserAudioLoaded(this.props.index, buffer);
     }
 
     handleNoteClick = (taktIndex, noteIndex, newlevel) => {
       this.props.noteClick && this.props.noteClick(this.props.index, taktIndex, noteIndex, newlevel);
-    }
-  
-    get Notes() {
-      return this.props.track.notes;
     }
 
     onVolumeChange = (value) => {

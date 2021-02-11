@@ -40,8 +40,8 @@ export default class TaktControls extends React.Component {
         console.log('Paste', taktIndex, this.props.clipboard);
 
         if (this.props.clipboard.length === 0) {
-        console.log('Empty clipboard');
-        return;
+            console.log('Empty clipboard');
+            return;
         }
 
         this.props.taktPaste(taktIndex);
