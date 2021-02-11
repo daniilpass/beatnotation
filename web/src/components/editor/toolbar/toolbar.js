@@ -1,7 +1,9 @@
 import React from "react";
 import {connect} from "react-redux";
 
-import {setPlayerState, setRealtimeRender, setPlaybackNotes, setBpm, setTimeSignature, loadTracks, renderNotes, printNotes, loadUserAudio, exportAsWav, setAppBusy} from "../../../redux/actions";
+import {setPlayerState, setRealtimeRender, setPlaybackNotes, setBpm, setTimeSignature, loadTracks, 
+    renderNotes, printNotes, loadUserAudio, exportAsWav, setAppBusy,
+    setLoop} from "../../../redux/actions";
 import {CanPlay, CanStop, CanPause, CanSave, CanLoad, CanPrint, CanExport} from "../../../redux/selectors";
 import * as PlayerStates from "../../../redux/dictionary/playerStates";
 
@@ -38,6 +40,7 @@ class Toolbar extends React.Component {
             || this.props.canPrint !== nextProps.canPrint
             || this.props.realtimeRender !== nextProps.realtimeRender
             || this.props.playbackNotes !== nextProps.playbackNotes
+            || this.props.loop !== nextProps.loop
             ) {
             return true;
         }
@@ -228,6 +231,9 @@ class Toolbar extends React.Component {
             case "playbackNotes":
                 this.props.setPlaybackNotes(value);
                 break;
+            case "loop":
+                this.props.setLoop(value);
+                break;
             default:
                 break;
         }
@@ -272,6 +278,11 @@ class Toolbar extends React.Component {
                 </div>
 
                 <div>
+                    Loop: 
+                    <input name="loop" onChange={this.handleBooleanInputChange} checked={this.props.loop} type="checkbox"></input>
+                </div>
+
+                <div>
                     Show notation: 
                     <input name="realtimeRender" onChange={this.handleBooleanInputChange} checked={this.props.realtimeRender} type="checkbox"></input>
                 </div>
@@ -298,4 +309,4 @@ const mapStateToProps = state => {
     return {...editor, canPlay, canStop, canPause, canSave, canLoad, canPrint, canExport};
 }
 
-export default connect(mapStateToProps, {setPlayerState, setRealtimeRender, setPlaybackNotes, setBpm, setTimeSignature, loadTracks, renderNotes, printNotes, loadUserAudio, exportAsWav, setAppBusy}) (Toolbar)
+export default connect(mapStateToProps, {setPlayerState, setRealtimeRender, setPlaybackNotes, setBpm, setTimeSignature, loadTracks, renderNotes, printNotes, loadUserAudio, exportAsWav, setAppBusy, setLoop}) (Toolbar)

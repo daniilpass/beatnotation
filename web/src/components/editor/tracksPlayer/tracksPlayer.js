@@ -124,12 +124,20 @@ export default class TracksPlayer extends React.Component {
 
         //CALLBACK
         this.props.onStep && this.props.onStep();
+        
+        //Loop
+        if (this.props.loop && this.timestamp >= this.props.loopEnd){
+            //this.props.setEndOfTrack(false);
+            this.props.setBaseTime(Math.ceil(this.props.loopStart), Date.now());  
+            return;
+        }
 
         //Pause then end
         if(this.timelineNote > this.props.tracksLengthInNotes)
         {
             this.props.setPlayerState(PlayerStates.PAUSE);  
             this.props.setEndOfTrack(true);
+            return;
         }
     }
 

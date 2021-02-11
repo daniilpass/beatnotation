@@ -3,7 +3,7 @@ import {SET_REALTIME_RENDER, SET_PLAYER_STATE, SET_PLAYBACK_NOTES, SET_BPM, SET_
 ,TAKT_COPY, TAKT_PASTE, TAKT_CLEAR, TAKT_DELETE, TAKT_ADD
 ,LOAD_TRACKS, SET_END_OF_TRACK, SET_TRACK_VOLUME, SET_BASETIME
 ,SET_TRACK_LOADED, SET_TRACK_OFFSET, SET_TRACK_MUTE, EXPORT_AS_WAV
-,CLEAR_TRACK, SET_LOOP_PERIOD } from '../types'
+,CLEAR_TRACK, SET_LOOP_PERIOD, SET_LOOP } from '../types'
 
 
 export const setPlayerState = (value) => {
@@ -189,6 +189,15 @@ export const setLoopPeriod = (start, end) => {
         payload: {
             loopStart: start,
             loopEnd: end
+        }
+    }
+}
+
+export const setLoop = (value) => {
+    return {
+        type: SET_LOOP,
+        payload: {
+            loop: value
         }
     }
 }

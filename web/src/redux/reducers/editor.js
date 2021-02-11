@@ -3,7 +3,7 @@ import {SET_REALTIME_RENDER, SET_PLAYER_STATE, SET_PLAYBACK_NOTES, SET_BPM, SET_
     ,TAKT_COPY, TAKT_PASTE, TAKT_CLEAR, TAKT_DELETE, TAKT_ADD
     ,LOAD_TRACKS, SET_END_OF_TRACK, SET_TRACK_VOLUME, SET_BASETIME
     ,SET_TRACK_LOADED, SET_TRACK_OFFSET, SET_TRACK_MUTE
-    ,EXPORT_AS_WAV, CLEAR_TRACK, SET_LOOP_PERIOD
+    ,EXPORT_AS_WAV, CLEAR_TRACK, SET_LOOP_PERIOD, SET_LOOP
 } from '../types'
 
 import {tracksData} from "../../assets/data/tracksData";
@@ -34,6 +34,7 @@ const initialState = {
         //"2/16","3/16",      "6/16","9/16","12/16", //TODO: выяснить группировку нот в таком размере
       ],    
     //loop
+    loop: false,
     loopStart: 0,
     loopEnd: 2000,    
     //View settings
@@ -103,6 +104,8 @@ export default function editorReducer(state = initialState, action) {
             return clearTrack(state, action.payload); 
         case SET_LOOP_PERIOD:
             return setLoopPeriod(state, action.payload);
+        case SET_LOOP:
+            return setLoop(state, action.payload);
         default:
             return state;
     }
@@ -130,6 +133,9 @@ function setPlayerState(state, payload) {
     } else if (payload.playerState === PlayerState.PLAY) {
         newPlayerStartedAt = Date.now();
         newPlayerStoppedAt = 0;
+        if (state.loop) {
+            newBaseTime = Math.ceil(state.loopStart);
+        }
     }
 
     return {
@@ -624,5 +630,12 @@ function setLoopPeriod(state, payload) {
         ...state,
         loopStart: payload.loopStart,
         loopEnd: payload.loopEnd
+    }
+}
+
+function setLoop(state, payload) {
+    return {
+        ...state,
+        loop: payload.loop
     }
 }
