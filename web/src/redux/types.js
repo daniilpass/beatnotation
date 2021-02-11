@@ -23,6 +23,7 @@ export const TAKT_CLEAR =  "TAKT_CLEAR";
 export const TAKT_DELETE =  "TAKT_DELETE";
 
 export const SET_BASETIME = "SET_BASETIME";
+export const SET_LOOP_PERIOD = "SET_LOOP_PERIOD";
 
 //CANVAS
 export const RENDER_NOTES = "RENDER_NOTES";

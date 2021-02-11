@@ -3,7 +3,7 @@ import {SET_REALTIME_RENDER, SET_PLAYER_STATE, SET_PLAYBACK_NOTES, SET_BPM, SET_
     ,TAKT_COPY, TAKT_PASTE, TAKT_CLEAR, TAKT_DELETE, TAKT_ADD
     ,LOAD_TRACKS, SET_END_OF_TRACK, SET_TRACK_VOLUME, SET_BASETIME
     ,SET_TRACK_LOADED, SET_TRACK_OFFSET, SET_TRACK_MUTE
-    ,EXPORT_AS_WAV, CLEAR_TRACK
+    ,EXPORT_AS_WAV, CLEAR_TRACK, SET_LOOP_PERIOD
 } from '../types'
 
 import {tracksData} from "../../assets/data/tracksData";
@@ -34,8 +34,8 @@ const initialState = {
         //"2/16","3/16",      "6/16","9/16","12/16", //TODO: выяснить группировку нот в таком размере
       ],    
     //loop
-    loopStart:0,
-    loopEnd: 5000,
+    loopStart: 0,
+    loopEnd: 2000,    
     //View settings
     noteWidth: 20,
     defaultNotewWidth: 20,
@@ -101,6 +101,8 @@ export default function editorReducer(state = initialState, action) {
             return exportAsWav(state); 
         case CLEAR_TRACK:
             return clearTrack(state, action.payload); 
+        case SET_LOOP_PERIOD:
+            return setLoopPeriod(state, action.payload);
         default:
             return state;
     }
@@ -154,6 +156,8 @@ function setBpm(state, payload) {
     return {
         ...state, 
         bpm: payload.bpm,
+        loopEnd: state.loopEnd * (state.bpm / payload.bpm),
+        loopStart: state.loopStart * (state.bpm / payload.bpm),
         playerState: PlayerState.STOP,
         baseTime: 0,
         baseTimeUpdated: Date.now(),
@@ -355,11 +359,32 @@ function taktDelete(state, payload) {
         tmpTracks[trackIndex] = tmpTrack;
     });
 
+    
+    // Хитрые перерасчеты цикла
+    let newLoopEnd = state.loopEnd;
+    let newTrackLengthInMs = newTracksLengthInNotes  / (state.bpm / 60 / 1000) / state.notesInPartCount;
+    if (newTrackLengthInMs < state.loopEnd) {
+        newLoopEnd = newTrackLengthInMs;
+    }
+
+    let newLoopStart = state.loopStart;
+    let minLoopLengthInMs = state.noteWidth * 3 / state.noteWidth / (state.bpm / 60 / 1000)  / state.notesInPartCount;
+    if (newLoopEnd < state.loopStart + minLoopLengthInMs) {
+        newLoopStart = newLoopEnd - minLoopLengthInMs;
+    }
+
+    if (newLoopStart < 0) {
+        newLoopStart = 0;
+        newLoopEnd = minLoopLengthInMs;
+    }
+
     return {
         ...state,
+        loopStart: newLoopStart,
+        loopEnd: newLoopEnd,
         tracksLengthInTakts: newTracksLengthInTakts,
         tracksLengthInNotes: newTracksLengthInNotes,
-        tracks: [...tmpTracks]      
+        tracks: [...tmpTracks]
     };    
 }
 
@@ -590,5 +615,14 @@ function clearTrack(state, payload) {
         baseTimeUpdated: Date.now(),
         playerStoppedAt: Date.now(),
         endOfTrack: false
+    }
+}
+
+
+function setLoopPeriod(state, payload) {
+    return {
+        ...state,
+        loopStart: payload.loopStart,
+        loopEnd: payload.loopEnd
     }
 }

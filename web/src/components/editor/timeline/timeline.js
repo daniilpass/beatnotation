@@ -18,7 +18,10 @@ export default class Timeline extends React.Component {
         || this.props.tracksLengthInNotes !== nextProps.tracksLengthInNotes
         || this.props.tracksLengthInTakts !== nextProps.tracksLengthInTakts
         || this.props.trackControlWidth !== nextProps.trackControlWidth
-        || this.props.notesInTakt !== nextProps.notesInTakt) {
+        || this.props.notesInTakt !== nextProps.notesInTakt
+        || this.props.loopStart !== nextProps.loopStart
+        || this.props.loopEnd !== nextProps.loopEnd
+        /*|| this.props.bpm !== nextProps.bpm*/) {
         return true;
     }
     return false;
@@ -34,8 +37,13 @@ export default class Timeline extends React.Component {
     onLoopDragStarted = () => {
       this.loopDrag = true;
     }
-    onLoopDragEnded = (left, right) => {
-      console.log('Loop position', left, right);
+    onLoopDragEnded = (left, right) => {           
+      //pixels to time
+      let loopStart = left / this.props.noteWidth / this.props.bpms / this.props.notesInPartCount;
+      let loopEnd =  right / this.props.noteWidth / this.props.bpms / this.props.notesInPartCount;
+      // update loop period
+      this.props.setLoopPeriod(loopStart, loopEnd);
+      // Скажу компоненту что перетаскивание цикла завершилось, использую таймаут чтобы выполнится после события родительского клика
       setTimeout(()=>{this.loopDrag = false}, 0);
     }
 
@@ -48,6 +56,14 @@ export default class Timeline extends React.Component {
       return this.props.noteWidth * this.props.tracksLengthInNotes;
     }
 
+    get loopLeft() {
+      return this.props.loopStart * this.props.bpms * this.props.notesInPartCount * this.props.noteWidth;
+    }
+
+    get loopWidth() {
+      return (this.props.loopEnd - this.props.loopStart) * this.props.bpms * this.props.notesInPartCount * this.props.noteWidth;
+    }
+
     render() {
       console.log('Render Timeline');
       return [<div key="timeline" className="timeline" style={{width:this.timelineWidth + "px", marginLeft: this.props.trackControlWidth+"px"}} onClick={this.onClick}>
@@ -58,7 +74,8 @@ export default class Timeline extends React.Component {
                 </div>
             })
         }
-        <LoopSelection onDragStarted={this.onLoopDragStarted} onDragEnded={this.onLoopDragEnded} minWidth={30} maxRightBorder={this.timelineWidth} left={0} width={100}/>
+        <LoopSelection onDragStarted={this.onLoopDragStarted} onDragEnded={this.onLoopDragEnded} 
+                       minWidth={this.props.noteWidth*3} maxRightBorder={this.timelineWidth} left={this.loopLeft} width={this.loopWidth}/>
         </div>,        
         <div key="time-pointer" className="time-pointer" ref={this.props.timePointerRef}> 
           <div className="time-pointer__stick" style={{height: this.timePointerHeight+"px"}}>
@@ -88,7 +105,9 @@ class LoopSelection extends React.Component {
     if (this.state.left !== nextState.left
       || this.state.width !== nextState.width
       || this.props.left !== nextProps.left
-      || this.props.width !== nextProps.width)
+      || this.props.width !== nextProps.width
+      || this.props.minWidth !== nextProps.minWidth
+      || this.props.maxRightBorder !== nextProps.maxRightBorder)
       return true;
 
     return false;
@@ -129,8 +148,11 @@ class LoopSelection extends React.Component {
 
     document.onmouseup = null;
     document.onmousemove = null;
+    
+    if (this.drag.started) {
+      this.props.onDragEnded && this.props.onDragEnded(this.state.left, this.state.left+this.state.width);
+    }
     this.drag.started = false;
-    this.props.onDragEnded && this.props.onDragEnded(this.state.left, this.state.left+this.state.width);
   }
 
   dragLoop = (e) => {

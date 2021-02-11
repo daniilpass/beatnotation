@@ -21,6 +21,8 @@ TIMELINE
     -webkit-user-select: none;
     margin-top: 4px;
     /* margin-bottom: 5px;*/
+    position: relative;
+    z-index: 1;
 }
 
 .timeline__takt:first-child{
@@ -71,19 +73,31 @@ TIME-POINTER
 .loop-selection {
     width: 350px;
     height: 21px;
-    background: green;
+    background: #1d6040;
     position: absolute;
     top: 0;
 }
 
 .loop-selection__button {    
     position: absolute;
-    width: 10px;
-    height: 100%;
-    background: red;    
+    width: 20px;
+    height: 100%;   
     top: 0;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.loop-selection__button--left {
+    /* border: solid;
+    border-width: 10px 15px 10px 0px;
+    border-color: transparent #329d27 transparent #329d27; */
+    background: linear-gradient(to right, #329d276e, transparent);
 }
 
 .loop-selection__button--right {
+    /* border: solid;
+    border-width: 10px 0px 10px 15px;
+    border-color: transparent #329d27 transparent #329d27; */
+    background: linear-gradient(to left, #329d276e, transparent);
     right: 0;
 }

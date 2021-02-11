@@ -3,7 +3,7 @@ import {
     setRealtimeRender, taktCopy, taktPaste, taktClear, taktDelete, taktAdd 
     ,setPlayerState, setEndOfTrack, setTrackVolume, setBaseTime
     ,renderNotes, loadUserAudio, setTrackLoaded, setTrackOffset
-    ,setTrackIsMute, setAppBusy, clearTrack
+    ,setTrackIsMute, setAppBusy, clearTrack, setLoopPeriod
 } from "../../redux/actions";
 import {GetBpms, CanImportAudio} from "../../redux//selectors";
 
@@ -23,5 +23,5 @@ export default connect(
     {setRealtimeRender, taktCopy, taktPaste, taktClear, taktDelete, 
         taktAdd, setPlayerState, setEndOfTrack, setTrackVolume, setBaseTime,
         renderNotes, loadUserAudio, setTrackLoaded, setTrackOffset, setTrackIsMute, setAppBusy,
-        clearTrack}
+        clearTrack, setLoopPeriod}
 ) (Editor)
