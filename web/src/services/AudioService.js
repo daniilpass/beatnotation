@@ -111,7 +111,12 @@ class AudioSercive {
         let sampleRate = this.audioCtx.sampleRate;
 
         // Вычисляю длину микс трека
-        let mixLengthInSec = settings.tracksLengthInNotes / settings.notesInPartCount / (settings.bpm / 60);
+        let mixLengthInSec = 0;
+        if (settings.loop) {
+            mixLengthInSec = (settings.loopEnd - settings.loopStart) / 1000;
+        } else {
+            mixLengthInSec = settings.tracksLengthInNotes / settings.notesInPartCount / (settings.bpm / 60);
+        }
 
         // Вычисляю размер микс буфреа
         let mixLength = Math.round(sampleRate * mixLengthInSec);
@@ -150,7 +155,7 @@ class AudioSercive {
                     }
 
                     if (track.type === 0) {
-                        this.writeUserAudioToBuffer(trackIndex, sampleIndex, sampleRate, mixLength, mixBufferChannelData, tracks, channel);
+                        this.writeUserAudioToBuffer(trackIndex, sampleIndex, sampleRate, mixLength, mixBufferChannelData, tracks, channel, settings);
                     } else {
                         this.writeTrackSampleToBuffer(trackIndex, sampleIndex, sampleRate, mixLength, mixBufferChannelData, tracks, channel, settings);
                     }                    
@@ -180,7 +185,7 @@ class AudioSercive {
         let track = tracks[trackIndex];
 
         // Временные метки
-        let timestamp = (sampleIndex / sampleRate) * 1000; // sample to ms timesatmp
+        let timestamp = (sampleIndex / sampleRate) * 1000 + (settings.loop ? settings.loopStart : 0); // sample to ms timesatmp
         let noteIndex = Math.trunc(timestamp * settings.bpms * settings.notesInPartCount); // timestamp  to note index
         let taktIndex = Math.trunc(noteIndex / settings.notesInTakt);
         let noteInTaktIndex = noteIndex % settings.notesInTakt;
@@ -197,13 +202,13 @@ class AudioSercive {
         let volume = track.volume;
 
         // Запись аудио буфера в микс
-        this.writeTrackBufferToOutputBuffert(trackIndex, sampleIndex, mixLength, channelIndex, mixBufferChannelData, volume);
+        this.writeTrackBufferToOutputBuffert(trackIndex, sampleIndex, mixLength, channelIndex, mixBufferChannelData, volume, sampleRate);
 
         // Флаг, что дорожка обработана
         track.takts[taktIndex].notes[noteInTaktIndex] = "-9"+channelIndex;
     }
 
-    writeUserAudioToBuffer = (trackIndex, sampleIndex, sampleRate, mixLength, mixBufferChannelData, tracks, channelIndex) => {  
+    writeUserAudioToBuffer = (trackIndex, sampleIndex, sampleRate, mixLength, mixBufferChannelData, tracks, channelIndex, settings) => {  
         // Трек для чтения
         let track = tracks[trackIndex];
 
@@ -217,41 +222,53 @@ class AudioSercive {
         }
 
         // Временные метки
-        let timestamp = (sampleIndex / sampleRate) * 1000; // sample to ms timesatmp
+        let timestamp = (sampleIndex / sampleRate) * 1000 + (settings.loop ? settings.loopStart : 0); // sample to ms timesatmp
+        let trackOffsetInMs =  track.offset / ( settings.bpms * settings.notesInPartCount *  settings.noteWidth);
 
         // Если трэк еще не должен звучать, то выхожу
-        if (timestamp < track.offset) {
+        if (timestamp < trackOffsetInMs) {
             return;
         }
 
         //Звук
         let volume = track.volume;
 
+        // Сдвиг
+        let offset = 0;
+        if (settings.loop && settings.loopStart > trackOffsetInMs) {
+            offset = settings.loopStart - trackOffsetInMs;
+        }
+     
         // Запись аудио буфера в микс
-        this.writeTrackBufferToOutputBuffert(trackIndex, sampleIndex, mixLength, channelIndex, mixBufferChannelData, volume);
+        this.writeTrackBufferToOutputBuffert(trackIndex, sampleIndex, mixLength, channelIndex, mixBufferChannelData, volume, sampleRate, offset);
 
         // Флаг, что дорожка обработана
         track.processed = "-9"+channelIndex; // Т.к. аудиодорожка одна на трек, то флаг общий для всего трека
     }
 
-    writeTrackBufferToOutputBuffert (trackIndex, sampleIndex, mixLength, channelIndex, mixBufferChannelData, volume) {
+    writeTrackBufferToOutputBuffert (trackIndex, sampleIndex, mixLength, channelIndex, mixBufferChannelData, volume, sampleRate, offsetInMs = 0) {
         //Определяю input канал
         let inputChannel = 0;
         if (channelIndex + 1 <= this.soundBuffer[trackIndex].audioBuffer.numberOfChannels) {
             inputChannel = channelIndex;
         }
 
+        // Позиция начала чтения входного потока
+        let startSampleIndex = Math.round(sampleRate * offsetInMs / 1000);
+
         // Буффер трэка
         let trackBufferData = this.soundBuffer[trackIndex].audioBuffer.getChannelData(inputChannel);
 
         // Запись в микс буфер
         let trackBufferLength = trackBufferData.length;
-        if (sampleIndex + trackBufferLength > mixLength) {
+        if (sampleIndex + trackBufferLength - startSampleIndex > mixLength) {
             trackBufferLength = mixLength - sampleIndex; //Избегаем переполнения исходного буфера
         }
 
-        for (let trackSampleIndex = 0; trackSampleIndex < trackBufferLength; trackSampleIndex++) {
-            let value = mixBufferChannelData[sampleIndex + trackSampleIndex];
+        // Указатель индекса для выходного буфера
+        let mixSampleIndex = 0;
+        for (let trackSampleIndex = startSampleIndex; trackSampleIndex < trackBufferLength + startSampleIndex; trackSampleIndex++) {
+            let value = mixBufferChannelData[sampleIndex + mixSampleIndex];
             value = value + trackBufferData[trackSampleIndex] * volume;
 
             if (value > 1) {
@@ -261,7 +278,8 @@ class AudioSercive {
                 value = -1;
             }
             
-            mixBufferChannelData[sampleIndex + trackSampleIndex] = value;
+            mixBufferChannelData[sampleIndex + mixSampleIndex] = value;
+            mixSampleIndex++;
         }
     }
 }

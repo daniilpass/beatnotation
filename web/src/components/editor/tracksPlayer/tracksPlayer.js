@@ -254,6 +254,10 @@ export default class TracksPlayer extends React.Component {
             notesInPartCount: this.props.notesInPartCount,
             notesInTakt: this.props.notesInTakt,
             tracksLengthInNotes: this.props.tracksLengthInNotes,
+            noteWidth: this.props.noteWidth,
+            loop: this.props.loop,
+            loopStart: this.props.loopStart,
+            loopEnd: this.props.loopEnd,
         }
 
         // Экспорт
