@@ -4,6 +4,12 @@ import "./timeline.css";
 
 export default class Timeline extends React.Component {  
 
+    constructor(props) {
+      super(props);
+
+      this.loopDrag = false;   
+    }
+
     shouldComponentUpdate(nextProps) {
       if (this.props.tracks.length !== nextProps.tracks.length
         || this.props.noteHeight !== nextProps.noteHeight
@@ -19,9 +25,21 @@ export default class Timeline extends React.Component {
     }
 
     onClick = (e) => {
-        this.props.onClick && this.props.onClick(e);
+      if (this.loopDrag) {
+        return;
+      }
+      this.props.onClick && this.props.onClick(e);
     }
     
+    onLoopDragStarted = () => {
+      this.loopDrag = true;
+    }
+    onLoopDragEnded = (left, right) => {
+      console.log('Loop position', left, right);
+      setTimeout(()=>{this.loopDrag = false}, 0);
+    }
+
+
     get timePointerHeight() {
         return this.props.tracks.length * this.props.noteHeight + this.props.timePointerWidth;
     }
@@ -40,6 +58,7 @@ export default class Timeline extends React.Component {
                 </div>
             })
         }
+        <LoopSelection onDragStarted={this.onLoopDragStarted} onDragEnded={this.onLoopDragEnded} minWidth={30} maxRightBorder={this.timelineWidth} left={0} width={100}/>
         </div>,        
         <div key="time-pointer" className="time-pointer" ref={this.props.timePointerRef}> 
           <div className="time-pointer__stick" style={{height: this.timePointerHeight+"px"}}>
@@ -47,3 +66,120 @@ export default class Timeline extends React.Component {
         </div>]
     }
   }
+
+class LoopSelection extends React.Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      left: this.props.left || 0,
+      width: this.props.width || 250
+    }
+
+    this.drag = {
+      oldClientX: -1,
+      started: false,
+      left: false
+    }
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.state.left !== nextState.left
+      || this.state.width !== nextState.width
+      || this.props.left !== nextProps.left
+      || this.props.width !== nextProps.width)
+      return true;
+
+    return false;
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.left !== prevProps.left || this.props.width !== prevProps.width) {
+        this.setState({left:this.props.left, width: this.props.width}) 
+    }
+  }
+
+  onMouseDownLeft = (e) => {
+    this.drag.left = true;
+    //this.onMouseDown(e);
+    this.drag.oldClientX = e.clientX;
+    document.onmouseup = this.endDrag;
+    document.onmousemove = this.dragLoop;
+  }
+  
+  onMouseDownRight = (e) => {
+    this.drag.left = false;
+    //this.onMouseDown(e);
+    this.drag.oldClientX = e.clientX;
+    document.onmouseup = this.endDrag;
+    document.onmousemove = this.dragLoop;
+  }
+  
+  onMouseDown = (e) => {    
+    e.preventDefault();
+
+    this.drag.oldClientX = e.clientX;
+    document.onmouseup = this.endDrag;
+    document.onmousemove = this.dragLoop;
+  }
+
+  endDrag = (e) => {
+    e.preventDefault();
+
+    document.onmouseup = null;
+    document.onmousemove = null;
+    this.drag.started = false;
+    this.props.onDragEnded && this.props.onDragEnded(this.state.left, this.state.left+this.state.width);
+  }
+
+  dragLoop = (e) => {
+    e.preventDefault();
+
+    if (Math.abs(this.drag.oldClientX - e.clientX) >= 10) {
+      this.drag.started = true;
+      this.props.onDragStarted && this.props.onDragStarted()
+    }
+
+    if (!this.drag.started) {
+      return;
+    }     
+
+    let deltaX = (this.drag.oldClientX - e.clientX);
+    this.drag.oldClientX = e.clientX;
+
+    let newLeft = this.state.left;
+    let newWidth = this.state.width;
+
+    if (this.drag.left) {
+      newLeft = this.state.left - deltaX;
+      newWidth = this.state.width + deltaX;      
+    } else {
+      newWidth = this.state.width - deltaX;
+    }
+
+    // Валидация значений
+    if (newWidth < this.props.minWidth || newLeft < 0 || (newLeft+newWidth) > this.props.maxRightBorder ) {
+      return;
+    }
+
+    this.setState({left: newLeft, width: newWidth}) 
+    //if (newVolume <= this.maxVolume && newVolume >= 0) {
+      
+  }
+
+  get left() {
+    return (this.state.left > -1 ? this.state.left : this.props.left) || 0;
+  }
+
+  get width() {
+    return (this.state.width > -1 ? this.state.width : this.props.width) || 50;
+  }
+  render() {
+    //console.log("Render loop", this.state, this.props)
+    return <div className="loop-selection" style={{left: this.left+"px", width: this.width+"px"}}>
+      <div className="loop-selection__button loop-selection__button--left" onMouseDown={this.onMouseDownLeft}></div>
+      <div className="loop-selection__button loop-selection__button--right" onMouseDown={this.onMouseDownRight}></div>
+    </div>
+  }
+}

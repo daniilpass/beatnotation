@@ -4,6 +4,7 @@
 TIMELINE
 */
 .timeline{
+    position: relative;
     display: block;
     height: 20px;
     background-color: #2F3485;
@@ -61,4 +62,28 @@ TIME-POINTER
     background-color: #FFAA40;
     margin-left: -1px;
     margin-top : -10px;
+}
+
+/*
+*Loop selection
+*/
+
+.loop-selection {
+    width: 350px;
+    height: 21px;
+    background: green;
+    position: absolute;
+    top: 0;
+}
+
+.loop-selection__button {    
+    position: absolute;
+    width: 10px;
+    height: 100%;
+    background: red;    
+    top: 0;
+}
+
+.loop-selection__button--right {
+    right: 0;
 }

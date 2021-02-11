@@ -33,6 +33,9 @@ const initialState = {
         "3/8", "6/8", "9/8", "12/8",
         //"2/16","3/16",      "6/16","9/16","12/16", //TODO: выяснить группировку нот в таком размере
       ],    
+    //loop
+    loopStart:0,
+    loopEnd: 5000,
     //View settings
     noteWidth: 20,
     defaultNotewWidth: 20,
