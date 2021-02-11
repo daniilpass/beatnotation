@@ -78,6 +78,10 @@ TIME-POINTER
     top: 0;
 }
 
+.loop-selection--disabled{
+    background: #1d60407a;
+}
+
 .loop-selection__button {    
     position: absolute;
     width: 20px;
@@ -88,16 +92,20 @@ TIME-POINTER
 }
 
 .loop-selection__button--left {
-    /* border: solid;
-    border-width: 10px 15px 10px 0px;
-    border-color: transparent #329d27 transparent #329d27; */
     background: linear-gradient(to right, #329d276e, transparent);
 }
 
 .loop-selection__button--right {
-    /* border: solid;
-    border-width: 10px 0px 10px 15px;
-    border-color: transparent #329d27 transparent #329d27; */
     background: linear-gradient(to left, #329d276e, transparent);
     right: 0;
 }
+
+.loop-selection--disabled .loop-selection__button--left{
+    background: linear-gradient(to right, #329d2733, transparent);
+}
+
+.loop-selection--disabled .loop-selection__button--right{
+    background: linear-gradient(to left, #329d2733, transparent);
+}
+
+

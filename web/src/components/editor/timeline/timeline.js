@@ -21,6 +21,7 @@ export default class Timeline extends React.Component {
         || this.props.notesInTakt !== nextProps.notesInTakt
         || this.props.loopStart !== nextProps.loopStart
         || this.props.loopEnd !== nextProps.loopEnd
+        || this.props.loop !== nextProps.loop
         /*|| this.props.bpm !== nextProps.bpm*/) {
         return true;
     }
@@ -74,7 +75,7 @@ export default class Timeline extends React.Component {
                 </div>
             })
         }
-        <LoopSelection onDragStarted={this.onLoopDragStarted} onDragEnded={this.onLoopDragEnded} 
+        <LoopSelection onDragStarted={this.onLoopDragStarted} onDragEnded={this.onLoopDragEnded} active={this.props.loop}
                        minWidth={this.props.noteWidth*3} maxRightBorder={this.timelineWidth} left={this.loopLeft} width={this.loopWidth}/>
         </div>,        
         <div key="time-pointer" className="time-pointer" ref={this.props.timePointerRef}> 
@@ -107,7 +108,8 @@ class LoopSelection extends React.Component {
       || this.props.left !== nextProps.left
       || this.props.width !== nextProps.width
       || this.props.minWidth !== nextProps.minWidth
-      || this.props.maxRightBorder !== nextProps.maxRightBorder)
+      || this.props.maxRightBorder !== nextProps.maxRightBorder
+      || this.props.active !== nextProps.active)
       return true;
 
     return false;
@@ -199,7 +201,7 @@ class LoopSelection extends React.Component {
   }
   render() {
     //console.log("Render loop", this.state, this.props)
-    return <div className="loop-selection" style={{left: this.left+"px", width: this.width+"px"}}>
+    return <div className={"loop-selection " + (this.props.active ? "loop-selection--active" : "loop-selection--disabled") } style={{left: this.left+"px", width: this.width+"px"}}>
       <div className="loop-selection__button loop-selection__button--left" onMouseDown={this.onMouseDownLeft}></div>
       <div className="loop-selection__button loop-selection__button--right" onMouseDown={this.onMouseDownRight}></div>
     </div>
