@@ -1,6 +1,6 @@
 .switch-button {
     display: inline-block;
-    height: 32px; 
+    height: 28px;
     background-color: #7277D8;
     border: 2px solid #2F3485;
     box-shadow: 2px 2px 0px rgb(0 0 0 / 30%);
@@ -11,8 +11,8 @@
 }
 
 .switch-button svg{
-    width: 32px;
-    height: 20px;
+    width: 25px;
+    height: 16px;
     vertical-align: top;
 }
 

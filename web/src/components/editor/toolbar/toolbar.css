@@ -20,7 +20,7 @@ app-toolbar
   }
   
   .app-toolbar__button {
-    height: 32px;
+    height: 28px;
     margin-right: 8px;
     background-color: #2F3485;
     color: #FFC173;
@@ -43,7 +43,7 @@ app-toolbar
   .app-toolbar > div {
     display: inline-block;
     margin-right: 8px;
-    height: 32px;
+    height: 28px;
     vertical-align: top;
     color: #FFC173;
     line-height: 28px;
@@ -92,7 +92,7 @@ app-toolbar
  .app-toolbar__input-title {
   font-size: 11px;
   line-height: 11px;
-  margin-top: -1px;
+  margin-top: -5px;
   margin-bottom: 1px;
  }
 
@@ -102,8 +102,9 @@ app-toolbar
 
  .app-toolbar .app-toolbar__delimiter{
   display: inline-block;
-  height: 22px;
+  height: 24px;
   width: 2px;
-  margin-top: 5px;
+  margin-top: 2px;
+  margin-right: 7px;
   background-color: rgb(0 0 0 / 30%);
  }
