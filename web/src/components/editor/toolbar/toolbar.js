@@ -38,6 +38,7 @@ class Toolbar extends React.Component {
             || this.props.canSave !== nextProps.canSave
             || this.props.canLoad !== nextProps.canLoad
             || this.props.canPrint !== nextProps.canPrint
+            || this.props.canExport!== nextProps.canExport
             || this.props.realtimeRender !== nextProps.realtimeRender
             || this.props.playbackNotes !== nextProps.playbackNotes
             || this.props.loop !== nextProps.loop

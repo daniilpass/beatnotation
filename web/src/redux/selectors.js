@@ -26,7 +26,7 @@ export const CanLoad = state => {
 }
 
 export const CanExport = state => {
-    return state.editor.playerState === PlayerStates.STOP || state.editor.playerState === PlayerStates.PAUSE;
+    return (state.editor.playerState === PlayerStates.STOP || state.editor.playerState === PlayerStates.PAUSE) && state.editor.tracksLengthInTakts > 0 ;
 }
 
 export const CanImportAudio = state => {
