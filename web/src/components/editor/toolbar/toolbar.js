@@ -7,6 +7,7 @@ import {setPlayerState, setRealtimeRender, setPlaybackNotes, setBpm, setTimeSign
 import {CanPlay, CanStop, CanPause, CanSave, CanLoad, CanPrint, CanExport} from "../../../redux/selectors";
 import * as PlayerStates from "../../../redux/dictionary/playerStates";
 
+import SaveService from "../../../services/SaveService";
 
 import UserFileReader from "../../userFileReader/userFileReader";
 import {Select, Option} from "../../controls/select/select";
@@ -127,41 +128,34 @@ class Toolbar extends React.Component {
     }
 
     handleSave = () => {
-        //TODO: move to service
         console.log("save");
-        
-        //TODO: improve data to save (add app version)
-        //console.log(this.props.tracks);
-        let saveData = {
-            bpm: this.props.bpm,
-            timeSignature: this.props.timeSignature,
-            loop: this.props.loop,
-            loopStart:this.props.loopStart,
-            loopEnd: this.props.loopEnd,  
-            realtimeRender: this.props.realtimeRender,
-            playbackNotes: this.props.playbackNotes,
-            tracks: [...this.props.tracks],     
-        }
 
-        //Save audio arrayBuffer to file
-        saveData.tracks.forEach( (track, index) => {
-            if (track.type === 0) {
-                let tmpTrack = {...track};
-                tmpTrack.arrayBuffer = Array.from(new Uint8Array(track.arrayBuffer));
-                saveData.tracks[index] = tmpTrack;
+        this.props.setAppBusy(true, "Processing ...");
+        setTimeout(() => {
+            let saveData = {
+                bpm: this.props.bpm,
+                timeSignature: this.props.timeSignature,
+                loop: this.props.loop,
+                loopStart:this.props.loopStart,
+                loopEnd: this.props.loopEnd,  
+                realtimeRender: this.props.realtimeRender,
+                playbackNotes: this.props.playbackNotes,
+                tracks: [...this.props.tracks],     
             }
-        });
-
-        let content = JSON.stringify(saveData);
-        let filename = "BeatNotation_"+Date.now()+".beno";
-        const file = new Blob([content], {type: 'application/json'});
-
-        const a = document.createElement('a');
-        a.href= URL.createObjectURL(file);
-        a.download = filename;
-        a.click();
     
-        URL.revokeObjectURL(a.href);
+            let blobSave = SaveService.createSaveFile(saveData);
+            const file = new Blob([blobSave], {type: 'application/octet-stream'});
+    
+            const a = document.createElement('a');
+            a.href= URL.createObjectURL(file);
+            a.download = "BeatNotation_"+Date.now()+".beno";
+            a.click();
+        
+            URL.revokeObjectURL(a.href);
+    
+            this.props.setAppBusy(false);
+        }, 0)
+        
     }
 
     handleLoad = () => {
@@ -169,13 +163,12 @@ class Toolbar extends React.Component {
         this.fileReaderRef.current.selectFile();
     }
 
-    handleFileLoaded = (content) => {
-        //TODO: move to service
-        console.log("loaded");
+    handleFileLoaded = (arrayBuffer) => {
         let asyncLoading = false;
         this.props.setAppBusy(true, "Processing ...");
+
         setTimeout(() => {
-            var data = JSON.parse(content);
+            var data = SaveService.readSaveFile(arrayBuffer);
             this.props.loadTracks(data);
             this.props.renderNotes();
     
@@ -183,7 +176,7 @@ class Toolbar extends React.Component {
             //TODO: использовать асинхронно, когда появится поддержка нескольких дорожек      
             data.tracks.forEach((track, trackIndex) => {
                 if (track.type === 0 && track.arrayBuffer && track.arrayBuffer.length > 0) {
-                    var buffer = new Uint8Array(track.arrayBuffer.slice(0)).buffer;
+                    var buffer = track.arrayBuffer.buffer; //new Uint8Array(track.arrayBuffer.slice(0)).buffer;
                     this.props.loadUserAudio(trackIndex, buffer, track.offset);
                     asyncLoading = true;                 
                 }            
@@ -194,8 +187,7 @@ class Toolbar extends React.Component {
                 this.props.setAppBusy(false);
             }
             
-        }, 500)
-        
+        }, 500)        
     }
 
     handlePrint = () => {
@@ -313,7 +305,7 @@ class Toolbar extends React.Component {
                     <SwitchButton name="playbackNotes" onChange={this.handleBooleanInputChange} checked={this.props.playbackNotes} icon={<PlayNoteIcon />} title="Playback notes"/>
                 </div>
 
-                <UserFileReader  ref={this.fileReaderRef} onFileLoaded={this.handleFileLoaded} accept=".beno"/>
+                <UserFileReader  ref={this.fileReaderRef} onFileLoaded={this.handleFileLoaded} readAsArrayBuffer accept=".beno"/>
         </div>
     }
 }
