@@ -121,7 +121,7 @@ class TrackControl extends React.Component {
   class TrackSettingsButton extends React.Component {
 
     shouldComponentUpdate(nextProps) {
-      if (nextProps.showImportOption !== nextProps.showImportOption
+      if (this.props.showImportOption !== nextProps.showImportOption
           || (nextProps.showImportOption === true && this.props.canImportAudio !== nextProps.canImportAudio) ) {
             return true;
       }

@@ -100,7 +100,7 @@ class SaveService {
         for ( var i = start; i <= end - 1; i++) {
             value = (value * 256) + byteArray[i];
 
-            if ( i % 2 == 1) {                
+            if ( i % 2 === 1) {                
                 str += String.fromCharCode(value);
                 value = 0;
             }
@@ -120,7 +120,7 @@ class SaveService {
 
     charToUint8Array = (char) => {
         if ( char > 65535)
-            throw "Buffer overflow";
+            throw new Error("Buffer overflow");
 
         var byteArray = [];
         var byte = char & 0xff;
@@ -134,7 +134,7 @@ class SaveService {
 
         for ( var index = byteArray.length - 1; index >= 0; index--) {
             var byte = long & 0xff;      // 300 - 44
-            byteArray [ index ] = byte; 
+            byteArray[index] = byte; 
             long = (long - byte) / 256 ;
         }
 
