@@ -108,7 +108,7 @@ class TrackControl extends React.Component {
             {this.Volume}
           </div>
           <div className="track-control__title" style={{lineHeight: this.props.height-2+"px"}}>{this.Title}</div>
-          <TrackSettingsButton {...this.props} onClearTrack={this.props.onClearTrack} onImportAudio={this.props.onLoadClick}/>
+          <TrackSettingsButton showImportOption={this.props.track.type === 0} canImportAudio={this.props.canImportAudio} onClearTrack={this.props.onClearTrack} onImportAudio={this.props.onLoadClick}/>
           <MuteButton onClick={this.handleTrackIsMuteClick} isMuted={this.isMuted}/>
           {this.props.track.type === 0 && <IconButton className="track-control__load" onClick={this.onLoadClick} disabled={!this.props.canImportAudio} icon={<OpenIcon/>} title="Import audio file"/>}
       </div>
@@ -120,6 +120,15 @@ class TrackControl extends React.Component {
 
   class TrackSettingsButton extends React.Component {
 
+    shouldComponentUpdate(nextProps) {
+      if (nextProps.showImportOption !== nextProps.showImportOption
+          || (nextProps.showImportOption === true && this.props.canImportAudio !== nextProps.canImportAudio) ) {
+            return true;
+      }
+
+      return false;
+    }
+
     handleImportAudio = () => {
       this.props.canImportAudio && this.props.onImportAudio && this.props.onImportAudio();
     }
@@ -129,15 +138,15 @@ class TrackControl extends React.Component {
     }
 
     render() {
+      console.log("RENDER SETTINGS")
       const selectInput=<SettingsIcon className="settings-icon"/>;
       return <div className="track-control__settings">
         <Select input={selectInput}>
-          {this.props.track.type === 0 &&
+          {this.props.showImportOption  &&
             <Option key="import-audio" content="Import audio file" value="import-audio" onClick={this.handleImportAudio} disabled={!this.props.canImportAudio}></Option>
           }
           <Option key="clear-track" content="Clear track" value="Clear-track" onClick={this.handleClearTrack}></Option>
         </Select>
-        {/* <SettingsIcon className="settings-icon"/> */}
       </div>
     }
 
