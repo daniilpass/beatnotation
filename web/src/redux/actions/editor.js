@@ -168,9 +168,12 @@ export const setTrackIsMute = (index) => {
     }
 }
 
-export const exportAsWav = () => {
+export const exportAsWav = (onlySelection) => {
     return {
-        type: EXPORT_AS_WAV
+        type: EXPORT_AS_WAV,
+        payload: {
+            onlySelection: onlySelection
+        }
     }
 }
 

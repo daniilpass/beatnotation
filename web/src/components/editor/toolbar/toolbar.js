@@ -186,9 +186,9 @@ class Toolbar extends React.Component {
         this.props.printNotes();
     }
     
-    handleExport = () => {
-        console.log("export");
-        this.props.exportAsWav();
+    handleExport = (onlySelection) => {
+        console.log("export. onlySelection", onlySelection);
+        this.props.exportAsWav(onlySelection);
     }
 
     handleBpmInputChange = (event) => {
@@ -254,7 +254,7 @@ class Toolbar extends React.Component {
                 <button className="app-toolbar__button" onClick={this.handlePrint} disabled={!this.props.canPrint}>Print</button>
                 <button className="app-toolbar__button" onClick={this.handleSave} disabled={!this.props.canSave}>Save</button>
                 <button className="app-toolbar__button" onClick={this.handleLoad} disabled={!this.props.canLoad}>Load</button>
-                <button className="app-toolbar__button" onClick={this.handleExport} disabled={!this.props.canExport}>Export as WAV</button>
+                <ExportButton onClick={this.handleExport} disabled={!this.props.canExport}/>
 
                 {/* <div className="app-toolbar__part" >
                     Part: {Math.trunc(this.timelineNote) + 1 }
@@ -310,3 +310,26 @@ const mapStateToProps = state => {
 }
 
 export default connect(mapStateToProps, {setPlayerState, setRealtimeRender, setPlaybackNotes, setBpm, setTimeSignature, loadTracks, renderNotes, printNotes, loadUserAudio, exportAsWav, setAppBusy, setLoop}) (Toolbar)
+
+
+class ExportButton extends React.Component {
+
+    handleExportSelectionClick = () => {
+        this.props.onClick && this.props.onClick(true);
+    }
+
+    handleExportWholeProjectClick = () => {
+        this.props.onClick && this.props.onClick(false);
+    }
+  
+    render() {
+      const selectInput= <button className="app-toolbar__button" disabled={this.props.disabled}>Export as WAV</button>;
+      return <div>
+        <Select input={selectInput}>
+            <Option key="export-whole-project" content="Export whole project" value="export-whole-project" onClick={this.handleExportWholeProjectClick}></Option>
+            <Option key="export-selected-region" content="Export selected region" value="export-selected-region" onClick={this.handleExportSelectionClick}></Option>           
+        </Select>
+      </div>
+    }
+
+  }

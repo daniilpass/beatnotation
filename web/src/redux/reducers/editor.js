@@ -48,6 +48,7 @@ const initialState = {
     timePointerWidth: 10,
     //TRAAAAAAAAAACK
     exportAsWav: 0,
+    exportOnlySelection: false,
     audioTracksPositionChanged: 0,
     audioTracksVolumeChanged: 0,
     tracks: initTracks({tracksLengthInTakts: 4, notesInTakt: 16}), //TODO: что-то не так делаю явно
@@ -99,7 +100,7 @@ export default function editorReducer(state = initialState, action) {
         case SET_TRACK_MUTE:
             return setTrackIsMute(state, action.payload); 
         case EXPORT_AS_WAV:
-            return exportAsWav(state); 
+            return exportAsWav(state, action.payload); 
         case CLEAR_TRACK:
             return clearTrack(state, action.payload); 
         case SET_LOOP_PERIOD:
@@ -578,10 +579,11 @@ function setTrackIsMute (state, payload) {
     }
 }
 
-function exportAsWav(state) {
+function exportAsWav(state, payload) {
     return {
         ...state,
-        exportAsWav: Date.now()
+        exportAsWav: Date.now(),
+        exportOnlySelection: payload.onlySelection
     }
 }
 
