@@ -23,7 +23,7 @@ export default class App extends React.Component {
       <Header />
       <Editor />
       <NotesRenderer />
-      <Version value="1.3.0"/>      
+      <Version value="1.4.0"/>      
     </div>
   }
 }
