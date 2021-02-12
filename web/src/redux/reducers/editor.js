@@ -13,7 +13,7 @@ const initialState = {
     //Track settings
     playerState: "stop",
     baseTime: 0,
-    baseTimeUpdated: 0,
+    baseTimeUpdatedAt: 0,
     playerStartedAt: 0, 
     playerStoppedAt: 0, 
     endOfTrack: false,
@@ -47,10 +47,10 @@ const initialState = {
     addTaktButtonWidth: 100,
     timePointerWidth: 10,
     //TRAAAAAAAAAACK
-    exportAsWav: 0,
+    exportAsWavAt: 0,
     exportOnlySelection: false,
-    audioTracksPositionChanged: 0,
-    audioTracksVolumeChanged: 0,
+    audioTracksPositionChangedAt: 0,
+    audioTracksVolumeChangedAt: 0,
     tracks: initTracks({tracksLengthInTakts: 4, notesInTakt: 16}), //TODO: что-то не так делаю явно
     clipboard: []
 }
@@ -116,7 +116,7 @@ function setPlayerState(state, payload) {
     let newPlayerStartedAt = state.playerStartedAt;
     let newPlayerStoppedAt = state.playerStoppedAt;    
     let newBaseTime = state.baseTime;
-    let newBaseTimeUpdated = state.baseTimeUpdated;
+    let newbaseTimeUpdatedAt = state.baseTimeUpdatedAt;
 
     let eot = state.endOfTrack; //TODO: обходное решение
     if (payload.playerState === PlayerState.STOP) {
@@ -124,13 +124,13 @@ function setPlayerState(state, payload) {
         //newPlayerStartedAt = 0;
         newPlayerStoppedAt = Date.now();        
         newBaseTime = 0;
-        newBaseTimeUpdated = Date.now();
+        newbaseTimeUpdatedAt = Date.now();
         newPlayerStoppedAt = Date.now();
     } else if (payload.playerState === PlayerState.PAUSE) {
         // newPlayerStartedAt = 0;
         newPlayerStoppedAt = Date.now();
         newBaseTime = newBaseTime + Date.now() - state.playerStartedAt;
-        newBaseTimeUpdated = Date.now();
+        newbaseTimeUpdatedAt = Date.now();
     } else if (payload.playerState === PlayerState.PLAY) {
         newPlayerStartedAt = Date.now();
         newPlayerStoppedAt = 0;
@@ -143,7 +143,7 @@ function setPlayerState(state, payload) {
         ...state, 
         playerState: payload.playerState,
         baseTime: newBaseTime,
-        baseTimeUpdated: newBaseTimeUpdated,
+        baseTimeUpdatedAt: newbaseTimeUpdatedAt,
         playerStartedAt: newPlayerStartedAt,
         playerStoppedAt: newPlayerStoppedAt,
         endOfTrack: eot
@@ -167,7 +167,7 @@ function setBpm(state, payload) {
         loopStart: state.loopStart * (state.bpm / payload.bpm),
         playerState: PlayerState.STOP,
         baseTime: 0,
-        baseTimeUpdated: Date.now(),
+        baseTimeUpdatedAt: Date.now(),
         playerStoppedAt: Date.now(),
         endOfTrack: false
     };
@@ -250,7 +250,7 @@ function setTimeSignature(state, payload) {
         //stop player and reset to 0
         playerState: PlayerState.STOP,
         baseTime: 0,
-        baseTimeUpdated: Date.now(),
+        baseTimeUpdatedAt: Date.now(),
         playerStoppedAt: Date.now(),
         endOfTrack: false      
     };
@@ -481,7 +481,7 @@ function loadTracks(state, payload) {
     return {
         ...state,
         baseTime: 0,
-        newBaseTimeUpdated: Date.now(),
+        newbaseTimeUpdatedAt: Date.now(),
         bpm: data.bpm,
         timeSignature: data.timeSignature,
         loop: data.loop !== undefined ? data.loop : state.loop,
@@ -513,7 +513,7 @@ function setTrackVolume (state, payload) {
 
     return {
         ...state,
-        audioTracksVolumeChanged: tmpTrack.type === 0 ? Date.now() : state.audioTracksVolumeChanged,
+        audioTracksVolumeChangedAt: tmpTrack.type === 0 ? Date.now() : state.audioTracksVolumeChangedAt,
         tracks: tmpTracks
     }
 }
@@ -523,7 +523,7 @@ function setBaseTime(state, payload) {
         ...state, 
         playerStartedAt: payload.playerStartedAt || state.playerStartedAt,
         baseTime: payload.baseTime,
-        baseTimeUpdated: Date.now()
+        baseTimeUpdatedAt: Date.now()
     }
 }
 
@@ -559,7 +559,7 @@ function setTrackOffset(state, payload) {
 
     return {
         ...state,
-        audioTracksPositionChanged: Date.now(),
+        audioTracksPositionChangedAt: Date.now(),
         tracks: tmpTracks
     }
 }
@@ -576,7 +576,7 @@ function setTrackIsMute (state, payload) {
 
     return {
         ...state,
-        audioTracksVolumeChanged: Date.now(),
+        audioTracksVolumeChangedAt: Date.now(),
         tracks: tmpTracks
     }
 }
@@ -584,7 +584,7 @@ function setTrackIsMute (state, payload) {
 function exportAsWav(state, payload) {
     return {
         ...state,
-        exportAsWav: Date.now(),
+        exportAsWavAt: Date.now(),
         exportOnlySelection: payload.onlySelection
     }
 }
@@ -622,7 +622,7 @@ function clearTrack(state, payload) {
         tracks: tmpTracks,
         playerState: PlayerState.STOP, //TODO: не сбрасывать на начало трека
         baseTime: 0,
-        baseTimeUpdated: Date.now(),
+        baseTimeUpdatedAt: Date.now(),
         playerStoppedAt: Date.now(),
         endOfTrack: false
     }

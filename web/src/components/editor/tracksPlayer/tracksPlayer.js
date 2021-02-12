@@ -33,12 +33,12 @@ export default class TracksPlayer extends React.Component {
         }
 
         //Идет проигрышь и изменилось базовое время(предвинули указатель времени) или сдвинулись аудио дорожки, то запустим треки с нужного отрезка
-        if ((this.props.baseTimeUpdated !== prevProps.baseTimeUpdated || this.props.audioTracksPositionChanged !== prevProps.audioTracksPositionChanged) && this.props.playerState === PlayerStates.PLAY) {
+        if ((this.props.baseTimeUpdatedAt !== prevProps.baseTimeUpdatedAt || this.props.audioTracksPositionChangedAt !== prevProps.audioTracksPositionChangedAt) && this.props.playerState === PlayerStates.PLAY) {
             this.handleAudioPositionChangeWhilePlaying();
         }
         
         // Обновление уровня звука
-        if (this.props.audioTracksVolumeChanged !== prevProps.audioTracksVolumeChanged && this.props.playerState === PlayerStates.PLAY) {
+        if (this.props.audioTracksVolumeChangedAt !== prevProps.audioTracksVolumeChangedAt && this.props.playerState === PlayerStates.PLAY) {
             this.handleAudioVolumeChangeWhilePlaying();
         }
 
@@ -48,7 +48,7 @@ export default class TracksPlayer extends React.Component {
         }
 
         // Экспорт аудио
-        if (this.props.exportAsWav !== prevProps.exportAsWav) {
+        if (this.props.exportAsWavAt !== prevProps.exportAsWavAt) {
             this.handleExportAsWav();
         }
     }
