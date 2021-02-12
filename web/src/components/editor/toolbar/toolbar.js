@@ -9,9 +9,13 @@ import * as PlayerStates from "../../../redux/dictionary/playerStates";
 
 
 import UserFileReader from "../../userFileReader/userFileReader";
+import {Select, Option} from "../../controls/select/select";
+import SwitchButton from "../../controls/switchButton/switchButton";
+import {ReactComponent as LoopIcon} from "../../../assets/img/loop.svg";
+import {ReactComponent as NoteIcon} from "../../../assets/img/note8.svg";
+import {ReactComponent as PlayNoteIcon} from "../../../assets/img/playback_note.svg";
 
 import "./toolbar.css";
-import {Select, Option} from "../../controls/select/select";
 
 class Toolbar extends React.Component {
     constructor(props) {
@@ -254,19 +258,25 @@ class Toolbar extends React.Component {
     render() {
       console.log('Render Toolbar');
       return <div className="app-toolbar no-print">
+                {/* <div className="app-toolbar__delimiter"></div> */}
+                <button className="app-toolbar__button" onClick={this.handleLoad} disabled={!this.props.canLoad}>Load</button>
+                <button className="app-toolbar__button" onClick={this.handleSave} disabled={!this.props.canSave}>Save</button>
+                <div className="app-toolbar__delimiter"></div>
+
+
+                <button className="app-toolbar__button" onClick={this.handlePrint} disabled={!this.props.canPrint}>Print</button>
+                <ExportButton onClick={this.handleExport} disabled={!this.props.canExport}/>
+                <div className="app-toolbar__delimiter"></div>
+
+
                 <button className="app-toolbar__button" onClick={this.handlePlay} disabled={!this.props.canPlay}>Play</button>
                 <button className="app-toolbar__button" onClick={this.handleStop} disabled={!this.props.canStop}>Stop</button>
                 <button className="app-toolbar__button" onClick={this.handlePause} disabled={!this.props.canPause}>Pause</button>
-                <button className="app-toolbar__button" onClick={this.handlePrint} disabled={!this.props.canPrint}>Print</button>
-                <button className="app-toolbar__button" onClick={this.handleSave} disabled={!this.props.canSave}>Save</button>
-                <button className="app-toolbar__button" onClick={this.handleLoad} disabled={!this.props.canLoad}>Load</button>
-                <ExportButton onClick={this.handleExport} disabled={!this.props.canExport}/>
+                <div className="app-toolbar__delimiter"></div>
 
-                {/* <div className="app-toolbar__part" >
-                    Part: {Math.trunc(this.timelineNote) + 1 }
-                </div> */}
+                
                 <div className="app-toolbar__time-signature" >
-                    Time signature:
+                    <div className="app-toolbar__input-title">TIME SIG</div>
                     <Select value={this.timeSignatureString} onChange={this.handleTimeSignatureChange}>
                         {this.props.timeSignatures.map(ts => {
                             return <Option key={ts} content={ts} value={ts}></Option>
@@ -275,27 +285,27 @@ class Toolbar extends React.Component {
                 </div>
 
                 <div className="app-toolbar__bpm" >
-                    BPM: 
+                    <div className="app-toolbar__input-title">BPM</div>
                     <input name="bpm" value={this.getBpm} onChange={this.handleBpmInputChange} type="number"></input>
                 </div>
 
-                <div className="app-toolbar__time" ref={this.props.timeTextRef} >
-                    00:00:00.000
+                <div className="app-toolbar__time">
+                    <div className="app-toolbar__input-title">TIME</div>
+                    <div className="app-toolbar__time-input" ref={this.props.timeTextRef}>00:00:00.000</div>                    
+                </div>
+                <div className="app-toolbar__delimiter"></div>
+
+                
+                <div>
+                    <SwitchButton name="loop" onChange={this.handleBooleanInputChange} checked={this.props.loop} icon={<LoopIcon />} title="Loop selected region"/>
                 </div>
 
                 <div>
-                    Loop: 
-                    <input name="loop" onChange={this.handleBooleanInputChange} checked={this.props.loop} type="checkbox"></input>
+                    <SwitchButton name="realtimeRender" onChange={this.handleBooleanInputChange} checked={this.props.realtimeRender} icon={<NoteIcon />} title="Show notation"/>
                 </div>
 
                 <div>
-                    Show notation: 
-                    <input name="realtimeRender" onChange={this.handleBooleanInputChange} checked={this.props.realtimeRender} type="checkbox"></input>
-                </div>
-
-                <div>
-                    Playback notes: 
-                    <input name="playbackNotes" onChange={this.handleBooleanInputChange} checked={this.props.playbackNotes} type="checkbox"></input>
+                    <SwitchButton name="playbackNotes" onChange={this.handleBooleanInputChange} checked={this.props.playbackNotes} icon={<PlayNoteIcon />} title="Playback notes"/>
                 </div>
 
                 <UserFileReader  ref={this.fileReaderRef} onFileLoaded={this.handleFileLoaded} accept=".beno"/>
@@ -329,7 +339,7 @@ class ExportButton extends React.Component {
     }
   
     render() {
-      const selectInput= <button className="app-toolbar__button" disabled={this.props.disabled}>Export as WAV</button>;
+      const selectInput= <button className="app-toolbar__button no-margin" disabled={this.props.disabled}>Export as WAV</button>;
       return <div>
         <Select input={selectInput}>
             <Option key="export-whole-project" content="Export whole project" value="export-whole-project" onClick={this.handleExportWholeProjectClick}></Option>

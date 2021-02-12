@@ -11,7 +11,7 @@ app-toolbar
     /* width: 100%; */
     top: 40px;
     margin-top: 40px;
-    height: 40px;
+    /* height: 40px; */
     width: 100%;
     background-color: #7277D8;
     padding: 8px;
@@ -20,7 +20,7 @@ app-toolbar
   }
   
   .app-toolbar__button {
-    height: 21px;
+    height: 32px;
     margin-right: 8px;
     background-color: #2F3485;
     color: #FFC173;
@@ -43,23 +43,67 @@ app-toolbar
   .app-toolbar > div {
     display: inline-block;
     margin-right: 8px;
-    height: 21px;
+    height: 32px;
     vertical-align: top;
     color: #FFC173;
-    line-height: 21px;
+    line-height: 28px;
   }
   
   .app-toolbar__bpm input{
     border: 2px solid #2F3485;
-    margin-left: 8px;
+    /* margin-left: 8px; */
     background-color: #7277D8;
     color: #FFC173;
     box-shadow: 2px 2px 0px rgb(0 0 0 / 30%);
     box-sizing: border-box;
     vertical-align: top;
+    height: 21px;
+    width: 60px;
+    font-size: 11pt;
   }
 
   .app-toolbar__time-signature .app-select{
     vertical-align: top;
-    margin-left: 8px;
+    /* margin-left: 8px; */
+    width: 60px;
   }
+
+  /* .app-toolbar__time-signature .app-select__input {
+    height: 32px;
+    line-height: 26px;
+  } */
+
+  .app-toolbar .switch-button{
+    vertical-align: top;
+  }
+
+ .app-toolbar__time-input {
+    height: 21px;
+    line-height: 15px;
+    border: 2px solid #2F3485;
+    background-color: #7277D8;
+    color: #FFC173;
+    padding: 0 4px;
+    overflow: hidden;
+    box-shadow: 2px 2px 0px rgb(0 0 0 / 30%);
+    box-sizing: border-box;
+ }
+
+ .app-toolbar__input-title {
+  font-size: 11px;
+  line-height: 11px;
+  margin-top: -1px;
+  margin-bottom: 1px;
+ }
+
+ .no-margin {
+   margin: 0;
+ }
+
+ .app-toolbar .app-toolbar__delimiter{
+  display: inline-block;
+  height: 22px;
+  width: 2px;
+  margin-top: 5px;
+  background-color: rgb(0 0 0 / 30%);
+ }

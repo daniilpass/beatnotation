@@ -27,6 +27,10 @@ body {
   background: #2F3485;
 }
 
+.App {
+  min-width: 1300px;
+}
+
 /*
 track-container
 */

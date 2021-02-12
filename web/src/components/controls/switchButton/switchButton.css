@@ -1,0 +1,29 @@
+.switch-button {
+    display: inline-block;
+    height: 32px; 
+    background-color: #7277D8;
+    border: 2px solid #2F3485;
+    box-shadow: 2px 2px 0px rgb(0 0 0 / 30%);
+    cursor: pointer;
+    user-select: none;
+    padding: 4px 4px;
+    box-sizing: border-box;
+}
+
+.switch-button svg{
+    width: 32px;
+    height: 20px;
+    vertical-align: top;
+}
+
+.switch-button--checked {
+    background-color: #2F3485;
+}
+
+.switch-button--checked svg path {
+    fill: #ffc173e6 !important;
+}
+
+.switch-button--unchecked svg path{
+    fill: #2F3485 !important;
+}

@@ -81,11 +81,15 @@ export class Select extends React.PureComponent {
     }
 
     renderInput() {
-        if (this.props.input && React.isValidElement(this.props.input)) {
+        if (this.customInput) {
             return React.cloneElement(this.props.input, { onClick: this.handleInputClick});
         } else {
             return <div className="app-select__input" onClick={this.handleInputClick}>{this.displayValue}</div>
         }
+    }
+
+    get customInput() {
+        return this.props.input && React.isValidElement(this.props.input);
     }
 
     get displayValue () {
@@ -104,18 +108,19 @@ export class Select extends React.PureComponent {
             return {};
         }
         let bound = this.element.current.getBoundingClientRect();
+        let bodyBound = document.body.getBoundingClientRect()
         return {
-            top: bound.top + bound.height + "px",
-            left: bound.left + "px",
+            top: bound.top + bound.height - bodyBound.top + "px",
+            left: bound.left - bodyBound.left+ "px",
         }
     }
 
     render() {
-        return <div ref={this.element} className={"app-select "  + (this.state.optionsVisible ? " app-select--custom-input" : " app-select--custom-input")}>
+        return <div ref={this.element} className={"app-select "  + (this.customInput ? " app-select--custom-input" : "")}>
             {this.renderInput()}
             {
                 ReactDOM.createPortal(
-                    <div style={{...this.positionStyle}} className={"app-select__options " + (this.state.optionsVisible ? "app-select__options--visible" : "app-select__options--hidden")}>
+                    <div style={{...this.positionStyle}} className={"app-select__options no-print " + (this.state.optionsVisible ? "app-select__options--visible" : "app-select__options--hidden")}>
                         {this.renderOptions()}
                     </div>, 
                     this.domNode)

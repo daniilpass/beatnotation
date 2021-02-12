@@ -71,7 +71,7 @@ export default class Editor extends React.Component {
     // Ручное обновление частей интерфейса зависимых от таймер 
     window.requestAnimationFrame(() => {
       // Обновление текстового представления времени
-      this.timeTextRef.current.innerText = "Time: " + this.getFormattedTime;
+      this.timeTextRef.current.innerText = this.getFormattedTime;
       // Обновление позиции курсора
       this.timePointerRef.current.style.left = this.timePointerXPos + "px";
 
