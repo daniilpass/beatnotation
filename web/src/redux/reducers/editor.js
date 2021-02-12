@@ -23,16 +23,16 @@ const initialState = {
     notesInTakt: 16, 
     tracksLengthInTakts: 4,
     tracksLengthInNotes: 4 * 16,
-    //Editor settings
-    realtimeRender: true,
-    playbackNotes: true,
     //Time signatures
     timeSignatures: [
         "2/4", "3/4", "4/4","6/4", "9/4",
         // "2/8", "4/8", 
         "3/8", "6/8", "9/8", "12/8",
         //"2/16","3/16",      "6/16","9/16","12/16", //TODO: выяснить группировку нот в таком размере
-      ],    
+      ], 
+    //Editor settings
+    realtimeRender: true,
+    playbackNotes: true,
     //loop
     loop: false,
     loopStart: 0,
@@ -429,9 +429,6 @@ function loadTracks(state, payload) {
     let data = payload.data;
 
     //Load from files:
-    //-volume
-    //-notes
-    //-trackLength
     var maxTaktCount = 0;
     let tmpTracks = [...state.tracks]; 
     for (let it = 0; it < tmpTracks.length; it++) {
@@ -487,6 +484,11 @@ function loadTracks(state, payload) {
         newBaseTimeUpdated: Date.now(),
         bpm: data.bpm,
         timeSignature: data.timeSignature,
+        loop: data.loop !== undefined ? data.loop : state.loop,
+        loopStart: data.loopStart!== undefined ? data.loopStart : state.loopStart,
+        loopEnd: data.loopEnd!== undefined ? data.loopEnd : state.loopEnd,  
+        realtimeRender: data.realtimeRender!== undefined ? data.realtimeRender : state.realtimeRender,
+        playbackNotes: data.playbackNotes!== undefined ? data.playbackNotes : state.playbackNotes,
         notesInTakt: newNotesInTakt,
         tracksLengthInTakts: newTracksLengthInTakts,
         tracksLengthInNotes: newTracksLengthInNotes,

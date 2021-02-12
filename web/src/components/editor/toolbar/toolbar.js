@@ -124,6 +124,11 @@ class Toolbar extends React.Component {
         let saveData = {
             bpm: this.props.bpm,
             timeSignature: this.props.timeSignature,
+            loop: this.props.loop,
+            loopStart:this.props.loopStart,
+            loopEnd: this.props.loopEnd,  
+            realtimeRender: this.props.realtimeRender,
+            playbackNotes: this.props.playbackNotes,
             tracks: [...this.props.tracks],     
         }
 
