@@ -117,6 +117,11 @@ class AudioTrack extends React.Component {
     return false;
   }
 
+  handlePositionChanged = (position) => {
+    let offset = position / this.props.noteWidth / this.props.bpms / this.props.notesInPartCount;   
+    this.props.setTrackOffset(this.props.index, offset);
+  }
+
   get width() {
     return this.props.noteWidth * this.props.tracksLengthInNotes;
   }
@@ -125,11 +130,15 @@ class AudioTrack extends React.Component {
     return this.props.loaded;
   }
 
+  get vPosition() {
+    return this.props.track.offset * this.props.bpms * this.props.notesInPartCount * this.props.noteWidth;
+  }
+
   render() {
     console.log("Render AudioTrack");
     return [
     <div key="user-audio-track" className={"user-audio-track" + (this.trackLoaded ? " user-audio-track-loaded" : "")} style={{width: this.width + "px"}}>
-      <AudioTrackVisualization {...this.props} parentWidth={this.width}/>
+      <AudioTrackVisualization {...this.props} parentWidth={this.width} position={this.vPosition} onPositionChanged={this.handlePositionChanged}/>
     </div>]
   }
 }

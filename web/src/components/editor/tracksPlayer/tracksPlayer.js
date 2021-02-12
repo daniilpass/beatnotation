@@ -185,8 +185,7 @@ export default class TracksPlayer extends React.Component {
             }
 
             // Рассчитываю время начала и смещения
-            let  whenInPx    = this.props.tracks[trackIndex].offset
-            let  whenInSec = whenInPx / ( this.props.bpms * this.props.notesInPartCount *  this.props.noteWidth) / 1000;
+            let  whenInSec = this.props.tracks[trackIndex].offset / 1000;
            
             whenInSec = whenInSec - offset;                
             if (whenInSec >= 0) {

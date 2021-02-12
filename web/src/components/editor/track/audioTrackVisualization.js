@@ -5,7 +5,7 @@ export default class AudioTrackVisualization extends React.Component {
       super(props);
   
       this.state = {
-        tmpPosition: -1
+        position: this.props.position || 0
       }
   
       this.drag = {
@@ -24,8 +24,8 @@ export default class AudioTrackVisualization extends React.Component {
         || this.props.bpms !== nextProps.bpms 
         || this.props.notesInPartCount !== nextProps.notesInPartCount 
         || this.props.noteWidth !== nextProps.noteWidth
-        || this.state.tmpPosition !== nextState.tmpPosition
-        || this.props.track.offset !== nextProps.track.offset) {
+        || this.state.position !== nextState.position
+        || this.props.position !== nextProps.position) {
         return true;
       }
       return false;
@@ -42,14 +42,16 @@ export default class AudioTrackVisualization extends React.Component {
       if (this.props.loaded === false) {
         this.clearVisualization("audio_canvas_inside");
       }
+      
+      if (this.props.position !== prevProps.position) {
+        this.setState({position:this.props.position}) 
+      }
     }
   
     dragMouseDown = (e) => {
       e.preventDefault();
   
-      this.setState({tmpPosition: this.props.track.offset || 0})
       this.drag.oldClientX = e.clientX;
-  
       document.onmouseup = this.closeDragElement;
       document.onmousemove = this.dragCanvas;
     }
@@ -58,8 +60,7 @@ export default class AudioTrackVisualization extends React.Component {
       e.preventDefault();
       document.onmouseup = null;
       document.onmousemove = null;
-      this.props.setTrackOffset(this.props.index, this.state.tmpPosition);
-      this.setState({tmpPosition: -1})
+      this.props.onPositionChanged(this.state.position);
     }
   
     dragCanvas = (e) => {
@@ -69,23 +70,17 @@ export default class AudioTrackVisualization extends React.Component {
       this.drag.oldClientX = e.clientX;
   
       //change pos
-      let newPosition = this.state.tmpPosition - deltaX;
+      let newPosition = this.state.position - deltaX;
       if (newPosition >= 0 && (newPosition + this.props.noteWidth) <= this.props.parentWidth) {
-        this.setState({tmpPosition: newPosition})
-        //requestAnimationFrame( () => { this.setState({tmpPosition: newPosition}) } );
+        this.setState({position: newPosition})
+        //requestAnimationFrame( () => { this.setState({position: newPosition}) } );
       }
-    }
-  
-    get offset() {
-      return this.state.tmpPosition > -1 ? this.state.tmpPosition : this.props.track.offset;
     }
   
     get track() {
       return this.props.track;
     }
-
     
-  
     handleVisualize = (canvas_name) => {
         console.log("Visualize");
         this.props.setAppBusy(true, "Processing ...");
@@ -212,7 +207,7 @@ export default class AudioTrackVisualization extends React.Component {
 
     render() {
       console.log("Render AudioTrackVisualization");
-      return <canvas id="audio_canvas_inside" className="user-audio-visualization"  ref={this.canvasRef} width="0" height={this.props.noteHeight} style={{marginLeft: this.offset + "px"}}></canvas>
+      return <canvas id="audio_canvas_inside" className="user-audio-visualization"  ref={this.canvasRef} width="0" height={this.props.noteHeight} style={{marginLeft: this.state.position + "px"}}></canvas>
     }
     
   }

@@ -223,7 +223,7 @@ class AudioSercive {
 
         // Временные метки
         let timestamp = (sampleIndex / sampleRate) * 1000 + (settings.loop ? settings.loopStart : 0); // sample to ms timesatmp
-        let trackOffsetInMs =  track.offset / ( settings.bpms * settings.notesInPartCount *  settings.noteWidth);
+        let trackOffsetInMs =  track.offset;
 
         // Если трэк еще не должен звучать, то выхожу
         if (timestamp < trackOffsetInMs) {
