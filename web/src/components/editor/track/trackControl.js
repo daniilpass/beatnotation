@@ -2,9 +2,12 @@ import React from "react";
 import MuteButton from "../../controls/muteButton/muteButton";
 
 
+import {ReactComponent as OpenIcon} from "../../../assets/img/open-file.svg"
 
 import  {ReactComponent as SettingsIcon}  from "../../../assets/img/settings.svg";
 import { Option, Select } from "../../controls/select/select";
+import IconButton from "../../controls/iconButton/iconButton";
+
 
 class TrackControl extends React.Component {
     constructor(props) {
@@ -105,9 +108,9 @@ class TrackControl extends React.Component {
             {this.Volume}
           </div>
           <div className="track-control__title" style={{lineHeight: this.props.height-2+"px"}}>{this.Title}</div>
-          <TrackSettingsButton onClearTrack={this.props.onClearTrack}/>
+          <TrackSettingsButton {...this.props} onClearTrack={this.props.onClearTrack} onImportAudio={this.props.onLoadClick}/>
           <MuteButton onClick={this.handleTrackIsMuteClick} isMuted={this.isMuted}/>
-          {this.props.track.type === 0 && <button className="track-control__load button" onClick={this.onLoadClick} disabled={!this.props.canImportAudio}>Load</button>}
+          {this.props.track.type === 0 && <IconButton className="track-control__load" onClick={this.onLoadClick} disabled={!this.props.canImportAudio} icon={<OpenIcon/>} title="Import audio file"/>}
       </div>
     }
   }
@@ -117,6 +120,10 @@ class TrackControl extends React.Component {
 
   class TrackSettingsButton extends React.Component {
 
+    handleImportAudio = () => {
+      this.props.canImportAudio && this.props.onImportAudio && this.props.onImportAudio();
+    }
+
     handleClearTrack = () => {
       this.props.onClearTrack && this.props.onClearTrack();
     }
@@ -125,6 +132,9 @@ class TrackControl extends React.Component {
       const selectInput=<SettingsIcon className="settings-icon"/>;
       return <div className="track-control__settings">
         <Select input={selectInput}>
+          {this.props.track.type === 0 &&
+            <Option key="import-audio" content="Import audio file" value="import-audio" onClick={this.handleImportAudio} disabled={!this.props.canImportAudio}></Option>
+          }
           <Option key="clear-track" content="Clear track" value="Clear-track" onClick={this.handleClearTrack}></Option>
         </Select>
         {/* <SettingsIcon className="settings-icon"/> */}

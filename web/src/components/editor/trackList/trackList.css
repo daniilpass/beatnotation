@@ -67,17 +67,21 @@ TRACK-CONTROL
   
 
   .track-control__load{
-    color: #FFAA40;
     height: 20px;
-    /* display: inline-block; */
     float: right;
     margin-top: 4px;
     box-shadow: 1px 1px 0px 2px rgb(0 0 0 / 30%);
   }
 
-  .track-control__load.button:disabled {
-    background-color: #2F3485;
-    color: rgb(0 0 0 / 30%);
+  .track-control .icon-button.icon-button--disabled.track-control__load{
+    border-color: #7277D8;
+  } 
+
+  .track-control__load svg{
+    margin-top: -3px;
+    width: 20px;
+    height: 14px;
+    vertical-align: top;
   }
 
   .track-control__settings{

@@ -144,11 +144,16 @@ export class Option extends React.PureComponent {
     handleClick = (e) => {
         e.preventDefault();
         e.stopPropagation();
+
+        if (this.props.disabled) {
+            return;
+        }
+
         this.props.onSelect && this.props.onSelect(this.props.value);
         this.props.onClick && this.props.onClick();
     }
 
     render() {
-        return <div className="app-select-option" onClick={this.handleClick} style={{...this.props.style}}>{this.props.content}</div>;
+        return <div className={"app-select-option " + (this.props.disabled ? "app-select-option--disabled" : "")} onClick={this.handleClick} style={{...this.props.style}}>{this.props.content}</div>;
     }
 }

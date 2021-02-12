@@ -9,7 +9,7 @@ export default class IconButton extends React.PureComponent {
     }
 
     render() {
-        return <div className={"icon-button"+(this.props.disabled ? " icon-button--disabled" : "")} onClick={this.onClick} title={this.props.title}>
+        return <div className={"icon-button"+(this.props.disabled ? " icon-button--disabled" : "") + " " + this.props.className} onClick={this.onClick} title={this.props.title}>
             {this.props.icon}
         </div>
     }

@@ -55,3 +55,8 @@
 .app-select-option:hover{
     background-color: #4e4982;
 }
+
+.app-select-option--disabled {
+    color: #7277D8;
+    cursor: auto;
+}
