@@ -133,6 +133,7 @@ class Toolbar extends React.Component {
         this.props.setAppBusy(true, "Processing ...");
         setTimeout(() => {
             let saveData = {
+                appVersion: this.props.appVersion,
                 bpm: this.props.bpm,
                 timeSignature: this.props.timeSignature,
                 loop: this.props.loop,
@@ -312,6 +313,7 @@ class Toolbar extends React.Component {
 
 const mapStateToProps = state => {
     const editor = state.editor;
+    const appVersion = state.app.version;
     const canPlay = CanPlay(state);
     const canStop = CanStop(state);
     const canPause = CanPause(state);
@@ -319,7 +321,7 @@ const mapStateToProps = state => {
     const canLoad = CanLoad(state);
     const canPrint = CanPrint(state);
     const canExport = CanExport(state);
-    return {...editor, canPlay, canStop, canPause, canSave, canLoad, canPrint, canExport};
+    return {...editor, canPlay, canStop, canPause, canSave, canLoad, canPrint, canExport, appVersion};
 }
 
 export default connect(mapStateToProps, {setPlayerState, setRealtimeRender, setPlaybackNotes, setBpm, setTimeSignature, loadTracks, renderNotes, printNotes, loadUserAudio, exportAsWav, setAppBusy, setLoop}) (Toolbar)
