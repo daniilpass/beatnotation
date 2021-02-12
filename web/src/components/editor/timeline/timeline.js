@@ -193,11 +193,11 @@ class LoopSelection extends React.Component {
   }
 
   get left() {
-    return (this.state.left > -1 ? this.state.left : this.props.left) || 0;
+    return this.state.left;
   }
 
   get width() {
-    return (this.state.width > -1 ? this.state.width : this.props.width) || 50;
+    return this.state.width;
   }
   render() {
     //console.log("Render loop", this.state, this.props)
