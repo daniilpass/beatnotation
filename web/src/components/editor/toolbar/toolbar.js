@@ -14,8 +14,15 @@ import SwitchButton from "../../controls/switchButton/switchButton";
 import {ReactComponent as LoopIcon} from "../../../assets/img/loop.svg";
 import {ReactComponent as NoteIcon} from "../../../assets/img/note8.svg";
 import {ReactComponent as PlayNoteIcon} from "../../../assets/img/playback_note.svg";
+import {ReactComponent as PlayIcon} from "../../../assets/img/play.svg";
+import {ReactComponent as PauseIcon} from "../../../assets/img/pause.svg";
+import {ReactComponent as StopIcon} from "../../../assets/img/stop.svg";
+import {ReactComponent as OpenIcon} from "../../../assets/img/open-file.svg";
+import {ReactComponent as SaveIcon} from "../../../assets/img/save.svg";
+import {ReactComponent as PrintIcon} from "../../../assets/img/printing.svg";
 
 import "./toolbar.css";
+import IconButton from "../../controls/iconButton/iconButton";
 
 class Toolbar extends React.Component {
     constructor(props) {
@@ -258,20 +265,18 @@ class Toolbar extends React.Component {
     render() {
       console.log('Render Toolbar');
       return <div className="app-toolbar no-print">
-                {/* <div className="app-toolbar__delimiter"></div> */}
-                <button className="app-toolbar__button" onClick={this.handleLoad} disabled={!this.props.canLoad}>Load</button>
-                <button className="app-toolbar__button" onClick={this.handleSave} disabled={!this.props.canSave}>Save</button>
+                <IconButton onClick={this.handleLoad} disabled={!this.props.canLoad} icon={<OpenIcon />} title="Open project"/>
+                <IconButton onClick={this.handleSave} disabled={!this.props.canSave} icon={<SaveIcon />} title="Save project"/>
                 <div className="app-toolbar__delimiter"></div>
 
-
-                <button className="app-toolbar__button" onClick={this.handlePrint} disabled={!this.props.canPrint}>Print</button>
-                <ExportButton onClick={this.handleExport} disabled={!this.props.canExport}/>
+                <IconButton onClick={this.handlePrint} disabled={!this.props.canPrint} icon={<PrintIcon />}  title="Print sheet music"/>
+                <ExportButton onClick={this.handleExport} disabled={!this.props.canExport}  title="Export as WAV"/>
                 <div className="app-toolbar__delimiter"></div>
 
-
-                <button className="app-toolbar__button" onClick={this.handlePlay} disabled={!this.props.canPlay}>Play</button>
-                <button className="app-toolbar__button" onClick={this.handleStop} disabled={!this.props.canStop}>Stop</button>
-                <button className="app-toolbar__button" onClick={this.handlePause} disabled={!this.props.canPause}>Pause</button>
+                
+                <IconButton onClick={this.handlePlay} disabled={!this.props.canPlay} icon={<PlayIcon />} title="Play (Space)"/>
+                <IconButton onClick={this.handlePause} disabled={!this.props.canPause} icon={<PauseIcon />} title="Pause (P)"/>
+                <IconButton onClick={this.handleStop} disabled={!this.props.canStop} icon={<StopIcon />} title="Stop (S)"/>
                 <div className="app-toolbar__delimiter"></div>
 
                 
@@ -339,7 +344,7 @@ class ExportButton extends React.Component {
     }
   
     render() {
-      const selectInput= <button className="app-toolbar__button no-margin" disabled={this.props.disabled}>Export as WAV</button>;
+      const selectInput= <button className="app-toolbar__button no-margin" disabled={this.props.disabled} title={this.props.title}>Export as WAV</button>;
       return <div>
         <Select input={selectInput}>
             <Option key="export-whole-project" content="Export whole project" value="export-whole-project" onClick={this.handleExportWholeProjectClick}></Option>

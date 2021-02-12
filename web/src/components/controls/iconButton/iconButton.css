@@ -1,0 +1,54 @@
+.icon-button {
+    height: 32px;
+    margin-right: 8px;
+    background-color: #2F3485;
+    color: #FFC173;
+    border: 2px solid #2F3485;
+    box-shadow: 2px 2px 0px rgb(0 0 0 / 30%);
+    vertical-align: top;
+    padding: 4px 4px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.icon-button svg{
+    width: 32px;
+    height: 20px;
+    vertical-align: top;
+}
+
+.icon-button svg path{
+    width: 32px;
+    height: 20px;
+    vertical-align: top;
+    fill: #ffc173e6 !important;
+}
+
+.icon-button svg rect{
+    fill: #ffc173e6 !important;
+}
+
+
+.icon-button--disabled{
+    cursor: auto;
+    background-color: #7277D8;
+}
+
+.icon-button--disabled svg path{
+    fill: #2F3485 !important;
+}
+.icon-button--disabled svg rect{
+    fill: #2F3485 !important;
+}
+
+/* .switch-button--checked {
+    background-color: #2F3485;
+}
+
+.switch-button--checked svg path {
+    fill: #ffc173e6 !important;
+}
+
+.switch-button--unchecked svg path{
+    fill: #2F3485 !important;
+} */
