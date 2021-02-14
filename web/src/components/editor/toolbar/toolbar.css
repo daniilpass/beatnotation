@@ -13,7 +13,7 @@ app-toolbar
     margin-top: 40px;
     /* height: 40px; */
     width: 100%;
-    background-color: #7277D8;
+    background-color: #323232;
     padding: 8px;
     white-space: nowrap;
     z-index: 3;
@@ -22,9 +22,9 @@ app-toolbar
   .app-toolbar__button {
     height: 28px;
     margin-right: 8px;
-    background-color: #2F3485;
-    color: #FFC173;
-    border: 2px solid #2F3485;
+    background-color: #272727;
+    color: #f5d8b3;
+    border: 2px solid #272727;
     box-shadow: 2px 2px 0px rgb(0 0 0 / 30%);
     vertical-align: top;
   }
@@ -35,9 +35,9 @@ app-toolbar
   
   .app-toolbar__button:disabled {
     cursor: default;
-    background-color: #7277D8;
-    color: #2F3485;
-    border: 2px solid #2F3485;
+    background-color: #323232;
+    color: #272727;
+    border: 2px solid #272727;
   }
   
   .app-toolbar > div {
@@ -45,15 +45,15 @@ app-toolbar
     margin-right: 8px;
     height: 28px;
     vertical-align: top;
-    color: #FFC173;
+    color: #f5d8b3;
     line-height: 28px;
   }
   
   .app-toolbar__bpm input{
-    border: 2px solid #2F3485;
+    border: 2px solid #272727;
     /* margin-left: 8px; */
-    background-color: #7277D8;
-    color: #FFC173;
+    background-color: #323232;
+    color: #f5d8b3;
     box-shadow: 2px 2px 0px rgb(0 0 0 / 30%);
     box-sizing: border-box;
     vertical-align: top;
@@ -80,9 +80,9 @@ app-toolbar
  .app-toolbar__time-input {
     height: 21px;
     line-height: 15px;
-    border: 2px solid #2F3485;
-    background-color: #7277D8;
-    color: #FFC173;
+    border: 2px solid #272727;
+    background-color: #323232;
+    color: #f5d8b3;
     padding: 0 4px;
     overflow: hidden;
     box-shadow: 2px 2px 0px rgb(0 0 0 / 30%);

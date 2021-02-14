@@ -4,25 +4,25 @@ TAKT-CONTROLS
 .takt-controls{
     display: block;
     height: 31px;
-    background-color: #2F3485;
+    background-color: #272727;
   }
   
   .takt-control{
     display: inline-block;
     height: 31px;
     /* border-left: 1px solid #080E73; */
-    border-right: 1px solid #080E73;
+    border-right: 1px solid #121212;
     vertical-align: top;  
     user-select: none;
     -webkit-user-select: none;
   }
   
   .takt-control:first-child{
-    border-left: 1px solid #080E73;
+    border-left: 1px solid #121212;
   }
   
   .takt-control__button.button{
-    color: #FFAA40;
+    color: #f5d8b3;
     height: 20px;
     /* display: inline-block; */
     float: right;

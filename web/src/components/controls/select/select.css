@@ -4,7 +4,7 @@
     box-shadow: 2px 2px 0px rgb(0 0 0 / 30%);
     box-sizing: border-box;    
     cursor: pointer;
-    color: #FFC173;
+    color: #f5d8b3;
 }
 
 .app-select--custom-input{
@@ -14,9 +14,9 @@
 .app-select__input{
     height: 21px;
     line-height: 15px;
-    border: 2px solid #2F3485;
-    background-color: #7277D8;
-    color: #FFC173;
+    border: 2px solid #272727;
+    background-color: #323232;
+    color: #f5d8b3;
     padding: 0 4px;
     overflow: hidden;
 }
@@ -26,10 +26,10 @@
     /* width: 200px; */
     /* height: 200px; */
     z-index: 2;
-    background-color: #2F3485;
-    border: 2px solid #080E73;
+    background-color: #323232;
+    border: 2px solid #272727;
     box-shadow: 2px 2px 0px rgb(0 0 0 / 30%);
-    color: #FFC173;
+    color: #f5d8b3;
 }
 
 
@@ -53,7 +53,7 @@
 
 
 .app-select-option:hover{
-    background-color: #4e4982;
+    background-color: #424242;
 }
 
 .app-select-option--disabled {

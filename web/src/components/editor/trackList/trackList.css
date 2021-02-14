@@ -31,12 +31,12 @@ TRACK-CONTROL
     display: inline-block;
     width: 150px;
     /* height: 31px; */
-    background-color: #2F3485;
+    background-color: #212121;
     z-index: 2;
-    border: 1px solid #080E73;
-    border-right: 8px solid #080E73;
+    border: 1px solid #121212;
+    border-right: 8px solid #121212;
     border-left: 0px;
-    color: #FFC173;
+    color: #f5d8b3;
   }
   
   .track-control__title{
@@ -74,7 +74,7 @@ TRACK-CONTROL
   }
 
   .track-control .icon-button.icon-button--disabled.track-control__load{
-    border-color: #7277D8;
+    border-color: #323232;
   } 
 
   .track-control__load svg{
@@ -98,16 +98,16 @@ TRACK-CONTROL
   }
 
   .track-control__settings .settings-icon path{
-    fill: #7277d8; /*#080E73;*/
+    fill: #d6c1a6; /*#080E73;*/
   }
 
   /*
   Note
   */
   .note{
-    border: 1px solid #080E73;
+    border: 1px solid #121212;
     display: inline-block;
-    background-color:#7277D8 ;
+    background-color:#323232 ;
   }
   
   /* .note:last-child{
@@ -115,11 +115,11 @@ TRACK-CONTROL
   } */
   
   .note.note_filled, .note.note_filled.note.note_level_0 {
-    background-color:#2F3485 ;
+    background-color:#212121 ;
   }
   
   .note.note_level_1 {
-    background-color:#FFC173 ;
+    background-color:#ff8e00 ;
   } 
 
   
@@ -139,9 +139,9 @@ TRACK-CONTROL
 .user-audio-track{
   display: inline-block;
   height: 31px;
-  background-color: rgb(80 83 151);
+  background-color: #323232;
   /* cursor: pointer; */
-  border: 1px solid #080E73;
+  border: 1px solid #121212;
   overflow: hidden;
 }
 

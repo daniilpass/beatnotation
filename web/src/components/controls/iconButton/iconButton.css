@@ -1,9 +1,9 @@
 .icon-button {
     height: 32px;
     margin-right: 8px;
-    background-color: #2F3485;
-    color: #FFC173;
-    border: 2px solid #2F3485;
+    background-color: #272727;
+    color: #f5d8b3;
+    border: 2px solid #272727;
     box-shadow: 2px 2px 0px rgb(0 0 0 / 30%);
     vertical-align: top;
     padding: 4px 4px;
@@ -18,24 +18,24 @@
 }
 
 .icon-button svg path{
-    fill: #ffc173e6 !important;
+    fill: #f5d8b3 !important;
 }
 
 .icon-button svg rect{
-    fill: #ffc173e6 !important;
+    fill: #f5d8b3 !important;
 }
 
 
 .icon-button--disabled{
     cursor: auto;
-    background-color: #7277D8;
+    background-color: #323232;
 }
 
 .icon-button--disabled svg path{
-    fill: #2F3485 !important;
+    fill: #272727 !important;
 }
 .icon-button--disabled svg rect{
-    fill: #2F3485 !important;
+    fill: #272727 !important;
 }
 
 /* .switch-button--checked {
