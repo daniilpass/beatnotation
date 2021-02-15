@@ -8,6 +8,7 @@ WORKSPACE__TRACK
     width: 100%;
     white-space: nowrap;
     z-index: 1;
+    background-color: #1d1d1d;
   }
 
   
@@ -106,6 +107,7 @@ TRACK-CONTROL
   */
   .note{
     border: 1px solid #121212;
+    border-radius: 12%;
     display: inline-block;
     background-color:#323232 ;
   }
