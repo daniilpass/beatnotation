@@ -23,7 +23,7 @@ app-toolbar
     height: 28px;
     margin-right: 8px;
     background-color: #272727;
-    color: #f5d8b3;
+    color: #DBDBDB;
     border: 2px solid #272727;
     box-shadow: 2px 2px 0px rgb(0 0 0 / 30%);
     vertical-align: top;
@@ -35,9 +35,8 @@ app-toolbar
   
   .app-toolbar__button:disabled {
     cursor: default;
-    background-color: #323232;
-    color: #272727;
-    border: 2px solid #272727;
+    background-color: transparent;
+    color: #1d1d1d;
   }
   
   .app-toolbar > div {
@@ -45,7 +44,7 @@ app-toolbar
     margin-right: 8px;
     height: 28px;
     vertical-align: top;
-    color: #f5d8b3;
+    color: #DBDBDB;
     line-height: 28px;
   }
   
@@ -53,7 +52,7 @@ app-toolbar
     border: 2px solid #272727;
     /* margin-left: 8px; */
     background-color: #323232;
-    color: #f5d8b3;
+    color: #DBDBDB;
     box-shadow: 2px 2px 0px rgb(0 0 0 / 30%);
     box-sizing: border-box;
     vertical-align: top;
@@ -82,7 +81,7 @@ app-toolbar
     line-height: 15px;
     border: 2px solid #272727;
     background-color: #323232;
-    color: #f5d8b3;
+    color: #DBDBDB;
     padding: 0 4px;
     overflow: hidden;
     box-shadow: 2px 2px 0px rgb(0 0 0 / 30%);

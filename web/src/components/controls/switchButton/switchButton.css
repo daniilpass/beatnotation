@@ -21,7 +21,7 @@
 }
 
 .switch-button--checked svg path {
-    fill: #f5d8b3 !important;
+    fill: #DBDBDB !important;
 }
 
 .switch-button--unchecked svg path{

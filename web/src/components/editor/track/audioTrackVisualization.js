@@ -149,7 +149,7 @@ export default class AudioTrackVisualization extends React.Component {
 
         //clear
         canvasCtx.beginPath();
-        canvasCtx.fillStyle =  "#FF8E00";
+        canvasCtx.fillStyle =  "#FFA12A";
         canvasCtx.fillRect(0,0,WIDTH,HEIGHT);
         canvasCtx.stroke();
         //init brush

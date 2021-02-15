@@ -37,7 +37,7 @@ track-container
 
 .track-container {
  overflow-x: scroll;
- background-color: #272727
+ background-color: #1d1d1d
 }
 
 .track-container::-webkit-scrollbar {
@@ -104,7 +104,7 @@ CONTROLS
   height: 21px;
   margin-right: 8px;
   background-color: #272727;
-  color: #f5d8b3;
+  color: #DBDBDB;
   border: 2px solid #272727;
   box-shadow: 2px 2px 0px rgb(0 0 0 / 30%);
   vertical-align: top;
@@ -116,7 +116,7 @@ CONTROLS
 
 .button:disabled {
   cursor: default;
-  background-color: #323232;
+  background-color: transparent;
   color: #2F3485;
   border: 2px solid #272727;
 }

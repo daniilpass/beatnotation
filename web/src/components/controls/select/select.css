@@ -4,7 +4,7 @@
     box-shadow: 2px 2px 0px rgb(0 0 0 / 30%);
     box-sizing: border-box;    
     cursor: pointer;
-    color: #f5d8b3;
+    color: #DBDBDB;
 }
 
 .app-select--custom-input{
@@ -16,7 +16,7 @@
     line-height: 15px;
     border: 2px solid #272727;
     background-color: #323232;
-    color: #f5d8b3;
+    color: #DBDBDB;
     padding: 0 4px;
     overflow: hidden;
 }
@@ -29,7 +29,7 @@
     background-color: #323232;
     border: 2px solid #272727;
     box-shadow: 2px 2px 0px rgb(0 0 0 / 30%);
-    color: #f5d8b3;
+    color: #DBDBDB;
 }
 
 

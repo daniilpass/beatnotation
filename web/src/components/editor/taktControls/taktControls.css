@@ -4,7 +4,6 @@ TAKT-CONTROLS
 .takt-controls{
     display: block;
     height: 31px;
-    background-color: #272727;
   }
   
   .takt-control{
@@ -22,10 +21,10 @@ TAKT-CONTROLS
   }
   
   .takt-control__button.button{
-    color: #f5d8b3;
+    color: #DBDBDB;
     height: 20px;
     /* display: inline-block; */
     float: right;
     margin-top: 5px;
-    box-shadow: 1px 1px 0px 2px rgb(0 0 0 / 30%);
+    /* box-shadow: 1px 1px 0px 2px rgb(0 0 0 / 30%); */
   }
