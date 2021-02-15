@@ -1,7 +1,7 @@
 import {SET_APP_BUSY} from "../types"
 
 const initialState = {
-    version: "1.6.0",
+    version: "1.6.1",
     busy: false
 }
 
