@@ -100,8 +100,8 @@ export default class Editor extends React.Component {
     let takt = track.takts[taktIndex];
     takt.notes[noteIndex] = level;
 
-    // Проигрываю выбранную ноту
-    if (level > 0 && this.props.playbackNotes) {
+    // Проигрываю выбранную ноту (если включено проигрывание нот и в данный момент не проигрывается дорожка)
+    if (level > 0 && this.props.playbackNotes && this.props.playerState !== PlayerStates.PLAY) {
       AudioSercive.playSample(trackIndex, track.volume);
     }
 
