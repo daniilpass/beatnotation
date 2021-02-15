@@ -192,7 +192,7 @@ class LoopSelection extends React.Component {
 
     if (this.drag.auto) {
       //Расчет ускорения прокрутки
-      if (this.drag.direction == 1) {
+      if (this.drag.direction === 1) {
         this.drag.velocity = (e.clientX + this.drag.rightBound - document.body.clientWidth) / 100 * 2; 
       } else {
         this.drag.velocity = (this.drag.leftBound - e.clientX) / 100; 
@@ -201,10 +201,10 @@ class LoopSelection extends React.Component {
       this.drag.velocity = this.drag.velocity < 0 ? 0 : this.drag.velocity;
 
       // Проверка условия завершения прокрутки
-      if (e.clientX + this.drag.rightBound < document.body.clientWidth && this.drag.direction == 1){
+      if (e.clientX + this.drag.rightBound < document.body.clientWidth && this.drag.direction === 1){
         this.stopAutoDrag();
       }
-      if (e.clientX > this.drag.leftBound && this.drag.direction == -1){
+      if (e.clientX > this.drag.leftBound && this.drag.direction === -1){
         this.stopAutoDrag();
       }
       return;
@@ -278,7 +278,7 @@ class LoopSelection extends React.Component {
     }
 
 
-    if (newLeft == oldLeft && newWidth == oldWidth) {
+    if (newLeft === oldLeft && newWidth === oldWidth) {
       this.stopAutoDrag();
       return;
     }
