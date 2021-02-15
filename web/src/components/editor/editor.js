@@ -46,6 +46,10 @@ export default class Editor extends React.Component {
     if (this.props.tracksLengthInTakts > prevProps.tracksLengthInTakts) {      
       this.scrollTracksConatinerToEnd();
     }     
+
+    if (this.props.scroll !== prevProps.scroll) {
+      this.scrollTracksConatiner(this.props.scroll.x);
+    }
   }
 
   addEvents() {
@@ -58,6 +62,11 @@ export default class Editor extends React.Component {
     console.log("Auto scroll");
     let el = this.tracksContainerRef.current; 
     el.scrollLeft=el.scrollLeft+this.props.noteWidth*this.props.notesInTakt;
+  }
+
+  scrollTracksConatiner = (scrollX) => {
+    let el = this.tracksContainerRef.current; 
+    el.scrollLeft=el.scrollLeft+scrollX;
   }
 
   DrawNotes() { 

@@ -26,6 +26,7 @@ export const SET_BASETIME = "SET_BASETIME";
 export const SET_LOOP = "SET_LOOP";
 export const SET_LOOP_PERIOD = "SET_LOOP_PERIOD";
 
+export const SCROLL_WORKSPACE = "SCROLL_WORKSPACE";
 //CANVAS
 export const RENDER_NOTES = "RENDER_NOTES";
 export const PRINT_NOTES = "PRINT_NOTES";

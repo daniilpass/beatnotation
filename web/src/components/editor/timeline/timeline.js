@@ -76,7 +76,8 @@ export default class Timeline extends React.Component {
             })
         }
         <LoopSelection onDragStarted={this.onLoopDragStarted} onDragEnded={this.onLoopDragEnded} active={this.props.loop}
-                       minWidth={this.props.noteWidth*3} maxRightBorder={this.timelineWidth} left={this.loopLeft} width={this.loopWidth}/>
+                       minWidth={this.props.noteWidth*3} maxRightBorder={this.timelineWidth} left={this.loopLeft} width={this.loopWidth}
+                       scrollWorkspace={this.props.scrollWorkspace} trackControlWidth={this.props.trackControlWidth}/>
         </div>,        
         <div key="time-pointer" className="time-pointer" ref={this.props.timePointerRef}> 
           <div className="time-pointer__stick" style={{height: this.timePointerHeight+"px"}}>
@@ -98,8 +99,18 @@ class LoopSelection extends React.Component {
     this.drag = {
       oldClientX: -1,
       started: false,
-      left: false
+      left: false,
+      auto: false,
+      direction: 0,
+      velocity: 1,
+      maxVelocity: 1,
+      step: 50,
+      timerId: null,
+      rightBound: 50,
+      leftBound: 150
     }
+
+    this.loopRef = React.createRef();
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -147,49 +158,132 @@ class LoopSelection extends React.Component {
 
   endDrag = (e) => {
     e.preventDefault();
-
     document.onmouseup = null;
     document.onmousemove = null;
-    
+    this.stopAutoDrag();
+
     if (this.drag.started) {
       this.props.onDragEnded && this.props.onDragEnded(this.state.left, this.state.left+this.state.width);
     }
     this.drag.started = false;
   }
 
-  dragLoop = (e) => {
-    e.preventDefault();
+  startAutoDrag = (direction) => {
+    this.drag.auto = true;
+    this.drag.direction = direction;    
+    this.drag.timerId = setInterval(this.autoDrag, 1000/30);    
+  }
 
+  stopAutoDrag = () => {
+    this.drag.auto = false;
+    this.drag.direction = 0;    
+    clearInterval(this.drag.timerId);  
+  }
+
+  autoDrag = () => {
+    //console.log("AUTO DRAG", this.drag.direction * this.drag.velocity);
+    let scrollValue = Math.ceil(this.drag.direction * this.drag.velocity * this.drag.step);
+    this.props.scrollWorkspace(scrollValue);
+    this.updateTimeLine(-scrollValue);
+  }
+
+  dragLoop = (e) => {
+    e.preventDefault(); 
+
+    if (this.drag.auto) {
+      //Расчет ускорения прокрутки
+      if (this.drag.direction == 1) {
+        this.drag.velocity = (e.clientX + this.drag.rightBound - document.body.clientWidth) / 100 * 2; 
+      } else {
+        this.drag.velocity = (this.drag.leftBound - e.clientX) / 100; 
+      }
+      this.drag.velocity = this.drag.velocity > this.drag.maxVelocity ? this.drag.maxVelocity : this.drag.velocity;
+      this.drag.velocity = this.drag.velocity < 0 ? 0 : this.drag.velocity;
+
+      // Проверка условия завершения прокрутки
+      if (e.clientX + this.drag.rightBound < document.body.clientWidth && this.drag.direction == 1){
+        this.stopAutoDrag();
+      }
+      if (e.clientX > this.drag.leftBound && this.drag.direction == -1){
+        this.stopAutoDrag();
+      }
+      return;
+    }
+
+    // Обычная обработка выделения
     if (Math.abs(this.drag.oldClientX - e.clientX) >= 10) {
       this.drag.started = true;
       this.props.onDragStarted && this.props.onDragStarted()
-    }
+    }    
 
     if (!this.drag.started) {
       return;
-    }     
+    } 
 
     let deltaX = (this.drag.oldClientX - e.clientX);
     this.drag.oldClientX = e.clientX;
 
-    let newLeft = this.state.left;
-    let newWidth = this.state.width;
-
-    if (this.drag.left) {
-      newLeft = this.state.left - deltaX;
-      newWidth = this.state.width + deltaX;      
-    } else {
-      newWidth = this.state.width - deltaX;
-    }
-
-    // Валидация значений
-    if (newWidth < this.props.minWidth || newLeft < 0 || (newLeft+newWidth) > this.props.maxRightBorder ) {
+    // перетягиваем только тогда, когда мышка внтури интервала
+    let rect = this.loopRef.current.getBoundingClientRect();  
+    if (!this.drag.left && deltaX < 0 && e.clientX < rect.x + rect.width) {
+      return;
+    } else if (!this.drag.left && deltaX > 0 && e.clientX > rect.x + rect.width) {
+      return;
+    } else if (this.drag.left && deltaX > 0 && e.clientX > rect.x) {
+      return;
+    } else if (this.drag.left && deltaX < 0 && e.clientX < rect.x) {
       return;
     }
 
-    this.setState({left: newLeft, width: newWidth}) 
-    //if (newVolume <= this.maxVolume && newVolume >= 0) {
-      
+    // Проверка условий запуска авто-прокрутки
+    if (e.clientX + this.drag.rightBound > document.body.clientWidth && deltaX < 0) {
+      this.startAutoDrag(1);
+    } else if (e.clientX < this.drag.leftBound && deltaX > 0) {
+      this.startAutoDrag(-1);
+    }
+    
+    // Обновление UI
+    this.updateTimeLine(deltaX);
+  }
+  
+  updateTimeLine(deltaX) {
+    let oldLeft = this.state.left;
+    let oldWidth = this.state.width;
+
+    let newLeft = oldLeft;
+    let newWidth = oldWidth;
+
+    if (this.drag.left) {
+      newLeft = oldLeft - deltaX;
+      newWidth = oldWidth + deltaX;
+    } else {
+      newWidth = oldWidth- deltaX;
+    }    
+    
+    // Проверка условий и останвока авто-прокрутки если пограничное  значение долстигнуто
+    if (newLeft < 0) {
+      newLeft = 0;
+      newWidth = oldWidth + oldLeft;
+      this.stopAutoDrag();
+    }
+    
+    if (newWidth < this.props.minWidth)   {
+      this.stopAutoDrag();
+      return;
+    } 
+
+    if (newLeft+newWidth > this.props.maxRightBorder) {
+      newWidth = this.props.maxRightBorder - newLeft;
+      this.stopAutoDrag();
+    }
+
+
+    if (newLeft == oldLeft && newWidth == oldWidth) {
+      this.stopAutoDrag();
+      return;
+    }
+
+    this.setState({left: newLeft, width: newWidth})        
   }
 
   get left() {
@@ -201,7 +295,7 @@ class LoopSelection extends React.Component {
   }
   render() {
     //console.log("Render loop", this.state, this.props)
-    return <div className={"loop-selection " + (this.props.active ? "loop-selection--active" : "loop-selection--disabled") } style={{left: this.left+"px", width: this.width+"px"}}>
+    return <div ref={this.loopRef}  className={"loop-selection " + (this.props.active ? "loop-selection--active" : "loop-selection--disabled") } style={{left: this.left+"px", width: this.width+"px"}}>
       <div className="loop-selection__button loop-selection__button--left" onMouseDown={this.onMouseDownLeft}></div>
       <div className="loop-selection__button loop-selection__button--right" onMouseDown={this.onMouseDownRight}></div>
     </div>

@@ -3,7 +3,7 @@ import {SET_REALTIME_RENDER, SET_PLAYER_STATE, SET_PLAYBACK_NOTES, SET_BPM, SET_
     ,TAKT_COPY, TAKT_PASTE, TAKT_CLEAR, TAKT_DELETE, TAKT_ADD
     ,LOAD_TRACKS, SET_END_OF_TRACK, SET_TRACK_VOLUME, SET_BASETIME
     ,SET_TRACK_LOADED, SET_TRACK_OFFSET, SET_TRACK_MUTE
-    ,EXPORT_AS_WAV, CLEAR_TRACK, SET_LOOP_PERIOD, SET_LOOP
+    ,EXPORT_AS_WAV, CLEAR_TRACK, SET_LOOP_PERIOD, SET_LOOP, SCROLL_WORKSPACE
 } from '../types'
 
 import {tracksData} from "../../assets/data/tracksData";
@@ -52,13 +52,16 @@ const initialState = {
     audioTracksPositionChangedAt: 0,
     audioTracksVolumeChangedAt: 0,
     tracks: initTracks({tracksLengthInTakts: 4, notesInTakt: 16}), //TODO: что-то не так делаю явно
-    clipboard: []
+    clipboard: [],
+    scroll: {
+        x: 0
+    }
 }
 
 export default function editorReducer(state = initialState, action) {
-    if (process.env.NODE_ENV !== 'production') {
-        console.log("store reducer", action);
-    }
+    // if (process.env.NODE_ENV !== 'production') {
+    //     console.log("store reducer", action);
+    // }
     
 
 
@@ -107,6 +110,8 @@ export default function editorReducer(state = initialState, action) {
             return setLoopPeriod(state, action.payload);
         case SET_LOOP:
             return setLoop(state, action.payload);
+        case SCROLL_WORKSPACE:
+            return scrollWorkspace(state, action.payload);
         default:
             return state;
     }
@@ -641,5 +646,14 @@ function setLoop(state, payload) {
     return {
         ...state,
         loop: payload.loop
+    }
+}
+
+function scrollWorkspace (state, payload) {
+    return {
+        ...state,
+        scroll: {
+            x: payload.scrollX
+        }
     }
 }
