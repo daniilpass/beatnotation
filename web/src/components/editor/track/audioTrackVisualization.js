@@ -11,12 +11,17 @@ export default class AudioTrackVisualization extends React.Component {
       this.drag = {
         oldClientY: -1
       }
-  
-      this.canvasRef = React.createRef();
+
+      this.canvas = null;
+      this.canvasCtx = null;
+      this.canvasWrapper = null;
+
+      this.canvasContainer = React.createRef(); 
     }  
   
     componentDidMount() {
-      this.canvasRef.current.onmousedown = this.dragMouseDown;
+      this.canvasWrapper = document.getElementById(this.canvasContainerId);
+      this.canvasContainer.current.onmousedown = this.dragMouseDown;
     }
   
     shouldComponentUpdate(nextProps, nextState) {
@@ -36,18 +41,33 @@ export default class AudioTrackVisualization extends React.Component {
         || this.props.bpms !== prevProps.bpms 
         || this.props.notesInPartCount !== prevProps.notesInPartCount 
         || this.props.noteWidth !== prevProps.noteWidth)) {
-        this.handleVisualize("audio_canvas_inside");
+        this.handleVisualize();
       }
 
       if (this.props.loaded === false) {
-        this.clearVisualization("audio_canvas_inside");
+        this.clearVisualization();
       }
       
       if (this.props.position !== prevProps.position) {
         this.setState({position:this.props.position}) 
       }
-    }
+    }  
   
+    get track() {
+      return this.props.track;
+    }
+
+    get canvasContainerId () {
+      return "audio_canvas_container_"+this.props.index;
+    }
+
+    get canvasClassName() {
+      return "audio_canvas_"+this.props.index;
+    }
+
+    //
+    // DRAG
+    //
     dragMouseDown = (e) => {
       e.preventDefault();
   
@@ -76,30 +96,50 @@ export default class AudioTrackVisualization extends React.Component {
         //requestAnimationFrame( () => { this.setState({position: newPosition}) } );
       }
     }
-  
-    get track() {
-      return this.props.track;
-    }
     
-    handleVisualize = (canvas_name) => {
+    //
+    // DRAW
+    //
+    handleVisualize = () => {
         console.log("Visualize");
         this.props.setAppBusy(true, "Processing ...");
-        setTimeout(() => {this.visualize(canvas_name)}, 500);
+        setTimeout(() => {this.visualize()}, 500);
     }  
 
-    clearVisualization = (canvas_name) => {
+    clearVisualization = () => {
       console.log("Clear Visualization");
-      const canvas  = document.getElementById(canvas_name);
-      canvas.width = 0;
+      this.deleteCanvases();
     }
 
-    visualize = (canvas_name) => {
+
+    getCanvasContext = () => {
+      let allCanvasElements = document.getElementsByClassName(this.canvasClassName)
+      this.canvas = allCanvasElements[allCanvasElements.length - 1];
+      this.canvasCtx = this.canvas.getContext('2d');
+    }
+
+    addCanvas = () => {
+      let newCanvas = document.createElement("canvas");
+      newCanvas.width = 0;
+      newCanvas.height = this.props.noteHeight;
+      newCanvas.className = this.canvasClassName
+      this.canvasWrapper.appendChild(newCanvas);
+    }
+
+    deleteCanvases = () => {
+      // Удаляю старые холсты
+      while (this.canvasWrapper.childElementCount > 0) {
+        this.canvasWrapper.removeChild(this.canvasWrapper.firstChild);
+      }
+    }
+
+    visualize = () => {
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       const actx = new AudioContext();
 
       actx.decodeAudioData(this.track.arrayBuffer.slice(), 
           audioBuffer => {  
-              this.draw(canvas_name, audioBuffer);
+              this.drawFullTrack(audioBuffer);
           }, 
           error => { console.log("decodeAudioData failed", error); }
       );
@@ -116,30 +156,40 @@ export default class AudioTrackVisualization extends React.Component {
         return filteredData;
     }
 
-    draw = (canvas_name, audioBuffer) => {
-        //Пуолчаю холст
-        const canvas  = document.getElementById(canvas_name);
-        const canvasCtx = canvas.getContext('2d');
+    drawFullTrack = (audioBuffer) => {      
+      //Полдготовка данных
+      let filterNum = 64;
+      let sampleRate  = audioBuffer.sampleRate;
+      let dataArrayRaw = audioBuffer.getChannelData(0);
+      let dataArray = this.filterData(dataArrayRaw, dataArrayRaw.length / filterNum);
 
-        //Вычисляю и задаю новую длину холста
-        let durationInMs  = audioBuffer.duration * 1000;
+      //Очистка холстов
+      this.deleteCanvases();
+
+      // Отрисовка с разделением по холстам
+      let samplesInPart = sampleRate / filterNum * 30;
+      for (let i = 0; i < dataArray.length; i=i+samplesInPart) {
+        // Длина части в пикселях
+        let dataChunk = dataArray.slice(i, i+samplesInPart)
+        let durationInMs  = ((dataChunk.length * filterNum) / sampleRate) * 1000 ;
         let lengthInPx = durationInMs * this.props.bpms * this.props.notesInPartCount *  this.props.noteWidth;
-        canvas.width = lengthInPx;
 
-        //Константы размеров холста
-        const WIDTH = canvas.width;
-        const HEIGHT = canvas.height;
+        // Отрисовка части
+        this.addCanvas();
+        this.getCanvasContext();
+        this.draw(dataChunk, lengthInPx, this.props.noteHeight);        
+      }
+      
+    }
 
-        // //TEST
-        // canvasCtx.beginPath();
-        // canvasCtx.fillStyle =  "#FF8E00";
-        // canvasCtx.fillRect(0,0,WIDTH,HEIGHT);
-        // canvasCtx.stroke();
-        // return;
+    draw = (dataArray, WIDTH, HEIGHT) => {
+        //Пуолчаю холст
+        let canvas  = this.canvas
+        let canvasCtx = this.canvasCtx;
+        canvas.width = WIDTH;
+        canvas.height = HEIGHT;
 
         //Полдготовка данных
-        let dataArrayRaw = audioBuffer.getChannelData(0);
-        let dataArray = this.filterData(dataArrayRaw, dataArrayRaw.length / 64);
         let bufferLength = dataArray.length;
         //TODO: Нормализовать тихие дорожки
 
@@ -163,7 +213,7 @@ export default class AudioTrackVisualization extends React.Component {
             canvasCtx.lineTo(WIDTH, dy);
             canvasCtx.stroke();
 
-            dataArrayRaw=null;
+            //dataArrayRaw=null;
             dataArray=null;
             this.props.setAppBusy(false);
           }
@@ -190,8 +240,6 @@ export default class AudioTrackVisualization extends React.Component {
         chunkCounter++;
 
         if (chunkCounter > maxStepInFrame) {
-          let progress = Math.trunc((i/bufferLength) * 100);
-          this.props.setAppBusy(true, "Processing "+progress+"%");
           window.requestAnimationFrame(() => {
             this.drawByChunks(maxStepInFrame, i, x, dy, bufferLength, dataArray, canvasCtx, sliceWidth, callback)
           });
@@ -207,7 +255,9 @@ export default class AudioTrackVisualization extends React.Component {
 
     render() {
       console.log("Render AudioTrackVisualization");
-      return <canvas id="audio_canvas_inside" className="user-audio-visualization"  ref={this.canvasRef} width="0" height={this.props.noteHeight} style={{marginLeft: this.state.position + "px"}}></canvas>
+      return <div id={this.canvasContainerId} className="user-audio-visualization" style={{marginLeft: this.state.position + "px"}} ref={this.canvasContainer}>
+          <canvas className={this.canvasClassName} width="0" height={this.props.noteHeight}></canvas>
+        </div>
     }
     
   }
