@@ -74,15 +74,18 @@ export default class TracksPlayer extends React.Component {
 
     handleStop = () => {   
         clearInterval(this.timerId);
+        this.stopAllNotes();
         this.stopAllUserAudio();
     }
 
     handlePause = () => {   
         clearInterval(this.timerId);
+        this.stopAllNotes();
         this.stopAllUserAudio();
     }
 
     handleAudioPositionChangeWhilePlaying = () => {
+        this.stopAllNotes();
         this.stopAllUserAudio();
         let offset = this.props.baseTime + (Date.now() - this.props.playerStartedAt)
         this.startAllUserAudio(offset / 1000);
@@ -149,13 +152,33 @@ export default class TracksPlayer extends React.Component {
     
         if (noteIndex === this.prevNoteIndex)
             return;
-        
+
+        this.prevNoteIndex = noteIndex;
+
+        // Такт и нота в данный момент времени
         let taktIndex = Math.trunc(this.timelineTakt)
         let noteIndexInTakt = noteIndex % this.props.notesInTakt;
 
         if (taktIndex >= this.props.tracksLengthInTakts) {
             return;
         }
+
+        // На самом деле играем не текущую ноту, а планируем проиграть следующую, что увеличиват плавность и точность вопсроизведения
+        let nextNoteIndex = noteIndex + 1;
+        let nextNoteIndexInTakt = noteIndexInTakt + 1;
+        if (nextNoteIndexInTakt >= this.props.notesInTakt) {
+            taktIndex = taktIndex + 1;
+            nextNoteIndexInTakt = 0;
+        }
+        noteIndexInTakt = nextNoteIndexInTakt;
+
+        // Избегаем переполнения
+        if (taktIndex >= this.props.tracksLengthInTakts || noteIndexInTakt >= this.props.tracksLengthInNotes) {
+            return;
+        }
+
+        let whenNoteShouldPlay = nextNoteIndex / (this.props.bpms * this.props.notesInPartCount);
+        let when = (whenNoteShouldPlay - this.timestamp) / 1000;
 
         for (let trackIndex = 0; trackIndex < this.props.tracks.length; trackIndex++) {
             // Пропускаю аудио дорожки, их проигрывание идет отдельно
@@ -167,11 +190,24 @@ export default class TracksPlayer extends React.Component {
             const takt = track.takts[taktIndex];
             const volume = track.isMute ? 0 : track.volume;
             if (takt.notes[noteIndexInTakt] > 0 && volume > 0) {
-                AudioService.playSample(trackIndex, volume); 
+                AudioService.playSample(trackIndex, volume, when, 0); 
+            }
+            //HACK: Если текущаю нота самая первая, то проиграю её сразу, т.к. запланировать её нельзя
+            if (noteIndex == 0 && takt.notes[noteIndexInTakt - 1] > 0 && volume > 0) {
+                AudioService.playSample(trackIndex, volume, 0, 0); 
             }
         }    
+    }
 
-        this.prevNoteIndex = noteIndex;
+    stopAllNotes() {
+        for (let trackIndex = 0; trackIndex < this.props.tracks.length; trackIndex++) {
+            // Обрабатываю только загруженные аудио дорожки
+            if (this.props.tracks[trackIndex].type == 0) {
+                continue;
+            }
+
+            AudioService.stopSample(trackIndex); 
+        }
     }
     
     //
