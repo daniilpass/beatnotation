@@ -2,6 +2,7 @@ import React from "react";
 
 import AudioService from "../../../services/AudioService";
 import * as PlayerStates from "../../../redux/dictionary/playerStates";
+import { saveFile } from "../../../utils/fileSaver";
 
 export default class TracksPlayer extends React.Component {
     constructor(props) {
@@ -305,18 +306,8 @@ export default class TracksPlayer extends React.Component {
 
     handleExportSuccess = (waveBlob) => {
         this.props.setAppBusy(false);
-        this.donwloadFile(waveBlob, "BeatNotation_"+Date.now()+".wav");
-    }
-
-    donwloadFile = (blob, filename) => {
-        // Загрузка на устройство
-        const a = document.createElement('a');
-        a.href= URL.createObjectURL(blob);
-        a.download = filename;
-        a.click();
-    }
-
-    
+        saveFile(waveBlob, "BeatNotation_"+Date.now()+".wav");
+    }    
 
     ///
     /// GETTERS

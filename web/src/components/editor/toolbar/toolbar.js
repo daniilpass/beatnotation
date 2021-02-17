@@ -7,6 +7,7 @@ import {setPlayerState, setRealtimeRender, setPlaybackNotes, setBpm, setTimeSign
 import {CanPlay, CanStop, CanPause, CanSave, CanLoad, CanPrint, CanExport} from "../../../redux/selectors";
 import * as PlayerStates from "../../../redux/dictionary/playerStates";
 
+import { saveFile } from "../../../utils/fileSaver";
 import SaveService from "../../../services/SaveService";
 
 import UserFileReader from "../../userFileReader/userFileReader";
@@ -146,13 +147,8 @@ class Toolbar extends React.Component {
     
             let blobSave = SaveService.createSaveFile(saveData);
             const file = new Blob([blobSave], {type: 'application/octet-stream'});
-    
-            const a = document.createElement('a');
-            a.href= URL.createObjectURL(file);
-            a.download = "BeatNotation_"+Date.now()+".beno";
-            a.click();
-        
-            URL.revokeObjectURL(a.href);
+            
+            saveFile(file, "BeatNotation_"+Date.now()+".beno");
     
             this.props.setAppBusy(false);
         }, 0)
