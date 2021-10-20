@@ -4,6 +4,18 @@
     bottom: 0;
     padding: 8px;
     font-weight: 900;
-    color: #212121;
-    z-index: -1;
-  }
+    color: #424242;
+    z-index: 1;
+    text-align: right;
+}
+
+.app-ver__created {
+  display: block;
+  /* margin-right: 16px; */
+  text-decoration: none;
+  color: #424242
+}
+
+.app-ver__created:hover {
+  color: #DBDBDB;
+}

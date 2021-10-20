@@ -6,7 +6,10 @@ class Version extends React.PureComponent {
   
   /*Major.Minor.Fixes*/
   render() {
-    return <div className={styles['app-ver'] + " no-print"}>{this.props.version}</div>  
+    return <div className={styles['app-ver'] + " no-print"}>
+      {this.props.version}
+      <a className={styles['app-ver__created']} href="https://daniilpass.dev" target="_blank">daniilpass.dev</a>
+    </div>  
   }
 }
 
