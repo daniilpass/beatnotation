@@ -25,6 +25,7 @@ export const TAKT_DELETE =  "TAKT_DELETE";
 export const SET_BASETIME = "SET_BASETIME";
 export const SET_LOOP = "SET_LOOP";
 export const SET_LOOP_PERIOD = "SET_LOOP_PERIOD";
+export const SET_GO_TO_START_AFTER_STOP = "SET_GO_TO_START_AFTER_STOP";
 
 export const SCROLL_WORKSPACE = "SCROLL_WORKSPACE";
 //CANVAS

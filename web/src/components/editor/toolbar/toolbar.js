@@ -3,7 +3,7 @@ import {connect} from "react-redux";
 
 import {setPlayerState, setRealtimeRender, setPlaybackNotes, setBpm, setTimeSignature, loadTracks, 
     renderNotes, printNotes, loadUserAudio, exportAsWav, setAppBusy,
-    setLoop} from "../../../redux/actions";
+    setLoop, setGoToStartAfterStop} from "../../../redux/actions";
 import {CanPlay, CanStop, CanPause, CanSave, CanLoad, CanPrint, CanExport} from "../../../redux/selectors";
 import * as PlayerStates from "../../../redux/dictionary/playerStates";
 
@@ -22,6 +22,7 @@ import {ReactComponent as StopIcon} from "../../../assets/img/stop.svg";
 import {ReactComponent as OpenIcon} from "../../../assets/img/open-file.svg";
 import {ReactComponent as SaveIcon} from "../../../assets/img/save.svg";
 import {ReactComponent as PrintIcon} from "../../../assets/img/printing.svg";
+import {ReactComponent as RewindIcon} from "../../../assets/img/rewind.svg";
 
 import "./toolbar.css";
 import IconButton from "../../controls/iconButton/iconButton";
@@ -55,6 +56,7 @@ class Toolbar extends React.Component {
             || this.props.realtimeRender !== nextProps.realtimeRender
             || this.props.playbackNotes !== nextProps.playbackNotes
             || this.props.loop !== nextProps.loop
+            || this.props.goToStartAfterStop !== nextProps.goToStartAfterStop
             ) {
             return true;
         }
@@ -240,6 +242,9 @@ class Toolbar extends React.Component {
             case "loop":
                 this.props.setLoop(value);
                 break;
+            case "goToStartAfterStop":
+                this.props.setGoToStartAfterStop(value);
+                break;
             default:
                 break;
         }
@@ -289,7 +294,10 @@ class Toolbar extends React.Component {
                 </div>
                 <div className="app-toolbar__delimiter"></div>
 
-                
+                <div>
+                    <SwitchButton name="goToStartAfterStop" onChange={this.handleBooleanInputChange} checked={this.props.goToStartAfterStop} icon={<RewindIcon />} title="Go to start after stop"/>
+                </div>
+
                 <div>
                     <SwitchButton name="loop" onChange={this.handleBooleanInputChange} checked={this.props.loop} icon={<LoopIcon />} title="Loop selected region"/>
                 </div>
@@ -320,7 +328,7 @@ const mapStateToProps = state => {
     return {...editor, canPlay, canStop, canPause, canSave, canLoad, canPrint, canExport, appVersion};
 }
 
-export default connect(mapStateToProps, {setPlayerState, setRealtimeRender, setPlaybackNotes, setBpm, setTimeSignature, loadTracks, renderNotes, printNotes, loadUserAudio, exportAsWav, setAppBusy, setLoop}) (Toolbar)
+export default connect(mapStateToProps, {setPlayerState, setRealtimeRender, setPlaybackNotes, setBpm, setTimeSignature, loadTracks, renderNotes, printNotes, loadUserAudio, exportAsWav, setAppBusy, setLoop, setGoToStartAfterStop}) (Toolbar)
 
 
 class ExportButton extends React.Component {

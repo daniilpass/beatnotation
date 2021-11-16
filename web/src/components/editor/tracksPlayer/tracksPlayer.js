@@ -194,7 +194,7 @@ export default class TracksPlayer extends React.Component {
                 AudioService.playSample(trackIndex, volume, when, 0); 
             }
             //HACK: Если текущаю нота самая первая, то проиграю её сразу, т.к. запланировать её нельзя
-            if (noteIndex == 0 && takt.notes[noteIndexInTakt - 1] > 0 && volume > 0) {
+            if (noteIndex === 0 && takt.notes[noteIndexInTakt - 1] > 0 && volume > 0) {
                 AudioService.playSample(trackIndex, volume, 0, 0); 
             }
         }    
@@ -203,7 +203,7 @@ export default class TracksPlayer extends React.Component {
     stopAllNotes() {
         for (let trackIndex = 0; trackIndex < this.props.tracks.length; trackIndex++) {
             // Обрабатываю только загруженные аудио дорожки
-            if (this.props.tracks[trackIndex].type == 0) {
+            if (this.props.tracks[trackIndex].type === 0) {
                 continue;
             }
 

@@ -4,6 +4,7 @@ import {SET_REALTIME_RENDER, SET_PLAYER_STATE, SET_PLAYBACK_NOTES, SET_BPM, SET_
     ,LOAD_TRACKS, SET_END_OF_TRACK, SET_TRACK_VOLUME, SET_BASETIME
     ,SET_TRACK_LOADED, SET_TRACK_OFFSET, SET_TRACK_MUTE
     ,EXPORT_AS_WAV, CLEAR_TRACK, SET_LOOP_PERIOD, SET_LOOP, SCROLL_WORKSPACE
+    ,SET_GO_TO_START_AFTER_STOP
 } from '../types'
 
 import {tracksData} from "../../assets/data/tracksData";
@@ -36,7 +37,9 @@ const initialState = {
     //loop
     loop: false,
     loopStart: 0,
-    loopEnd: 2000,    
+    loopEnd: 2000,
+    //rewind
+    goToStartAfterStop: false,    
     //View settings
     noteWidth: 20,
     defaultNotewWidth: 20,
@@ -110,6 +113,8 @@ export default function editorReducer(state = initialState, action) {
             return setLoopPeriod(state, action.payload);
         case SET_LOOP:
             return setLoop(state, action.payload);
+        case SET_GO_TO_START_AFTER_STOP:
+            return setGoToStartAfterStop(state, action.payload);
         case SCROLL_WORKSPACE:
             return scrollWorkspace(state, action.payload);
         default:
@@ -125,14 +130,13 @@ function setPlayerState(state, payload) {
 
     let eot = state.endOfTrack; //TODO: обходное решение
     if (payload.playerState === PlayerState.STOP) {
-        eot = false;
-        //newPlayerStartedAt = 0;
-        newPlayerStoppedAt = Date.now();        
-        newBaseTime = 0;
-        newbaseTimeUpdatedAt = Date.now();
+        eot = false;   
+        if (state.goToStartAfterStop) {
+            newBaseTime = 0;
+            newbaseTimeUpdatedAt = Date.now();
+        }        
         newPlayerStoppedAt = Date.now();
     } else if (payload.playerState === PlayerState.PAUSE) {
-        // newPlayerStartedAt = 0;
         newPlayerStoppedAt = Date.now();
         newBaseTime = newBaseTime + Date.now() - state.playerStartedAt;
         newbaseTimeUpdatedAt = Date.now();
@@ -141,6 +145,7 @@ function setPlayerState(state, payload) {
         newPlayerStoppedAt = 0;
         if (state.loop) {
             newBaseTime = Math.ceil(state.loopStart);
+            newbaseTimeUpdatedAt = Date.now();
         }
     }
 
@@ -646,6 +651,13 @@ function setLoop(state, payload) {
     return {
         ...state,
         loop: payload.loop
+    }
+}
+
+function setGoToStartAfterStop(state, payload) {
+    return {
+        ...state,
+        goToStartAfterStop: payload.goToStartAfterStop
     }
 }
 

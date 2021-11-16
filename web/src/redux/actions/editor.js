@@ -3,7 +3,8 @@ import {SET_REALTIME_RENDER, SET_PLAYER_STATE, SET_PLAYBACK_NOTES, SET_BPM, SET_
 ,TAKT_COPY, TAKT_PASTE, TAKT_CLEAR, TAKT_DELETE, TAKT_ADD
 ,LOAD_TRACKS, SET_END_OF_TRACK, SET_TRACK_VOLUME, SET_BASETIME
 ,SET_TRACK_LOADED, SET_TRACK_OFFSET, SET_TRACK_MUTE, EXPORT_AS_WAV
-,CLEAR_TRACK, SET_LOOP_PERIOD, SET_LOOP, SCROLL_WORKSPACE } from '../types'
+,CLEAR_TRACK, SET_LOOP_PERIOD, SET_LOOP, SCROLL_WORKSPACE
+,SET_GO_TO_START_AFTER_STOP } from '../types'
 
 
 export const setPlayerState = (value) => {
@@ -201,6 +202,15 @@ export const setLoop = (value) => {
         type: SET_LOOP,
         payload: {
             loop: value
+        }
+    }
+}
+
+export const setGoToStartAfterStop = (value) => {
+    return {
+        type: SET_GO_TO_START_AFTER_STOP,
+        payload: {
+            goToStartAfterStop: value
         }
     }
 }
