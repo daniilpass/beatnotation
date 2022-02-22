@@ -4,13 +4,18 @@ import {SET_REALTIME_RENDER, SET_PLAYER_STATE, SET_PLAYBACK_NOTES, SET_BPM, SET_
     ,LOAD_TRACKS, SET_END_OF_TRACK, SET_TRACK_VOLUME, SET_BASETIME
     ,SET_TRACK_LOADED, SET_TRACK_OFFSET, SET_TRACK_MUTE
     ,EXPORT_AS_WAV, CLEAR_TRACK, SET_LOOP_PERIOD, SET_LOOP, SCROLL_WORKSPACE
-    ,SET_GO_TO_START_AFTER_STOP
+    ,SET_GO_TO_START_AFTER_STOP,
+    SET_PROJECT_NAME
 } from '../types'
 
 import {tracksData} from "../../assets/data/tracksData";
 import * as PlayerState from "../dictionary/playerStates";
 
+const defaultProjectName = `BeatNotation_Untitled`;
+
 const initialState = {
+    //project
+    projectName: defaultProjectName,
     //Track settings
     playerState: "stop",
     baseTime: 0,
@@ -117,6 +122,8 @@ export default function editorReducer(state = initialState, action) {
             return setGoToStartAfterStop(state, action.payload);
         case SCROLL_WORKSPACE:
             return scrollWorkspace(state, action.payload);
+        case SET_PROJECT_NAME:
+            return setProjectName(state, action.payload);
         default:
             return state;
     }
@@ -490,6 +497,7 @@ function loadTracks(state, payload) {
 
     return {
         ...state,
+        projectName: data.projectName || defaultProjectName,
         baseTime: 0,
         newbaseTimeUpdatedAt: Date.now(),
         bpm: data.bpm,
@@ -667,5 +675,12 @@ function scrollWorkspace (state, payload) {
         scroll: {
             x: payload.scrollX
         }
+    }
+}
+
+function setProjectName (state, payload) {
+    return {
+        ...state,
+        projectName: payload
     }
 }

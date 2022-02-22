@@ -306,7 +306,7 @@ export default class TracksPlayer extends React.Component {
 
     handleExportSuccess = (waveBlob) => {
         this.props.setAppBusy(false);
-        saveFile(waveBlob, "BeatNotation_"+Date.now()+".wav");
+        saveFile(waveBlob, `${this.props.projectName}.wav`);
     }    
 
     ///

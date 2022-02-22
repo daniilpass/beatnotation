@@ -4,7 +4,9 @@ import {SET_REALTIME_RENDER, SET_PLAYER_STATE, SET_PLAYBACK_NOTES, SET_BPM, SET_
 ,LOAD_TRACKS, SET_END_OF_TRACK, SET_TRACK_VOLUME, SET_BASETIME
 ,SET_TRACK_LOADED, SET_TRACK_OFFSET, SET_TRACK_MUTE, EXPORT_AS_WAV
 ,CLEAR_TRACK, SET_LOOP_PERIOD, SET_LOOP, SCROLL_WORKSPACE
-,SET_GO_TO_START_AFTER_STOP } from '../types'
+,SET_GO_TO_START_AFTER_STOP, 
+SET_PROJECT_NAME
+} from '../types'
 
 
 export const setPlayerState = (value) => {
@@ -221,5 +223,12 @@ export const scrollWorkspace = (x) => {
         payload: {
             scrollX: x
         }
+    }
+}
+
+export const setProjectName = (value) => {
+    return {
+        type: SET_PROJECT_NAME,
+        payload: value
     }
 }

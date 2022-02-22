@@ -3,7 +3,7 @@ import {connect} from "react-redux";
 
 import {setPlayerState, setRealtimeRender, setPlaybackNotes, setBpm, setTimeSignature, loadTracks, 
     renderNotes, printNotes, loadUserAudio, exportAsWav, setAppBusy,
-    setLoop, setGoToStartAfterStop} from "../../../redux/actions";
+    setLoop, setGoToStartAfterStop, setProjectName} from "../../../redux/actions";
 import {CanPlay, CanStop, CanPause, CanSave, CanLoad, CanPrint, CanExport} from "../../../redux/selectors";
 import * as PlayerStates from "../../../redux/dictionary/playerStates";
 
@@ -139,10 +139,20 @@ class Toolbar extends React.Component {
     handleSave = () => {
         console.log("save");
 
+        const fileName = prompt("Enter project name", this.props.projectName);
+        if (fileName == null) {
+            // exit if user press Cancel
+            return;
+        } else if (fileName !== this.props.projectName) {
+            // update project name
+            this.props.setProjectName(fileName);           
+        }
+
         this.props.setAppBusy(true, "Processing ...");
         setTimeout(() => {
             let saveData = {
                 appVersion: this.props.appVersion,
+                projectName: this.props.projectName,
                 bpm: this.props.bpm,
                 timeSignature: this.props.timeSignature,
                 loop: this.props.loop,
@@ -155,9 +165,10 @@ class Toolbar extends React.Component {
     
             let blobSave = SaveService.createSaveFile(saveData);
             const file = new Blob([blobSave], {type: 'application/octet-stream'});
-            
-            saveFile(file, "BeatNotation_"+Date.now()+".beno");
-    
+
+            //  save file
+            saveFile(file, `${fileName}.beno`);
+
             this.props.setAppBusy(false);
         }, 0)
         
@@ -326,7 +337,22 @@ const mapStateToProps = state => {
     return {...editor, canPlay, canStop, canPause, canSave, canLoad, canPrint, canExport, appVersion};
 }
 
-export default connect(mapStateToProps, {setPlayerState, setRealtimeRender, setPlaybackNotes, setBpm, setTimeSignature, loadTracks, renderNotes, printNotes, loadUserAudio, exportAsWav, setAppBusy, setLoop, setGoToStartAfterStop}) (Toolbar)
+export default connect(mapStateToProps, {
+    setPlayerState,
+    setRealtimeRender,
+    setPlaybackNotes,
+    setBpm,
+    setTimeSignature,
+    loadTracks,
+    renderNotes,
+    printNotes,
+    loadUserAudio,
+    exportAsWav,
+    setAppBusy,
+    setLoop,
+    setGoToStartAfterStop,
+    setProjectName
+}) (Toolbar)
 
 
 class ExportButton extends React.Component {
