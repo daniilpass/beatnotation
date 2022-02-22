@@ -32,20 +32,26 @@ class Toolbar extends React.Component {
       super(props)
 
       this.state = {
-        tmpBpm: -1
+        bpmDisplayValue: -1
       }
       this.bpmChangeTimerId = 0;
       this.fileReaderRef = React.createRef();  
     }
+    
+    componentDidMount () {
+        // События дли отслеживания горячих клавиш -- Добавление
+        document.addEventListener("keydown", this.handleKeyDown);
+    }
 
-    get getBpm() {
-        return this.state.tmpBpm > -1 ? this.state.tmpBpm : this.props.bpm;
+    componentWillUnmount () {
+        // События дли отслеживания горячих клавиш -- Удаление
+        document.removeEventListener("keydown", this.handleKeyDown);
     }
 
     shouldComponentUpdate (nextProps, nextState) {
         if (this.props.timeSignature !== nextProps.timeSignature
             || this.props.bpm !== nextProps.bpm
-            || this.state.tmpBpm !== nextState.tmpBpm
+            || this.state.bpmDisplayValue !== nextState.bpmDisplayValue
             || this.props.canPlay !== nextProps.canPlay
             || this.props.canStop !== nextProps.canStop
             || this.props.canPause !== nextProps.canPause
@@ -63,15 +69,15 @@ class Toolbar extends React.Component {
         
         return false;
     }
-    
-    componentDidMount () {
-        // События дли отслеживания горячих клавиш -- Добавление
-        document.addEventListener("keydown", this.handleKeyDown);
+
+    componentDidUpdate (prevProps, prevState) {
+        if (this.props.bpm !== prevProps.bpm) {
+            this.setState({ bpmDisplayValue: this.props.bpm });
+        }
     }
 
-    componentWillUnmount () {
-        // События дли отслеживания горячих клавиш -- Удаление
-        document.removeEventListener("keydown", this.handleKeyDown);
+    get getBpmDisplayValue() {
+        return this.state.bpmDisplayValue > -1 ? this.state.bpmDisplayValue : this.props.bpm;
     }
 
     get timeSignatureString() {
@@ -210,18 +216,10 @@ class Toolbar extends React.Component {
             let intValue = parseInt(value);
             intValue = intValue < 1 ?  1 : intValue;
             intValue = intValue > 300 ? 300 : intValue;
-            this.setState({
-                tmpBpm: intValue
-            });
+            this.setState({ bpmDisplayValue: intValue });
 
             this.bpmChangeTimerId = setTimeout(() => {this.changeBpm(value)} , 1000);
         } 
-
-        // if (value === null) {
-        //     this.setState({
-        //         tmpBpm: ""
-        //     });
-        // }
     }
 
     changeBpm = (value) => {
@@ -285,7 +283,7 @@ class Toolbar extends React.Component {
 
                 <div className="app-toolbar__bpm" >
                     <div className="app-toolbar__input-title">BPM</div>
-                    <input name="bpm" value={this.getBpm} onChange={this.handleBpmInputChange} type="number"></input>
+                    <input name="bpm" value={this.getBpmDisplayValue} onChange={this.handleBpmInputChange} type="number"></input>
                 </div>
 
                 <div className="app-toolbar__time">
