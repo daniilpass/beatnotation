@@ -1,4 +1,4 @@
 # Description
 Online drum editor with realtime notation
 # Link
-[https://beatnotation.me/](https://beatnotation.me/)
+[https://beat.daniilpass.dev/](https://beat.daniilpass.dev/)
