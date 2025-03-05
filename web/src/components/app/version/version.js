@@ -8,7 +8,6 @@ class Version extends React.PureComponent {
   render() {
     return <div className={styles['app-ver'] + " no-print"}>
       {this.props.version}
-      <a className={styles['app-ver__created']} href="https://daniilpass.dev" target="_blank">daniilpass.dev</a>
     </div>  
   }
 }
